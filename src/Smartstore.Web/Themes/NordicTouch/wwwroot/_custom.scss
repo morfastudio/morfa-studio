@@ -1,0 +1,694 @@
+//
+// NordicTouch - Custom SCSS overrides
+// --------------------------------------------------
+
+// =====================================================
+// CONTAINER: wider page
+// =====================================================
+
+.container,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl,
+.container-xxl {
+    @include media-breakpoint-up(xl) {
+        max-width: 1400px;
+    }
+    @include media-breakpoint-up(xxl) {
+        max-width: 1600px;
+    }
+}
+
+// =====================================================
+// HEADER: Logo left, navbar center, icons right
+// =====================================================
+
+// Hide the default megamenu section (we render it inside ShopBar)
+.megamenu-section {
+    display: none !important;
+}
+
+// Shopbar section: remove default padding (we control it inside)
+.shopbar-section {
+    padding: 0;
+}
+
+// Reset Flex base .shopbar styles that conflict with our layout
+.nt-shopbar.shopbar {
+    margin: 0;
+    flex-wrap: nowrap;
+    align-items: stretch;   // children stretch to full row height — prevents resize on nav/search swap
+    justify-content: space-between;
+    padding: 0.625rem 0;
+    gap: 1rem;
+}
+
+// Logo
+.nt-shopbar-brand {
+    flex: 0 0 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+
+    .brand {
+        display: block;
+        width: auto;
+        max-width: 180px;
+        max-height: 50px;
+        text-align: left;
+    }
+
+    .brand img {
+        max-height: 50px;
+        width: auto;
+    }
+}
+
+// Center wrapper (nav + inline search share this space)
+.nt-shopbar-center {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    // No overflow: hidden — would clip megamenu dropdowns
+}
+
+// Navigation
+.nt-shopbar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    .megamenu-container {
+        width: 100%;
+    }
+
+    .navbar-nav {
+        gap: 0;
+        justify-content: center;
+        flex-wrap: nowrap;
+    }
+
+    .nav-link,
+    .menu-link {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        white-space: nowrap;
+        padding: 0.5rem 0.75rem;
+        transition: opacity 0.2s ease;
+
+        &:hover,
+        &:focus {
+            opacity: 0.6;
+            text-decoration: none;
+        }
+    }
+
+    // Hide megamenu scroll arrows (use !important to override Flex's .megamenu-blend-- classes)
+    .megamenu-nav {
+        display: none !important;
+    }
+}
+
+// Inline search (full width, replaces nav)
+// padding-block matches megamenu-container's --mm-nav-padding-y (0.5em) default
+// so the row height stays the same when toggling between nav and search
+.nt-search-inline {
+    width: 100%;
+    align-items: center;
+    padding-block: 0.5em;
+
+    .instasearch-form {
+        width: 100%;
+    }
+}
+
+// =====================================================
+// HOME CATEGORIES: Polaroid / white-frame style
+// =====================================================
+
+.nt-categories {
+    padding: 2rem 0;
+}
+
+.nt-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+
+    @include media-breakpoint-up(md) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    @include media-breakpoint-up(xl) {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+.nt-category-card {
+    background: $nt-category-card-bg;
+}
+
+.nt-category-link {
+    display: block;
+    text-decoration: none !important;
+    color: inherit;
+}
+
+.nt-category-frame {
+    padding: 0.75rem;
+    background: $nt-category-frame-bg;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nt-category-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.nt-category-label {
+    padding: 0.5rem 0.75rem 0.75rem;
+    text-align: right;
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: $nt-category-label-color;
+    background: $nt-category-label-bg;
+}
+
+// =====================================================
+// BLOCK TITLES & ARTLIST
+// =====================================================
+
+.block-title {
+    border-color: $block-title-border-color;
+}
+
+.art-btn-group .btn-secondary {
+    color: $art-btn-secondary-color;
+}
+
+.show-all-items-link {
+    background-color: $art-show-all-bg;
+}
+
+// =====================================================
+// CART
+// =====================================================
+
+// =====================================================
+// CHECKOUT STEPS (costep) overrides
+// =====================================================
+
+.costep {
+    &:before, &:after {
+        background-color: $costep-border;
+    }
+}
+
+.costep-icon {
+    border-color: $costep-border;
+    background-color: $costep-bg;
+    color: $costep-color;
+}
+
+.costep-label {
+    color: $costep-label-color;
+}
+
+.costep.visited {
+    &:before, &:after {
+        background-color: $costep-progress-color;
+    }
+
+    .costep-icon {
+        border-color: $costep-progress-color;
+        background-color: $costep-progress-color;
+        color: $costep-visited-color;
+    }
+}
+
+.costep.active {
+    &:before {
+        background-color: $costep-progress-color;
+    }
+
+    .costep-icon {
+        border-color: $costep-progress-color;
+        background-color: $costep-active-bg;
+        color: $costep-active-color;
+    }
+}
+
+// =====================================================
+// OFFCANVAS CART
+// =====================================================
+
+.offcanvas-cart-body {
+    background-color: $offcanvas-cart-body;
+}
+
+.offcanvas-cart-item {
+    border-bottom-color: $offcanvas-cart-item-border-color;
+}
+
+.offcanvas-cart-body .no-item-icon {
+    color: $offcanvas-cart-empty-icon-color;
+}
+
+#offcanvas-cart .throbber {
+    background-color: $offcanvas-cart-throbber-bg;
+}
+
+.offcanvas-cart-footer-row {
+    color: $offcanvas-cart-footer-color;
+}
+
+.offcanvas-cart-external-checkout {
+    .heading-title {
+        color: $offcanvas-cart-footer-color;
+    }
+
+    .heading-center:before {
+        background: rgba($offcanvas-cart-footer-color, 0.4) !important;
+    }
+}
+
+// =====================================================
+// CART PAGE
+// =====================================================
+
+.cart-row:not(:first-child) {
+    border-top-color: $cart-row-border-color;
+}
+
+.cart-footer-group + .cart-footer-group:before {
+    background-color: $cart-footer-divider-color;
+}
+
+.cart-footer .alert {
+    --alert-border-color: #{$cart-footer-divider-color};
+}
+
+// Add to Cart button
+// =====================================================
+
+.btn-add-to-cart {
+    background-color: $add-to-cart-btn-bg;
+    border-color: $add-to-cart-btn-bg;
+    color: $add-to-cart-btn-color;
+
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+        background-color: darken($add-to-cart-btn-bg, 8%);
+        border-color: darken($add-to-cart-btn-bg, 8%);
+        color: $add-to-cart-btn-color;
+    }
+}
+
+// Product detail — stock status
+// =====================================================
+
+.pd-stock.pd-instock {
+    color: $product-stock-instock-color;
+}
+
+.pd-stock.pd-outofstock {
+    color: $product-stock-outofstock-color;
+}
+
+// Product detail — pricing extras
+// =====================================================
+
+.pd-saving-percent {
+    color: $product-saving-percent-color;
+}
+
+.pd-offer-countdown {
+    color: $product-offer-countdown-color;
+}
+
+// Product detail — secondary actions (wishlist, compare, questions)
+// =====================================================
+
+.pd-action-icon {
+    color: $product-action-icon-color;
+}
+
+.pd-action-item {
+    border-color: $product-action-border-color;
+}
+
+// Product detail — tier prices table
+// =====================================================
+
+.pd-tierprices .table {
+    background-color: $product-tierprices-bg;
+}
+
+// Product detail — associated products / variants
+// =====================================================
+
+.pd-assoc-header {
+    background-color: $product-assoc-header-bg;
+
+    &:hover {
+        background-color: darken($product-assoc-header-bg, 5%);
+    }
+}
+
+// =====================================================
+// SEARCH & FACETS
+// =====================================================
+
+// Facet group header & toggle
+.facet-group-header {
+    color: $facet-group-header-color !important;
+}
+
+.facet-group {
+    border-bottom-color: $facet-group-border-color;
+}
+
+.facet-toggle:after {
+    color: $facet-toggle-chevron-color;
+}
+
+// Facet checkbox / radio
+.facet-control-ui {
+    border-color: $facet-control-border-color;
+
+    &:after {
+        color: $facet-selection-glyph-color;
+    }
+}
+
+.facet-radio .facet-control-ui:after {
+    background: $facet-selection-glyph-color;
+}
+
+.facet-item input:checked + .facet-control-ui,
+.facet-item:hover .facet-control-ui {
+    border-color: $facet-control-checked-border-color;
+}
+
+// Facet selection count badge
+.facet-selection.badge-info {
+    background-color: $facet-selection-badge-bg;
+}
+
+// Remove group filters link
+.btn-remove-group-filters {
+    color: $facet-remove-link-color;
+}
+
+// Active filter badges
+.active-filter-link.badge-light {
+    background-color: $active-filter-badge-bg;
+    color: $active-filter-badge-color;
+}
+
+.active-filter-item-clear .active-filter-link.badge-danger {
+    background-color: $active-filter-remove-bg;
+    color: $active-filter-remove-color;
+}
+
+// Search term highlight & hit count
+.search-term {
+    color: $search-term-color;
+}
+
+.search-hitcount {
+    color: $search-hitcount-color;
+}
+
+// Instant search dropdown
+.instasearch-group-header {
+    color: $instasearch-group-header-color;
+}
+
+.instasearch-col:first-child {
+    border-color: $instasearch-divider-color;
+}
+
+.instasearch-clear {
+    color: $instasearch-clear-color;
+}
+
+// =====================================================
+// REVIEWS
+// =====================================================
+
+.review-item {
+    border-bottom-color: $review-item-border-color;
+}
+
+.write-review {
+    background-color: $write-review-bg;
+}
+
+// =====================================================
+// GALLERY
+// =====================================================
+
+.gal-nav .gal-item-viewport {
+    border-color: $gallery-thumb-border-color;
+}
+
+.gal-nav .gal-item-viewport:hover {
+    border-color: darken($gallery-thumb-border-color, 20%);
+}
+
+.gal-nav .gal-current .gal-item-viewport {
+    border-color: $gallery-thumb-active-border-color;
+
+    &:not(:focus-visible) {
+        box-shadow: 0 0 0 1px darken($gallery-thumb-active-border-color, 20%);
+    }
+}
+
+// =====================================================
+// OFFCANVAS MENU
+// =====================================================
+
+#offcanvas-menu {
+    --ocm-header-bg: #{$offcanvas-menu-header-bg};
+    --ocm-footer-bg: #{$offcanvas-menu-header-bg};
+    --ocm-border-color: #{$offcanvas-menu-border-color};
+    --ocm-item-selected-color: #{$offcanvas-menu-selected-color};
+
+    .layer {
+        background: $offcanvas-menu-bg;
+    }
+}
+
+#ocm-service .menubar-link {
+    background-color: $offcanvas-menu-bg;
+}
+
+// =====================================================
+// MISC UI
+// =====================================================
+
+#scroll-top {
+    background: $scroll-top-bg;
+}
+
+.post-comment-item {
+    border-bottom-color: $post-comment-border-color;
+}
+
+// =====================================================
+// ACCOUNT & IDENTITY
+// =====================================================
+
+:is(.customer-avatar, .customer-avatar-lg) .avatar-ring {
+    outline-color: $avatar-ring-outline-color;
+}
+
+.login-box {
+    background-color: $login-box-bg;
+}
+
+.pwd-policy {
+    background-color: $pwd-policy-bg;
+    @include bubble(top, near, 12, $pwd-policy-bg, $pwd-policy-bg);
+}
+
+.pwd-rules {
+    color: $pwd-rules-color;
+}
+
+.payment-method-item.active {
+    background: $payment-method-active-bg;
+}
+
+#terms-of-service-consent-box {
+    background: $terms-consent-bg;
+}
+
+.terms-of-service {
+    color: $terms-consent-color;
+}
+
+// Right-side icon tools — override Flex .shopbar-tools (width: 100%)
+.nt-shopbar-tools.shopbar-tools {
+    flex: 0 0 auto;
+    width: auto !important;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    justify-content: flex-end;
+
+    .shopbar-tool {
+        position: relative;
+    }
+
+    // Override Flex min-width: 60px on shopbar-button
+    .shopbar-button {
+        min-width: unset;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: 0;
+        transition: opacity 0.2s ease;
+
+        @include media-breakpoint-up(lg) {
+            height: 2.5rem;
+            .shopbar-button-icon { font-size: 1.25rem; }
+        }
+
+        &:hover {
+            opacity: 0.6;
+            border-color: transparent;
+            box-shadow: none;
+            background: transparent;
+        }
+    }
+
+    .shopbar-button-icon {
+        font-size: 1.25rem;
+        position: relative;
+        width: auto;
+        height: auto;
+        line-height: 1;
+        text-align: center;
+
+        > i { font-size: inherit !important; }
+    }
+
+    // Hide text labels - icon only
+    .shopbar-button-label,
+    .shopbar-button-label-sm {
+        display: none !important;
+    }
+}
+
+// =====================================================
+// BUTTONS — shared hover mixin
+// =====================================================
+
+@mixin nt-btn($bg, $color) {
+    background-color: $bg;
+    border-color: $bg;
+    color: $color;
+
+    &:hover, &:focus, &:active, &.active {
+        background-color: darken($bg, 8%);
+        border-color: darken($bg, 8%);
+        color: $color;
+    }
+}
+
+// Login button
+.btn-login {
+    @include nt-btn($login-btn-bg, $login-btn-color);
+}
+
+// Register button
+.register-button {
+    @include nt-btn($register-btn-bg, $register-btn-color);
+}
+
+// Save / submit buttons (address, customer info, register form)
+.save-address-button,
+.save-customer-info-button,
+#register-button {
+    @include nt-btn($save-btn-bg, $save-btn-color);
+}
+
+// Checkout next step buttons
+.new-address-next-step-button,
+.select-billing-address-button,
+.select-shipping-address-button,
+.change-checkout-data,
+.add-new-address {
+    @include nt-btn($checkout-next-btn-bg, $checkout-next-btn-color);
+}
+
+// Checkout confirm order button
+.btn-buy,
+.shipping-method-next-step-button,
+.payment-method-next-step-button {
+    @include nt-btn($checkout-confirm-btn-bg, $checkout-confirm-btn-color);
+}
+
+// Offcanvas view cart button
+.offcanvas-cart-footer .btn-success,
+.offcanvas-cart-footer .btn-flat-light {
+    @include nt-btn($offcanvas-viewcart-btn-bg, $offcanvas-viewcart-btn-color);
+}
+
+// Offcanvas checkout button
+.offcanvas-cart-footer .btn-clear {
+    @include nt-btn($offcanvas-checkout-btn-bg, $offcanvas-checkout-btn-color);
+}
+
+// Newsletter subscribe button
+#newsletter-subscribe-button {
+    @include nt-btn($newsletter-btn-bg, $newsletter-btn-color);
+}
+
+// Contact form submit button
+.contact-page button[name="send-email"] {
+    @include nt-btn($contact-btn-bg, $contact-btn-color);
+}
+
+// Password recovery / change password button
+.password-recovery-button,
+.password-recovery-page input[type="submit"],
+.page-myaccount-changepassword button[type="submit"] {
+    @include nt-btn($pwd-recovery-btn-bg, $pwd-recovery-btn-color);
+}
+
+// Wishlist add-to-cart & email wishlist button
+.wishlist-page button[name="addtocartbutton"],
+.send-email-a-friend-button {
+    @include nt-btn($wishlist-btn-bg, $wishlist-btn-color);
+}
+
+// Coupon / gift card / reward points apply buttons
+.apply-discount-coupon-code-button,
+.apply-gift-card-coupon-code-button,
+.apply-reward-points-button {
+    @include nt-btn($coupon-btn-bg, $coupon-btn-color);
+}
+
+// Estimate shipping button
+.estimate-shipping-button {
+    @include nt-btn($estimate-shipping-btn-bg, $estimate-shipping-btn-color);
+}
+

@@ -1,0 +1,170 @@
+@model ShopBarModel
+
+@{
+    var labelStyle = Display.GetThemeVariable<string>("shopbar-label", "warning");
+    var badgeCssClasses = "badge badge-pill badge-counter badge-counter-ring label-cart-amount badge-" + labelStyle;
+
+    var offcanvasAttributes = new AttributeDictionary
+    {
+        ["data-toggle"] = "offcanvas",
+        ["data-autohide"] = "true",
+        ["data-fullscreen"] = "false",
+        ["data-disablescrolling"] = "true",
+        ["aria-expanded"] = "false"
+    };
+
+    var cartTogglerAttributes = new AttributeDictionary();
+    cartTogglerAttributes.AddRange(offcanvasAttributes);
+    cartTogglerAttributes.Add("class", "shopbar-button navbar-toggler");
+    cartTogglerAttributes.Add("data-placement", "end");
+    cartTogglerAttributes.Add("data-target", "#offcanvas-cart");
+    cartTogglerAttributes.Add("aria-controls", "offcanvas-cart");
+}
+
+<div class="shopbar nt-shopbar" style="margin: 0;">
+    @* ===== LEFT: Logo ===== *@
+    <div class="nt-shopbar-brand">
+        @await Component.InvokeAsync("ShopLogo")
+    </div>
+
+    @* ===== CENTER: Nav + Inline Search (desktop only) ===== *@
+    <div class="nt-shopbar-center d-none d-lg-flex">
+        <div class="nt-shopbar-nav navbar-light" id="nt-nav">
+            <div class="megamenu-container">
+                <menu name="Main" template="Main" />
+            </div>
+        </div>
+        <div class="nt-search-inline" id="nt-search-inline" style="display: none;">
+            <zone name="searchbox" replace-content="true">
+                @await Component.InvokeAsync("SearchBox")
+            </zone>
+        </div>
+    </div>
+
+    @* ===== RIGHT: Icon tools ===== *@
+    <div class="nt-shopbar-tools shopbar-tools" style="width: auto;"
+         data-summary-href="@Url.Action("CartSummary", "ShoppingCart", new { cart = Model.ShoppingCartEnabled, wishlist = Model.WishlistEnabled, compare = Model.CompareProductsEnabled })">
+
+        @* Hamburger Menu (mobile only) *@
+        <div class="shopbar-tool d-lg-none" id="shopbar-menu">
+            <a id="offcanvas-menu-opener"
+               class="shopbar-button"
+               href="#"
+               attrs="offcanvasAttributes"
+               data-placement="start"
+               data-target="#offcanvas-menu"
+               aria-controls="offcanvas-menu">
+                <span class="shopbar-button-icon" aria-hidden="true">
+                    <i class="icm icm-menu"></i>
+                </span>
+            </a>
+        </div>
+
+        @* Search Icon *@
+        <div class="shopbar-tool" id="shopbar-search">
+            <a class="shopbar-button" href="#" id="nt-search-toggler" aria-label="Search">
+                <span class="shopbar-button-icon" aria-hidden="true">
+                    <i class="fa fa-magnifying-glass"></i>
+                </span>
+            </a>
+        </div>
+
+        @* Wishlist *@
+        <div sm-if="Model.WishlistEnabled" class="shopbar-tool" id="shopbar-wishlist" data-target="#wishlist-tab">
+            <a asp-route="Wishlist" attrs="cartTogglerAttributes" data-summary-href="@Url.Action("CartSummary", "ShoppingCart", new { wishlist = true })">
+                <span class="shopbar-button-icon" aria-hidden="true">
+                    <i class="icm icm-heart"></i>
+                    <span class='@badgeCssClasses' attr-style='(Model.WishlistItemsCount == 0, "display: none")' data-bind-to="WishlistItemsCount">
+                        @Model.WishlistItemsCount
+                    </span>
+                </span>
+            </a>
+        </div>
+
+        @* Shopping Cart *@
+        <div sm-if="Model.ShoppingCartEnabled" class="shopbar-tool" id="shopbar-cart" data-target="#cart-tab">
+            <a asp-route="ShoppingCart" attrs="cartTogglerAttributes" data-summary-href="@Url.Action("CartSummary", "ShoppingCart", new { cart = true })">
+                <span class="shopbar-button-icon" aria-hidden="true">
+                    <i class="icm icm-bag"></i>
+                    <span class='@badgeCssClasses' attr-style='(Model.CartItemsCount == 0, "display: none")' data-bind-to="CartItemsCount">
+                        @Model.CartItemsCount
+                    </span>
+                </span>
+            </a>
+        </div>
+
+        <zone name="shopbar_tools_after" preview-style="max-width: 106px"></zone>
+    </div>
+</div>
+
+@* ===== Offcanvas Menus ===== *@
+<widget target-zone="end" key="offcanvas-menu">
+    <aside id="offcanvas-menu"
+           class="offcanvas offcanvas-shadow"
+           data-blocker="true"
+           data-overlay="true"
+           aria-hidden="true"
+           aria-labelledby="offcanvas-menu-opener"
+           tabindex="-1">
+        <div class="offcanvas-content">
+            <div id="offcanvas-menu-container" data-url="@(Url.Action("OffCanvas", "Menu"))">
+            </div>
+        </div>
+    </aside>
+</widget>
+
+<widget target-zone="end" key="offcanvas-cart">
+    <aside id="offcanvas-cart"
+           class="offcanvas offcanvas-end offcanvas-lg offcanvas-shadow"
+           data-lg="true"
+           data-blocker="true"
+           data-overlay="true"
+           aria-label="@T("Aria.Label.OffCanvasCartTab")"
+           tabindex="-1">
+        <div class="offcanvas-content">
+            @await Component.InvokeAsync("OffCanvasCart")
+        </div>
+    </aside>
+    <script src="~/js/public.offcanvas-cart.js" asp-append-version="true"></script>
+</widget>
+
+<script>
+    (function () {
+        function initSearch() {
+            var toggler = document.getElementById("nt-search-toggler");
+            var nav     = document.getElementById("nt-nav");
+            var search  = document.getElementById("nt-search-inline");
+            if (!toggler || !nav || !search) return;
+
+            toggler.addEventListener("click", function (e) {
+                e.preventDefault();
+                var isOpen = search.style.display !== "none";
+                if (isOpen) {
+                    search.style.display = "none";
+                    nav.style.display = "";
+                    toggler.setAttribute("aria-expanded", "false");
+                } else {
+                    nav.style.display = "none";
+                    search.style.display = "flex";
+                    toggler.setAttribute("aria-expanded", "true");
+                    var input = search.querySelector("input");
+                    if (input) setTimeout(function () { input.focus(); }, 50);
+                }
+            });
+
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape" && search.style.display !== "none") {
+                    search.style.display = "none";
+                    nav.style.display = "";
+                    toggler.setAttribute("aria-expanded", "false");
+                }
+            });
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initSearch);
+        } else {
+            initSearch();
+        }
+    })();
+</script>

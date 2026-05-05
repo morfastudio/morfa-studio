@@ -225,6 +225,7 @@ src/Smartstore.Web/Themes/*
 !src/Smartstore.Web/Themes/Flex/
 !src/Smartstore.Web/Themes/FlexBlue/
 !src/Smartstore.Web/Themes/FlexBlack/
+!src/Smartstore.Web/Themes/NordicTouch/
 
 # DataProtection
 DataProtection-Keys/

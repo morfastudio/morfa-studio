@@ -1,0 +1,30 @@
+@using Smartstore.Web.Models.Catalog
+
+@model List<CategorySummaryModel>
+
+<div sm-if="Model.Count > 0" class="nt-categories" role="region" aria-labelledby="top-categories-title">
+    <h3 id="top-categories-title" class="sr-only">@T("Homepage.TopCategories")</h3>
+
+    <div class="nt-categories-grid" role="list">
+        @foreach (var item in Model)
+        {
+            var image = item.Image;
+            var hasImage = image != null && image.HasImage();
+            var linkTitle = T("Media.Category.ImageLinkTitleFormat", item.Name);
+
+            <div class="nt-category-card" role="listitem" data-id="@item.Id">
+                <a class="nt-category-link" href="@item.Url" title="@linkTitle">
+                    <div class="nt-category-frame">
+                        @if (hasImage)
+                        {
+                            <img sm-model="image" loading="lazy" attr-alt='(image.Alt.IsEmpty(), item.Name)' class="nt-category-img" />
+                        }
+                    </div>
+                    <div class="nt-category-label">
+                        <span sm-language-attributes-for="item.Name">@item.Name</span>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
