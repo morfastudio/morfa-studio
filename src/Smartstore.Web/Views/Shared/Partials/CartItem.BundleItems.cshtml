@@ -81,7 +81,7 @@
 
                 @* Price *@
                 <div sm-if="item.BundleItem.PerItemShoppingCart" class="cart-item-price-group cart-item-group">
-                    <partial name="CartItem.Price" model="item.Price">
+                    <partial name="CartItem.Price" model="item.Price"/>
                 </div>
 
                 <div sm-if="item.AttributeInfo.HasValue() || item.EssentialSpecAttributesInfo.HasValue()" class="cart-item-attrs cart-item-group">
