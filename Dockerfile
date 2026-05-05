@@ -34,9 +34,9 @@ WORKDIR /app
 COPY --from=build /app/release/publish .
 
 # Install wkhtmltopdf
-COPY install-wkhtmltopdf.sh /tmp/
-RUN chmod +x /tmp/install-wkhtmltopdf.sh && \
-    /tmp/install-wkhtmltopdf.sh && \
-    rm /tmp/install-wkhtmltopdf.sh
+# COPY install-wkhtmltopdf.sh /tmp/
+# RUN chmod +x /tmp/install-wkhtmltopdf.sh && \
+#     /tmp/install-wkhtmltopdf.sh && \
+#     rm /tmp/install-wkhtmltopdf.sh
 
 ENTRYPOINT ["./Smartstore.Web", "--urls", "http://0.0.0.0:80"]
