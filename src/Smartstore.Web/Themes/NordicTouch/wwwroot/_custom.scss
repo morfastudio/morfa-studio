@@ -3,7 +3,7 @@
 // --------------------------------------------------
 
 // =====================================================
-// CONTAINER: wider page
+// CONTAINER: wider page (gallery-style, edge-aware)
 // =====================================================
 
 .container,
@@ -19,6 +19,321 @@
         max-width: 1600px;
     }
 }
+
+// =====================================================
+// GLOBAL TYPOGRAPHY (Louise-Roe inspired)
+// Uppercase, letter-spaced, lighter weights
+// =====================================================
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0.01em;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    letter-spacing: 0.02em;
+}
+
+// Page titles & section block titles get the gallery-tag uppercase style
+.page-title h1,
+.page-title .h1,
+.page-title h2,
+.page-title .h2,
+.page-title h3,
+.page-title .h3,
+.block-title,
+.block-title h1,
+.block-title h2,
+.block-title h3 {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+}
+
+// Soft underlined links (gallery editorial style)
+.page-body a:not(.btn):not(.nav-link):not(.menu-link):not(.dropdown-item):not(.art-name-link) {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: rgba(0, 0, 0, 0.25);
+
+    &:hover {
+        text-decoration-color: currentColor;
+    }
+}
+
+// =====================================================
+// PROMO BAR (top announcement strip)
+// =====================================================
+
+.nt-promo-bar {
+    background-color: $nt-promo-bar-bg;
+    color: $nt-promo-bar-color;
+    border-bottom: 1px solid $nt-promo-bar-border-color;
+    padding: 0.6rem 1rem;
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.4;
+
+    a {
+        color: inherit;
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 0.25em;
+        margin-inline-start: 0.4rem;
+
+        &:hover { color: inherit; opacity: 0.7; }
+    }
+}
+
+// =====================================================
+// BUTTONS — sharp, square, uppercase letter-spaced
+// =====================================================
+
+.btn {
+    border-radius: 0;
+    box-shadow: none !important;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.85rem 1.5rem;
+    line-height: 1.2;
+
+    &.btn-sm {
+        font-size: 0.6875rem;
+        padding: 0.6rem 1rem;
+    }
+
+    &.btn-lg {
+        font-size: 0.8125rem;
+        padding: 1rem 1.75rem;
+    }
+
+    &.rounded-pill {
+        border-radius: 0 !important;
+    }
+}
+
+// "Place inquiry" / minimal underlined link-button
+.btn-link {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.75rem;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.35em;
+    padding-inline: 0;
+    color: $body-color;
+
+    &:hover { color: $body-color; opacity: 0.7; }
+}
+
+// =====================================================
+// FORMS — sharp, generous
+// =====================================================
+
+// Kill Bootstrap pill utility border-radii (we want sharp Scandi corners everywhere)
+.rounded-pill,
+.rounded-start-pill,
+.rounded-end-pill,
+.rounded-top-pill,
+.rounded-bottom-pill,
+.rounded-circle {
+    border-radius: 0 !important;
+}
+
+// Force sharp on input-group containers that wrap a pill-styled input + addon
+.input-group.rounded-pill,
+.input-group .form-control,
+.input-group .input-group-text,
+.input-group .btn {
+    border-radius: 0 !important;
+}
+
+.form-control,
+.custom-select,
+.input-group-text {
+    border-radius: 0;
+    border-color: rgba(0, 0, 0, 0.18);
+    background-color: transparent;
+    padding: 0.8rem 1rem;
+    font-size: 0.875rem;
+
+    &:focus {
+        border-color: $body-color;
+        box-shadow: none;
+    }
+}
+
+// Inline icon inside .input-group.has-icon (e.g. newsletter email field)
+// Push placeholder text away from the trailing icon so they don't overlap
+.input-group.has-icon .form-control {
+    padding-right: 2.5rem;
+}
+
+textarea.form-control {
+    min-height: 7rem;
+}
+
+.form-label,
+.col-form-label,
+label {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: $body-secondary-color;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+// Restore form-check-label readability — Bootstrap's small inline radio/checkbox labels
+// shouldn't take the heavy uppercase styling globally applied to <label>
+.form-check-label {
+    margin-bottom: 0;
+    line-height: 1.4;
+    color: $body-color;
+}
+
+// Custom checkbox / radio: make the 16×16 box visible on all 4 sides.
+// Bootstrap's default uses appearance:none with subtle borders — we strengthen them.
+.form-check-input {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.4) !important;
+    border-radius: 0 !important;
+    background-color: transparent;
+    box-shadow: none !important;
+    margin-top: 0.2rem;
+
+    &[type="radio"] {
+        border-radius: 50% !important;
+    }
+
+    &:checked {
+        background-color: $body-color !important;
+        border-color: $body-color !important;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+    }
+}
+
+// =====================================================
+// HEADER & SHOPBAR refinements
+// =====================================================
+
+.header-section,
+.shopbar-section,
+.megamenu-section {
+    background-color: $header-bg;
+}
+
+// Logo: gallery-style letter-spaced wordmark when no image is uploaded
+.nt-shopbar-brand .brand {
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 1.125rem;
+    color: $body-color;
+
+    &:hover { color: $body-color; opacity: 0.7; text-decoration: none; }
+}
+
+// Top-level menu items in big-cap, restrained
+.nt-shopbar-nav {
+    .nav-link,
+    .menu-link {
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 0.6875rem !important;
+        font-weight: 500;
+        padding-inline: 1rem;
+    }
+
+    // Remove any hover underline / artifacts
+    .nav-item.active .nav-link,
+    .nav-link:hover {
+        background: transparent;
+    }
+}
+
+// MegaMenu dropdown: generous editorial spacing
+.megamenu-dropdown,
+.dropdown-menu {
+    border-radius: 0 !important;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+
+    .dropdown-item,
+    .menu-link {
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.75rem;
+    }
+}
+
+// MegaMenu rotator (full-bleed image area on large dropdowns)
+.megamenu-rotator { background: $megamenu-rotator-bg; }
+
+// Top menubar — also restrained, low-contrast (announces lang/currency/help)
+.menubar-section {
+    background-color: $body-bg;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.menubar {
+    min-height: 2rem;
+
+    .menubar-link {
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.6875rem;
+        color: $body-secondary-color;
+        padding-block: 0.4rem;
+
+        &:hover { color: $body-color; }
+    }
+}
+
+// Megamenu (main nav) menu-item badges (NEW, SALE %)
+// Force a single dark/cream tone instead of yellow/red to keep the gallery palette
+.cms-menu-navbar .nav-item > .badge,
+.nt-shopbar-nav .nav-item > .badge,
+.menubar .nav-item > .badge,
+.megamenu-container .nav-item > .badge,
+.shopbar-section .badge.badge-warning,
+.shopbar-section .badge.badge-danger {
+    background-color: $body-color !important;
+    color: $body-bg !important;
+    border-radius: 0 !important;
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 0.25rem 0.45rem;
+    line-height: 1;
+}
+
+// =====================================================
+// HOMEPAGE: Block titles & artlist actions
+// =====================================================
+
+.block-title {
+    border-color: $block-title-border-color;
+    text-align: center;
+    border-bottom: 0;
+    padding-bottom: 0;
+    margin-bottom: 1.5rem;
+}
+
+.block .block-body { margin-top: 0; }
 
 // =====================================================
 // HEADER: Logo left, navbar center, icons right
@@ -130,16 +445,21 @@
 // =====================================================
 
 .nt-categories {
-    padding: 2rem 0;
+    padding: 3rem 0 2rem;
 }
 
 .nt-categories-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem 1.5rem;
 
     @include media-breakpoint-up(md) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @include media-breakpoint-up(lg) {
         grid-template-columns: repeat(4, 1fr);
+        gap: 2.5rem 1.5rem;
     }
 
     @include media-breakpoint-up(xl) {
@@ -149,6 +469,9 @@
 
 .nt-category-card {
     background: $nt-category-card-bg;
+    transition: opacity 0.2s ease;
+
+    &:hover { opacity: 0.85; }
 }
 
 .nt-category-link {
@@ -158,9 +481,9 @@
 }
 
 .nt-category-frame {
-    padding: 0.75rem;
+    padding: 0;
     background: $nt-category-frame-bg;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 1 / 1;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -172,17 +495,20 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 0.6s ease;
+
+    .nt-category-card:hover & { transform: scale(1.03); }
 }
 
 .nt-category-label {
-    padding: 0.5rem 0.75rem 0.75rem;
-    text-align: right;
-    font-size: 0.625rem;
+    padding: 0.9rem 0 0;
+    text-align: center;
+    font-size: 0.6875rem;
     font-weight: 500;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: $nt-category-label-color;
-    background: $nt-category-label-bg;
+    background: transparent;
 }
 
 // =====================================================
@@ -692,3 +1018,812 @@
     @include nt-btn($estimate-shipping-btn-bg, $estimate-shipping-btn-color);
 }
 
+// =====================================================
+// PRODUCT LISTS / CARDS (Louise-Roe)
+// Square/portrait images, minimal text, uppercase names
+// =====================================================
+
+.artlist {
+    --art-padding: 1rem;
+    --art-gutter: 1.5rem;
+    --art-line-height: 1.4;
+    --art-finalprice-font-size: 0.8125rem;
+    --art-border-color: transparent;
+}
+
+.artlist.artlist-grid {
+    gap: 2.5rem 1.5rem;
+
+    > .art {
+        padding-inline: 0;
+    }
+}
+
+// Force a 4-column grid on large screens (gallery feel)
+@include media-breakpoint-up(lg) {
+    .artlist.artlist-grid:not(.artlist-2-cols):not(.artlist-3-cols) {
+        > .art { width: 25%; }
+    }
+}
+
+.art {
+    background: transparent;
+
+    .art-picture-block {
+        position: relative;
+        margin-bottom: 1rem;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.025); // very subtle tint over body-bg, no harsh white
+    }
+
+    .art-picture {
+        aspect-ratio: 1 / 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+    }
+
+    &:hover .art-picture img { transform: scale(1.03); }
+}
+
+// Badges (LOW IN STOCK, NEW, etc.) — small black tag, top-left
+.art-badges {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    bottom: auto;
+    right: auto;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.art-badge {
+    margin: 0;
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: $body-color !important;
+    border-radius: 0 !important;
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+// Product name: uppercase letter-spaced
+.art-name,
+.art-genericname {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+
+    > a.art-name-link {
+        color: $body-color;
+
+        &:hover { color: $body-color; opacity: 0.7; text-decoration: none; }
+    }
+}
+
+.art-brand {
+    text-align: center;
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+    margin-bottom: 0.35rem;
+}
+
+// Price: minimal, no shadow
+.art-price-block {
+    text-align: center;
+    margin-top: 0.25rem;
+}
+
+.art-price,
+.art-finalprice,
+.art-compareprice-group {
+    justify-content: center;
+}
+
+.art-price-value {
+    font-size: 0.8125rem !important;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+}
+
+// Variants: tiny color/swatch row centered
+.art-variants {
+    justify-content: center;
+    margin-top: 0.5rem;
+    gap: 0.25rem;
+}
+
+.art-color-opt {
+    border-radius: 0 !important;
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+// Hover overlay buttons drop — subtle, square
+.art-drop {
+    background: $body-bg;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+// Buttons inside product cards
+.art .btn { font-size: 0.625rem; padding: 0.6rem 0.8rem; }
+
+.art-actions-block .btn-secondary { color: $art-btn-secondary-color; }
+
+// "Show all items" — quiet, square
+.show-all-items-link {
+    background-color: transparent !important;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 0 !important;
+    padding: 0.85rem 1.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+
+    &:hover { background-color: $body-color !important; color: $body-bg !important; }
+}
+
+// =====================================================
+// CATEGORY / FILTER SIDEBAR (left column)
+// Strip Bootstrap's default white card chrome — gallery feel: transparent + dividers
+// =====================================================
+
+#content-left {
+    .block,
+    .block-catmenu,
+    .block-body,
+    .card,
+    .card-body,
+    .filters,
+    .search-filters {
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        padding-inline: 0;
+    }
+
+    // Category menu (catmenu)
+    .list-group {
+        background: transparent;
+        border: 0;
+    }
+
+    .list-group-item,
+    .catmenu-item {
+        background: transparent !important;
+        // Strip Bootstrap's 4-side borders; keep only a subtle divider on the bottom
+        border: 0 !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+        border-radius: 0 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: $body-color;
+        padding: 0.85rem 0;
+
+        // Smartstore default active state uses a coloured left bar — kill it
+        &::before { display: none !important; }
+        box-shadow: none !important;
+
+        &:hover {
+            background: transparent !important;
+            color: $body-secondary-color;
+        }
+
+        &.active {
+            background: transparent !important;
+            color: $body-color;
+            font-weight: 600;
+            // active gets a slightly stronger underline, no other accent
+            border-bottom-color: $body-color !important;
+        }
+
+        // Last item in the list — drop its bottom border so it sits flush with the next group
+        &:last-child { border-bottom: 0 !important; }
+    }
+
+    // Facet groups (Brand, Price, Rating, etc.)
+    .facet-group {
+        background: transparent !important;
+        border: 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        padding-block: 1rem;
+        margin-bottom: 0;
+    }
+
+    .facet-group-header {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: $body-color !important;
+        font-weight: 500;
+        padding-inline: 0;
+    }
+
+    .facet-body { padding-inline: 0; padding-block-start: 0.5rem; }
+
+    // Search-within-filter input (Brand search etc.) — thin underline only
+    .filter-search,
+    .facet-search-input,
+    .facet-control input.form-control {
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+        padding: 0.4rem 0;
+        font-size: 0.8125rem;
+        text-transform: none;
+        letter-spacing: 0;
+
+        &:focus {
+            border-bottom-color: $body-color;
+            box-shadow: none;
+        }
+    }
+
+    .facet-item {
+        font-size: 0.8125rem;
+        padding-block: 0.25rem;
+    }
+}
+
+// =====================================================
+// LISTING / SEARCH PAGE
+// =====================================================
+
+.search-page,
+.category-page,
+.manufacturer-page {
+    .page-title {
+        text-align: center;
+        margin-bottom: 2.5rem;
+
+        h1, .h1, h2 {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-weight: 500;
+        }
+    }
+}
+
+.artlist-actions--top {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding-block: 0.75rem;
+    align-items: center;
+
+    .artlist-action-group--filtersort,
+    .artlist-action-group--viewmode {
+        font-size: 0.75rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+}
+
+// Search hits / results count
+.search-result-hits-count {
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+// Big search input on search page
+.search-page .instasearch-form {
+    .instasearch-term {
+        height: 3.25rem;
+        font-size: 1rem;
+        border-radius: 0;
+    }
+}
+
+// Active filter pills
+.active-filter-link.badge {
+    border-radius: 0 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.6875rem;
+    padding: 0.5rem 0.75rem;
+}
+
+// Pagination — minimal
+.pagination .page-link {
+    border-radius: 0 !important;
+    border-color: transparent;
+    background: transparent;
+    color: $body-color;
+    font-size: 0.8125rem;
+    letter-spacing: 0.1em;
+
+    &:hover { background: rgba(0, 0, 0, 0.04); }
+}
+
+.pagination .page-item.active .page-link {
+    background-color: $body-color;
+    border-color: $body-color;
+    color: $body-bg;
+}
+
+// =====================================================
+// PRODUCT DETAIL
+// =====================================================
+
+.product-details-page {
+    .pd-section-top { row-gap: 2rem; }
+
+    // Gallery: full-bleed feel
+    .pd-data-col {
+        @include media-breakpoint-up(lg) {
+            padding-inline-end: 2.5rem;
+        }
+    }
+
+    // Info column: minimal, tall, restrained
+    .pd-info-col {
+        font-size: 0.875rem;
+
+        .pd-name,
+        .pd-genericname,
+        h1.pd-title,
+        .pd-title h1 {
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-weight: 500;
+            font-size: 1rem;
+            line-height: 1.4;
+            margin-bottom: 1.25rem;
+        }
+
+        .pd-shortdesc { font-size: 0.875rem; line-height: 1.7; color: $body-secondary-color; }
+    }
+
+    // Price box — flat, no shadow, generous spacing
+    .pd-finalprice-block,
+    .pd-price-block,
+    .product-detail-addtocart-box {
+        background: transparent !important;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding-block: 1.25rem !important;
+        margin-bottom: 1.5rem;
+    }
+
+    .pd-finalprice {
+        font-size: 1.25rem;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        color: $product-price-color;
+    }
+
+    // Variant attribute boxes (color/size chips) — square outlined
+    .attribute-squares .attribute-square-container,
+    .attribute-list .attribute-square-container {
+        border-radius: 0;
+    }
+
+    // Size / radio chips
+    .attribute-list label,
+    .attribute-list .form-check-label {
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        padding: 0.65rem 1.25rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    .attribute-list .form-check-input:checked + label,
+    .attribute-list .form-check-input:checked ~ label {
+        background: $body-color;
+        color: $body-bg;
+        border-color: $body-color;
+    }
+
+    // Quantity input — minimal
+    .qty-input,
+    .qty-input .form-control {
+        border-radius: 0;
+    }
+
+    // Add-to-cart button — full width, prominent
+    .btn-add-to-cart,
+    .btn-buy {
+        width: 100%;
+        padding: 1.1rem 1.5rem;
+        font-size: 0.8125rem;
+        letter-spacing: 0.18em;
+    }
+
+    // Action icons (wishlist, compare) — minimalist row
+    .pd-actions {
+        margin-top: 1rem;
+        gap: 1.5rem;
+    }
+
+    .pd-action-item {
+        border-color: $product-action-border-color;
+        font-size: 0.6875rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        border-radius: 0;
+        padding: 0.65rem 0;
+    }
+
+    .pd-action-icon { color: $product-action-icon-color; }
+
+    // Tabs (description, specs, reviews) — borderless underlined
+    .pd-section-bottom {
+        margin-top: 4rem;
+
+        .nav-tabs {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            justify-content: center;
+
+            .nav-link {
+                border: 0;
+                border-bottom: 2px solid transparent;
+                border-radius: 0;
+                font-size: 0.75rem;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+                color: $body-secondary-color;
+                padding: 1rem 1.5rem;
+                background: transparent !important;
+
+                &.active {
+                    border-bottom-color: $body-color;
+                    color: $body-color;
+                }
+            }
+        }
+    }
+}
+
+// Product detail gallery (thumbnails + main image)
+.gal-nav .gal-item-viewport {
+    border-radius: 0 !important;
+    border-color: transparent;
+    background: $body-bg;
+}
+
+.gal-nav .gal-current .gal-item-viewport {
+    border-color: $body-color;
+}
+
+.media-gallery .ms-thumb { border-radius: 0; }
+.gal-stage .img-center-container { background: rgba(0, 0, 0, 0.025); }
+
+// =====================================================
+// CART PAGE
+// =====================================================
+
+.shopping-cart-page,
+.order-summary-page {
+    .page-title {
+        text-align: center;
+        margin-bottom: 2.5rem;
+
+        h1, .h3 {
+            font-size: 0.875rem !important;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 500;
+        }
+    }
+
+    // Cart rows: minimal, clean dividers
+    .cart-row {
+        background: transparent;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid $cart-row-border-color;
+    }
+
+    .cart-row:not(:first-child) { border-top: 0; }
+
+    .cart-row-name a {
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: $body-color;
+        text-decoration: none;
+    }
+
+    .cart-row-price,
+    .cart-row-subtotal {
+        font-size: 0.875rem;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+    }
+
+    // Cart summary box (right side)
+    .cart-footer {
+        background: $cart-footer-bg;
+        padding: 1.75rem;
+        border-radius: 0;
+
+        .cart-footer-group { padding-block: 0.5rem; }
+
+        .total-info,
+        .total-line {
+            font-size: 0.8125rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .total-line.total-grand {
+            font-size: 1rem;
+            font-weight: 500;
+            border-top: 1px solid $cart-footer-divider-color;
+            padding-top: 0.75rem;
+            margin-top: 0.5rem;
+        }
+    }
+
+    // Continue shopping button — subdued, outlined
+    .btn-continue-shopping {
+        background: transparent !important;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        color: $body-color !important;
+
+        &:hover { background: $body-color !important; color: $body-bg !important; border-color: $body-color; }
+    }
+}
+
+// =====================================================
+// CHECKOUT FLOW
+// =====================================================
+
+.checkout-page {
+    background: $body-bg;
+
+    .page-title {
+        text-align: center;
+
+        h1, h2 {
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+    }
+
+    // Section group cards (billing, shipping, payment, etc.)
+    .opc-section,
+    .checkout-data,
+    .billing-info,
+    .shipping-info,
+    .payment-info {
+        background: $body-bg;
+        border: 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        padding: 1.5rem 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    // Selected/active states
+    .address-item.active,
+    .payment-method-item.active,
+    .shipping-method-item.active {
+        background: rgba(0, 0, 0, 0.02);
+        border: 1px solid $body-color !important;
+        border-radius: 0;
+    }
+
+    .address-item,
+    .payment-method-item,
+    .shipping-method-item {
+        border-radius: 0;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1rem 1.25rem;
+    }
+
+    // Order review block
+    .order-review-data,
+    .order-totals {
+        background: #fbf8f3;
+        padding: 1.5rem;
+    }
+}
+
+// Checkout step indicator (costep) — already styled, but make labels uppercase
+.costep-label {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.6875rem;
+}
+
+// =====================================================
+// ACCOUNT / IDENTITY
+// =====================================================
+
+.login-box,
+.register-box,
+.password-recovery-box {
+    background: transparent !important;
+    box-shadow: none;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 2.5rem;
+    border-radius: 0;
+}
+
+.account-page,
+.my-account {
+    .page-title h1,
+    .page-title .h3 {
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .account-list .list-group-item {
+        border-radius: 0;
+        border-color: rgba(0, 0, 0, 0.08);
+        font-size: 0.8125rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.9rem 1rem;
+    }
+}
+
+// Avatar
+.customer-avatar .avatar-ring,
+.customer-avatar-lg .avatar-ring {
+    border-radius: 50%;
+}
+
+// =====================================================
+// FOOTER (minimal, gallery-style)
+// =====================================================
+
+#footer,
+.footer {
+    background: $footer-bg;
+    color: $footer-color;
+    padding-block: 3.5rem 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+    .footer-block-title,
+    h4, h5 {
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        font-size: 0.6875rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+
+    a {
+        color: $footer-color;
+        font-size: 0.8125rem;
+        text-decoration: none;
+
+        &:hover { color: $footer-color; opacity: 0.7; }
+    }
+
+    .footer-newsletter input {
+        border-radius: 0;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        padding-inline: 0;
+    }
+
+    // Lower legal strip
+    .footer-row-end,
+    .footer-legal {
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        font-size: 0.6875rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: $footer-color-muted;
+    }
+
+    // Social icons: square, icon centered (overrides global .btn rectangular padding)
+    .footer-social .btn-social {
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+
+        > i { font-size: 1rem; line-height: 1; }
+
+        // Brand-color hover keeps the colored bg, but icon flips to white for contrast
+        &:hover,
+        &:focus,
+        &:active,
+        &.active {
+            color: #fff;
+        }
+    }
+}
+
+// =====================================================
+// DROPDOWNS / SEARCH SUGGESTIONS / OFFCANVAS
+// =====================================================
+
+.instasearch-drop {
+    border-radius: 0;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.offcanvas {
+    border-radius: 0;
+}
+
+#offcanvas-cart .offcanvas-cart-footer { background: $offcanvas-cart-footer; }
+
+// =====================================================
+// TABLES (orders / wishlist / etc.)
+// =====================================================
+
+table.table {
+    th {
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.6875rem;
+        font-weight: 500;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    td { font-size: 0.875rem; }
+}
+
+// =====================================================
+// MISC: alerts, breadcrumb
+// =====================================================
+
+.alert {
+    border-radius: 0;
+    font-size: 0.8125rem;
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 0.5rem 0 1.5rem;
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+
+    .breadcrumb-item a { color: $body-secondary-color; text-decoration: none; }
+    .breadcrumb-item.active { color: $body-color; }
+}
+
+// Scroll-top button — squared
+#scroll-top {
+    border-radius: 0;
+    background: $scroll-top-bg;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: none;
+}
+
+// =====================================================
+// HEADER STICKY POLISH
+// =====================================================
+
+#header {
+    background: $header-bg;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}

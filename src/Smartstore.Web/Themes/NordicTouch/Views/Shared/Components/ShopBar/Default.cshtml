@@ -4,6 +4,8 @@
     var labelStyle = Display.GetThemeVariable<string>("shopbar-label", "warning");
     var badgeCssClasses = "badge badge-pill badge-counter badge-counter-ring label-cart-amount badge-" + labelStyle;
 
+    // Promo bar is rendered in _Layout.cshtml override (header_before zone)
+
     var offcanvasAttributes = new AttributeDictionary
     {
         ["data-toggle"] = "offcanvas",

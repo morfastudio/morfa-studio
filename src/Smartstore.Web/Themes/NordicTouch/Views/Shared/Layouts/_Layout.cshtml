@@ -1,0 +1,138 @@
+@inject Smartstore.Core.Stores.IStoreContext StoreContext
+
+@{
+    Layout = "_Document";
+
+    var hasLeftCol = await Display.ZoneHasWidgetsAsync("left");
+    var hasRightCol = await Display.ZoneHasWidgetsAsync("right");
+    var hideLeftCol = ViewBag.HideLeftCol == true;
+    var hideRightCol = ViewBag.HideRightCol == true;
+
+    int mainColspan = 12;
+    int cols = 1;
+    if (hasLeftCol)
+    {
+        mainColspan -= 3;
+        cols += 1;
+    }
+    if (hasRightCol)
+    {
+        mainColspan -= 3;
+        cols += 1;
+    }
+
+    Assets.BodyAttributes.AppendCssClass("lyt-cols-" + cols);
+
+    if (Display.GetThemeVariable<bool>("boxed"))
+    {
+        Assets.BodyAttributes.AppendCssClass("boxed");
+    }
+
+    // NordicTouch promo bar (top announcement strip).
+    // To hide, set promoText to empty string.
+    var promoText     = "VISIT OUR STUDIO IN ISTANBUL.";
+    var promoLinkText = "READ MORE";
+    var promoLinkUrl  = Url.RouteUrl("ContactUs");
+}
+
+<a href="#content-center" id="skip-to-content" class="btn-skip-content btn btn-primary btn-lg rounded-pill">
+    @T("Common.SkipToMainContent")
+</a>
+
+<div id="page">
+    <div class="canvas-blocker canvas-slidable"></div>
+
+    <div class="page-main canvas-slidable">
+
+        @if (promoText.HasValue())
+        {
+            <div class="nt-promo-bar" role="region" aria-label="Site announcement">
+                <span>@promoText</span>
+                @if (promoLinkText.HasValue() && promoLinkUrl.HasValue())
+                {
+                    <a href="@promoLinkUrl">@promoLinkText</a>
+                }
+            </div>
+        }
+
+        <zone name="header_before"></zone>
+
+        <header id="header" zone-name="header" replace-content="true">
+            <div class="menubar-section d-none d-lg-block @(Display.GetThemeVariable<bool>("inverse-menubar") ? "menubar-inverse" : "menubar-light")">
+                <div class="container menubar-container">
+                    @await Component.InvokeAsync("TopBar")
+                </div>
+            </div>
+            <div class="shopbar-section @(Display.GetThemeVariable<bool>("inverse-shopbar") ? "shopbar-inverse" : "shopbar-light")">
+                <div class="container shopbar-container">
+                    @await Component.InvokeAsync("ShopBar")
+                </div>
+            </div>
+            <div class="megamenu-section d-none d-lg-block">
+                <nav class="navbar @(Display.GetThemeVariable<bool>("inverse-navbar") ? "navbar-inverse" : "navbar-light")" aria-label="@T("Aria.Label.MainNavigation")">
+                    <div class="container megamenu-container">
+                        <menu name="Main" template="Main" />
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <div id="content-wrapper">
+
+            <partial name="JavaScriptDisabledWarning" />
+
+            <zone name="content_before"></zone>
+
+            <section id="content" class="container">
+                <zone name="teaser"></zone>
+
+                <partial name="Breadcrumb" model="null" />
+
+                <div id="content-body" class="row">
+
+                    @if (hasLeftCol)
+                    {
+                        <aside id="content-left" class="col-lg-3 mb-4 mb-lg-0" attr-class='(hideLeftCol, "d-none d-lg-block")'>
+                            <zone name="aside_left_before"></zone>
+                            <zone name="left"></zone>
+                            <zone name="aside_left_after"></zone>
+                        </aside>
+                    }
+
+                    <main id="content-center" class="col-lg-@mainColspan">
+                        <zone name="main_column_before"></zone>
+                        @RenderBody()
+                        <zone name="main_column_after"></zone>
+                    </main>
+
+                    @if (hasRightCol)
+                    {
+                        <aside id="content-right" class="col-lg-3 mt-4 mt-lg-0" attr-class='(hideRightCol, "d-none d-lg-block")'>
+                            <zone name="aside_right_before"></zone>
+                            <zone name="right"></zone>
+                            <zone name="aside_right_after"></zone>
+                        </aside>
+                    }
+
+                    <zone name="content_after"></zone>
+                </div>
+            </section>
+        </div>
+
+        <zone name="footer_before"></zone>
+
+        <zone name="footer" replace-content="true">
+            @await Component.InvokeAsync("Footer")
+        </zone>
+
+        <zone name="page-end"></zone>
+    </div>
+
+    <a href="#" id="scroll-top" class="scrollto d-flex align-items-center justify-content-center shadow-sm" aria-label="@T("Common.ScrollUp")">
+        <i class="fa fa-lg fa-angle-up"></i>
+    </a>
+    <span id="sr-desc-empty" class="sr-only"></span>
+    <span id="sr-status" class="sr-only" role="status" aria-live="polite"></span>
+</div>
+
+<partial name="Notifications" />
