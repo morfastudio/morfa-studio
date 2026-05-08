@@ -30,6 +30,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0
 EXPOSE 80
 EXPOSE 443
 ENV ASPNETCORE_URLS="http://+:80;https://+:443"
+RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/release/publish .
 
