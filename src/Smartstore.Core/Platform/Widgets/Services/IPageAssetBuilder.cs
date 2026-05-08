@@ -2,12 +2,18 @@
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.FileProviders;
 using Smartstore.Core.Seo;
+using Smartstore.Json;
 
 namespace Smartstore.Core.Widgets;
 
 public partial interface IPageAssetBuilder
 {
     IWidgetProvider WidgetProvider { get; }
+
+    /// <summary>
+    /// Gets the JSON-LD structured data builder for the current page.
+    /// </summary>
+    JsonLdBuilder JsonLd { get; }
 
     /// <summary>
     /// Gets the root element (html tag) attribute dictionary.
