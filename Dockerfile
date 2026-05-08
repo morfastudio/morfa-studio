@@ -33,6 +33,7 @@ ENV ASPNETCORE_URLS="http://+:80;https://+:443"
 RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/release/publish .
+RUN printf '#!/bin/bash\nset -e\necho "SMARTSTORE_DB_CONNECTION=$SMARTSTORE_DB_CONNECTION"\nSETTINGS_FILE="/app/App_Data/Tenants/Default/Settings.txt"\nif [ ! -f "$SETTINGS_FILE" ]; then\n  if [ -z "$SMARTSTORE_DB_CONNECTION" ]; then\n    echo "ERROR: Settings.txt not found and SMARTSTORE_DB_CONNECTION is not set."\n    exit 1\n  fi\n  mkdir -p "$(dirname "$SETTINGS_FILE")"\n  printf "AppVersion: ${SMARTSTORE_APP_VERSION:-6.3.0.0}\\nDataProvider: ${SMARTSTORE_DB_PROVIDER:-PostgreSql}\\nDataConnectionString: ${SMARTSTORE_DB_CONNECTION}\\n" > "$SETTINGS_FILE"\n  echo "Settings.txt created from environment variables."\nfi\nexec ./Smartstore.Web --urls http://0.0.0.0:80\n' > entrypoint.sh && chmod +x entrypoint.sh
 
 # Install wkhtmltopdf
 # COPY install-wkhtmltopdf.sh /tmp/
@@ -40,4 +41,4 @@ COPY --from=build /app/release/publish .
 #     /tmp/install-wkhtmltopdf.sh && \
 #     rm /tmp/install-wkhtmltopdf.sh
 
-ENTRYPOINT ["./Smartstore.Web", "--urls", "http://0.0.0.0:80"]
+ENTRYPOINT ["./entrypoint.sh"]
