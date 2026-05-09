@@ -28,11 +28,6 @@
         Assets.BodyAttributes.AppendCssClass("boxed");
     }
 
-    // NordicTouch promo bar (top announcement strip).
-    // To hide, set promoText to empty string.
-    var promoText     = "VISIT OUR STUDIO IN ISTANBUL.";
-    var promoLinkText = "READ MORE";
-    var promoLinkUrl  = Url.RouteUrl("ContactUs");
 }
 
 <a href="#content-center" id="skip-to-content" class="btn-skip-content btn btn-primary btn-lg rounded-pill">
@@ -43,17 +38,6 @@
     <div class="canvas-blocker canvas-slidable"></div>
 
     <div class="page-main canvas-slidable">
-
-        @if (promoText.HasValue())
-        {
-            <div class="nt-promo-bar" role="region" aria-label="Site announcement">
-                <span>@promoText</span>
-                @if (promoLinkText.HasValue() && promoLinkUrl.HasValue())
-                {
-                    <a href="@promoLinkUrl">@promoLinkText</a>
-                }
-            </div>
-        }
 
         <zone name="header_before"></zone>
 
