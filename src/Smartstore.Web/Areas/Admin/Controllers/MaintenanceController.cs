@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -1039,6 +1040,39 @@ namespace Smartstore.Admin.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        [Permission(Permissions.System.Maintenance.Execute)]
+        public IActionResult DownloadTenantsFolder()
+        {
+            var appContext = Services.ApplicationContext;
+            var tenantsPhysicalPath = Path.Combine(appContext.AppDataRoot.Root, "Tenants");
+
+            if (!Directory.Exists(tenantsPhysicalPath))
+            {
+                return NotFound("Tenants folder not found.");
+            }
+
+            var tempZipPath = Path.Combine(Path.GetTempPath(), $"Tenants_{DateTime.UtcNow:yyyyMMdd_HHmmss}.zip");
+
+            try
+            {
+                ZipFile.CreateFromDirectory(tenantsPhysicalPath, tempZipPath, CompressionLevel.Fastest, includeBaseDirectory: true);
+
+                var stream = new FileStream(tempZipPath, FileMode.Open, FileAccess.Read, FileShare.None, 65536, FileOptions.DeleteOnClose);
+                return new FileStreamResult(stream, "application/zip")
+                {
+                    FileDownloadName = Path.GetFileName(tempZipPath)
+                };
+            }
+            catch (Exception ex)
+            {
+                if (System.IO.File.Exists(tempZipPath))
+                    System.IO.File.Delete(tempZipPath);
+
+                NotifyError(ex.Message);
+                return RedirectToAction("Index");
+            }
         }
 
         #endregion

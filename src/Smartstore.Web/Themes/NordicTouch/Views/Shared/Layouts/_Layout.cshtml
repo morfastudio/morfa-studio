@@ -110,6 +110,56 @@
         </zone>
 
         <zone name="page-end"></zone>
+
+        <script>
+        // NordicTouch: Filter widget'ı desktop'ta da offcanvas olarak aç
+        // Smartstore'un public.search.js'i sadece <lg viewport'ta offcanvas oluşturuyor.
+        // Biz sidebar'ı gizlediğimiz için desktop'ta da aynı davranışı sağlıyoruz.
+        (function () {
+            function initDesktopFilter() {
+                var $btn = $('#toggle-filter-widget');
+                if (!$btn.length || $btn.data('nt-filter-init')) return;
+                $btn.data('nt-filter-init', true);
+
+                var $widget = $('#faceted-search');
+                if (!$widget.length) return;
+
+                // Offcanvas zaten oluşturulduysa atla
+                if ($btn.data('offcanvas')) return;
+
+                var title = $btn.data('title') || 'Filter & Sort';
+                var $offcanvas = $(
+                    '<aside id="filter-widget" class="offcanvas offcanvas-start offcanvas-shadow" data-overlay="true" data-blocker="true">' +
+                        '<div class="offcanvas-header">' +
+                            '<h5 class="offcanvas-title" style="font-size:.625rem;letter-spacing:.25em;text-transform:uppercase;font-weight:400">' + title + '</h5>' +
+                            '<button type="button" class="btn-close" data-dismiss="offcanvas" aria-label="Close"></button>' +
+                        '</div>' +
+                        '<div class="offcanvas-content offcanvas-scrollable" style="padding:1.5rem"></div>' +
+                    '</aside>'
+                ).appendTo('body');
+
+                $offcanvas.one('click', '.btn-close', function () {
+                    $offcanvas.offcanvas('hide');
+                });
+
+                // Sidebar gizliyken içeriği görünür hale getir
+                $widget.css('visibility', 'visible');
+                $widget.appendTo($offcanvas.find('.offcanvas-content'));
+
+                $btn
+                    .data('offcanvas', $offcanvas)
+                    .attr('data-toggle', 'offcanvas')
+                    .attr('data-disablescrolling', 'true')
+                    .data('placement', 'start')
+                    .data('target', $offcanvas);
+            }
+
+            $(document).ready(function () {
+                // Kısa gecikme: Smartstore'un kendi filter init'inin bitmesini bekle
+                setTimeout(initDesktopFilter, 150);
+            });
+        })();
+        </script>
     </div>
 
     <a href="#" id="scroll-top" class="scrollto d-flex align-items-center justify-content-center shadow-sm" aria-label="@T("Common.ScrollUp")">

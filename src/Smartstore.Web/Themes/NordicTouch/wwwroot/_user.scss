@@ -1,4 +1,122 @@
 //
-// Customize the (child) theme here with css overrides
-// or new selectors (for users)
+// NordicTouch – user-level overrides
+// Son katman ince ayarlar
 // --------------------------------------------------
+
+// =====================================================
+// HEADER: Üst çubuk (menubar) çok minimal
+// =====================================================
+
+.menubar-section {
+    font-size: 0.5625rem;
+    letter-spacing: 0.18em;
+}
+
+// =====================================================
+// Anasayfa featured products & brands başlıkları
+// =====================================================
+
+.product-grid-home-page .block-title,
+.manufacturer-grid .block-title {
+    position: relative;
+    padding-top: 2rem;
+    margin-bottom: 3rem;
+
+    &::before {
+        content: '';
+        display: block;
+        width: 1px;
+        height: 2.5rem;
+        background: rgba(0,0,0,0.1);
+        margin: 0 auto 2rem;
+    }
+}
+
+// =====================================================
+// ÜRÜN KARTI: Tüm hover action gruplarını gizle
+// Sadece isim + fiyat — saf galeri estetiği
+// =====================================================
+
+.art-actions-block,
+.art-drop {
+    // Hover'da sadece görünür, dışarıda gizli
+}
+
+// =====================================================
+// LISTING: Artlist gap fix for full-width
+// =====================================================
+
+body.lyt-cols-2 .artlist.artlist-grid {
+    padding-inline: 0;
+}
+
+// =====================================================
+// GENEL: Link hover daha zarif geçiş
+// =====================================================
+
+a {
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+// =====================================================
+// ÜRÜN KARTI: Picture-block overflow hidden
+// =====================================================
+
+.art .art-picture-block {
+    overflow: hidden !important;
+}
+
+// =====================================================
+// SAYFA BAŞLIKLARI: Listing, Cart, Checkout
+// =====================================================
+
+.shopping-cart-page .page-title,
+.checkout-page .page-title {
+    text-align: center;
+    padding-block: 2.5rem 1.5rem;
+
+    h1, h2, h3, .h1, .h2, .h3 {
+        font-size: 0.6875rem !important;
+        letter-spacing: 0.3em !important;
+        font-weight: 400 !important;
+        text-transform: uppercase !important;
+    }
+}
+
+// =====================================================
+// OFFCANVAS CART: Daha editorial header
+// =====================================================
+
+#offcanvas-cart .offcanvas-title {
+    font-size: 0.6875rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 400;
+}
+
+// =====================================================
+// SCROLL TOP: Daha minimal
+// =====================================================
+
+#scroll-top {
+    width: 2.25rem;
+    height: 2.25rem;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    opacity: 0.6;
+
+    &:hover { opacity: 1; }
+}
+
+// =====================================================
+// GENEL: Yuvarlak köşeler sıfır (global güvence)
+// =====================================================
+
+.badge,
+.alert,
+.card,
+.modal-content,
+.dropdown-menu,
+.popover {
+    border-radius: 0 !important;
+}
