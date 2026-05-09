@@ -2136,6 +2136,11 @@ table.table {
     background: rgba(0, 0, 0, 0.02) !important;
 }
 
+// Alt kategori grid: öğeleri yatayda ortala
+.artlist-sub-categories {
+    justify-content: center;
+}
+
 // Alt kategori kartları: ana sayfa gibi çerçeveli görünüm
 .artlist-sub-categories .art .art-picture-block {
     padding: 8px;
