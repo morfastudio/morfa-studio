@@ -47,7 +47,7 @@ body {
 .home-page .page-body::before {
     content: '';
     display: block;
-    height: 3rem;
+    height: 0.5rem;
 }
 
 // Categories bölümü üstüne ince çizgi + alan
@@ -59,9 +59,9 @@ body {
     content: '';
     display: block;
     width: 1px;
-    height: 3rem;
+    height: 1.5rem;
     background: rgba(0,0,0,0.12);
-    margin: 0 auto 3rem;
+    margin: 0 auto 1.5rem;
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -381,7 +381,7 @@ label {
     .product-grid,
     .manufacturer-grid,
     .block {
-        padding-block: 2rem 5rem;
+        padding-block: 2rem 2.5rem;
     }
 
     > .product-grid:first-of-type {
