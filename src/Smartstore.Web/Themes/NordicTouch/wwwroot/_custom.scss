@@ -288,6 +288,7 @@ label {
         font-size: 0.6875rem !important;
         font-weight: 500;
         padding-inline: 1rem;
+        color: $shopbar-color;
     }
 
     // Remove any hover underline / artifacts
@@ -1197,7 +1198,7 @@ label {
     font-weight: 400;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    text-align: left;
+    text-align: right;
     margin-bottom: 0.4rem;
     line-height: 1.5;
 
@@ -1939,6 +1940,8 @@ body.lyt-cols-2 {
         color: $footer-color-muted;
     }
 
+    .footer-bottom div:has(> .sm-hint) { display: none; }
+
     // Social icons: square, icon centered (overrides global .btn rectangular padding)
     .footer-social .btn-social {
         width: 2.5rem;
@@ -2120,6 +2123,12 @@ table.table {
 
 .art .art-picture-block {
     background: rgba(0, 0, 0, 0.02) !important;
+}
+
+// Alt kategori kartları: ana sayfa gibi çerçeveli görünüm
+.artlist-sub-categories .art .art-picture-block {
+    padding: 8px;
+    background: $nt-category-frame-bg !important;
 }
 
 // =====================================================
