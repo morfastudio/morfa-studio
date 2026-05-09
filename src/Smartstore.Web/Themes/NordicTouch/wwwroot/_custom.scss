@@ -499,49 +499,49 @@ label {
 // =====================================================
 
 .nt-categories {
-    padding: 4rem 0 5rem;
+    padding: 2.5rem 0 3.5rem;
 }
 
 .nt-categories-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 3.5rem 1.5rem;
+    gap: 2.5rem 1.25rem;
     align-items: start;
 
     @include media-breakpoint-up(md) {
         grid-template-columns: repeat(2, 1fr);
-        gap: 5rem 2.5rem;
+        gap: 3.5rem 2rem;
     }
 
     @include media-breakpoint-up(lg) {
         // 12-column gallery mosaic: asimetrik editorial yerleşim
         grid-template-columns: repeat(12, 1fr);
-        row-gap: 5rem;
-        column-gap: 1.5rem;
+        row-gap: 3.5rem;
+        column-gap: 1.25rem;
 
         // Row 1: sol küçük (4 col) + sağ orta (5 col)
         > .nt-category-card:nth-child(1) { grid-column: 1 / span 4; }
-        > .nt-category-card:nth-child(2) { grid-column: 7 / span 5; margin-top: 3rem; }
+        > .nt-category-card:nth-child(2) { grid-column: 7 / span 5; margin-top: 2rem; }
 
         // Row 2: sol orta (6 col) + sağ küçük (3 col), sağ biraz aşağıda
         > .nt-category-card:nth-child(3) { grid-column: 1 / span 6; }
-        > .nt-category-card:nth-child(4) { grid-column: 9 / span 3; margin-top: 3.5rem; }
+        > .nt-category-card:nth-child(4) { grid-column: 9 / span 3; margin-top: 2.5rem; }
 
         // Row 3: sol orta içeriden (4 col) + sağ orta (4 col), yukarı çıkıyor
         > .nt-category-card:nth-child(5) { grid-column: 2 / span 4; }
-        > .nt-category-card:nth-child(6) { grid-column: 8 / span 4; margin-top: -2.5rem; }
+        > .nt-category-card:nth-child(6) { grid-column: 8 / span 4; margin-top: -1.5rem; }
 
         // Row 4: iki orta sütun, biri kayık
         > .nt-category-card:nth-child(7) { grid-column: 1 / span 5; }
-        > .nt-category-card:nth-child(8) { grid-column: 7 / span 5; margin-top: 2rem; }
+        > .nt-category-card:nth-child(8) { grid-column: 7 / span 5; margin-top: 1.5rem; }
 
         // Kalan itemler: 4-col grid
         > .nt-category-card:nth-child(n+9) { grid-column: span 4; margin-top: 0; }
     }
 
     @include media-breakpoint-up(xl) {
-        column-gap: 2rem;
-        row-gap: 6rem;
+        column-gap: 1.5rem;
+        row-gap: 4rem;
     }
 }
 
@@ -559,9 +559,9 @@ label {
 }
 
 .nt-category-frame {
-    padding: 10px;
+    padding: 8px;
     background: $nt-category-frame-bg;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 2 / 3;
     overflow: hidden;
     display: flex;
     align-items: center;
