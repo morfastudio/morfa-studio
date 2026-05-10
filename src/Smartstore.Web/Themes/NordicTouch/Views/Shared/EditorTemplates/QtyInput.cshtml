@@ -1,0 +1,65 @@
+@using Smartstore.Core.Catalog.Products
+@using Smartstore.Web.Models.Catalog
+@using Smartstore.Utilities
+
+@model IQuantityInput
+
+@functions
+{
+    private string Value
+    {
+        get
+        {
+            string value = null;
+            if (ViewData.Model != null)
+            {
+                value = Convert.ToString(ViewData.Model.EnteredQuantity);
+            }
+            return value;
+        }
+    }
+}
+
+@{
+    var large = GetMetadata<bool>("large");
+    var controlSize = GetMetadata<ControlSize?>("size") ?? (large ? ControlSize.Large : ControlSize.Medium);
+
+    var attributes = new AttributeDictionary().Merge(ConvertUtility.ObjectToDictionary(ViewData["htmlAttributes"] ?? new object()));
+    if (!attributes.Any(a => a.Key == "aria-labelledby" || a.Key == "aria-label"))
+    {
+        attributes["aria-label"] = T("ShoppingCart.Quantity");
+    }
+
+    // Derive min/max/step from AllowedQuantities if present, otherwise use model values
+    var minQty = Model.MinOrderAmount;
+    var maxQty = Model.MaxOrderAmount;
+    var stepQty = Model.QuantityStep;
+
+    if (!Model.AllowedQuantities.IsNullOrEmpty())
+    {
+        var quantities = Model.AllowedQuantities.Select(q => q.Value.Convert<int>()).OrderBy(q => q).ToList();
+        if (quantities.Count > 0)
+        {
+            minQty = quantities.First();
+            maxQty = quantities.Last();
+            stepQty = quantities.Count > 1 ? quantities[1] - quantities[0] : 1;
+        }
+    }
+}
+
+<div class="qty-input qty-input-spinner">
+    <input asp-for="EnteredQuantity"
+           type="number"
+           attrs="@attributes"
+           sm-control-size="@controlSize"
+           sm-postfix="@(Model.EnteredQuantity > 1 ? Model.QuantityUnitNamePlural : Model.QuantityUnitName)"
+           sm-numberinput-style="Centered"
+           data-step-interval="150"
+           data-auto-select="false"
+           data-auto-focus="false"
+           data-qtyunit-singular="@Model.QuantityUnitName"
+           data-qtyunit-plural="@Model.QuantityUnitNamePlural"
+           min="@minQty"
+           max="@maxQty"
+           step="@stepQty" />
+</div>

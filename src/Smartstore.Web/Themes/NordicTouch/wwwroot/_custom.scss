@@ -760,6 +760,25 @@ label {
     }
 }
 
+// Product detail — qty spinner aligned to add-to-cart button height
+// =====================================================
+
+.pd-offer-actions {
+    align-items: stretch;
+
+    .pd-offer-action-qty {
+        display: flex;
+        align-items: stretch;
+
+        .qty-input,
+        .numberinput-group,
+        .form-control.numberinput,
+        .numberinput-stepper {
+            height: 100%;
+        }
+    }
+}
+
 // Product detail — stock status
 // =====================================================
 
