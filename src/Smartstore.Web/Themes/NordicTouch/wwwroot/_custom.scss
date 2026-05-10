@@ -1182,6 +1182,18 @@ label {
 
 .art {
     background: transparent;
+    --art-muted-color-2: #{$body-color};
+    --art-finalprice-color: #{$body-color};
+
+    .art-name,
+    .art-description,
+    .art-price-block {
+        padding-inline: 0.5rem;
+    }
+
+    .art-price-block {
+        padding-bottom: 0.75rem;
+    }
 
     .art-picture-block {
         position: relative;
