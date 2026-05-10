@@ -502,6 +502,34 @@ label {
     }
 }
 
+// Mobile search panel (slide down below header)
+.nt-mobile-search {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+    background: $header-bg;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+    &.is-open {
+        max-height: 80px;
+    }
+
+    .nt-mobile-search-inner {
+        padding: 0.625rem 0;
+
+        .instasearch-form {
+            width: 100%;
+        }
+    }
+
+    @include media-breakpoint-up(xl) {
+        .nt-mobile-search-inner {
+            width: 50%;
+            margin-inline: auto;
+        }
+    }
+}
+
 // =====================================================
 // HOME CATEGORIES: Art gallery wall — asymmetric mosaic
 // =====================================================

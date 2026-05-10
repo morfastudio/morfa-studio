@@ -99,6 +99,13 @@
     </div>
 </div>
 
+@* ===== MOBILE SEARCH PANEL (small screens only) ===== *@
+<div id="nt-mobile-search" class="nt-mobile-search" aria-hidden="true">
+    <div class="nt-mobile-search-inner container">
+        @await Component.InvokeAsync("SearchBox")
+    </div>
+</div>
+
 @* ===== Offcanvas Menus ===== *@
 <widget target-zone="end" key="offcanvas-menu">
     <aside id="offcanvas-menu"
@@ -133,33 +140,31 @@
 <script>
     (function () {
         function initSearch() {
-            var toggler = document.getElementById("nt-search-toggler");
-            var nav     = document.getElementById("nt-nav");
-            var search  = document.getElementById("nt-search-inline");
-            if (!toggler || !nav || !search) return;
+            var toggler     = document.getElementById("nt-search-toggler");
+            var searchPanel = document.getElementById("nt-mobile-search");
+            if (!toggler || !searchPanel) return;
+
+            function open() {
+                searchPanel.classList.add("is-open");
+                searchPanel.setAttribute("aria-hidden", "false");
+                toggler.setAttribute("aria-expanded", "true");
+                var input = searchPanel.querySelector("input");
+                if (input) setTimeout(function () { input.focus(); }, 50);
+            }
+
+            function close() {
+                searchPanel.classList.remove("is-open");
+                searchPanel.setAttribute("aria-hidden", "true");
+                toggler.setAttribute("aria-expanded", "false");
+            }
 
             toggler.addEventListener("click", function (e) {
                 e.preventDefault();
-                var isOpen = search.style.display !== "none";
-                if (isOpen) {
-                    search.style.display = "none";
-                    nav.style.display = "";
-                    toggler.setAttribute("aria-expanded", "false");
-                } else {
-                    nav.style.display = "none";
-                    search.style.display = "flex";
-                    toggler.setAttribute("aria-expanded", "true");
-                    var input = search.querySelector("input");
-                    if (input) setTimeout(function () { input.focus(); }, 50);
-                }
+                searchPanel.classList.contains("is-open") ? close() : open();
             });
 
             document.addEventListener("keydown", function (e) {
-                if (e.key === "Escape" && search.style.display !== "none") {
-                    search.style.display = "none";
-                    nav.style.display = "";
-                    toggler.setAttribute("aria-expanded", "false");
-                }
+                if (e.key === "Escape" && searchPanel.classList.contains("is-open")) close();
             });
         }
 
