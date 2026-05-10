@@ -2162,7 +2162,8 @@ table.table {
 // =====================================================
 
 .art .art-picture-block {
-    background: rgba(0, 0, 0, 0.02) !important;
+    padding: 8px;
+    background: $nt-category-frame-bg !important;
 }
 
 // Alt kategori grid: öğeleri yatayda ortala
@@ -2170,11 +2171,6 @@ table.table {
     justify-content: center;
 }
 
-// Alt kategori kartları: ana sayfa gibi çerçeveli görünüm
-.artlist-sub-categories .art .art-picture-block {
-    padding: 8px;
-    background: $nt-category-frame-bg !important;
-}
 
 // =====================================================
 // LISTING SAYFA: Ürün sayısı + sayfalama rafine
