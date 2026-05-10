@@ -109,6 +109,39 @@ a {
 }
 
 // =====================================================
+// SEPET: Ürün satırı aksiyon butonları
+// =====================================================
+
+// Seçim kutusu: soldan boşluk
+.cart-row .select-cart-item {
+    padding-left: 2rem;
+}
+
+// Çöp & kalp butonları: arka plan siteyle aynı (şeffaf) — sepet + offcanvas
+.cart-item-actions,
+.offcanvas-cart-item .col-auto {
+    .btn-secondary {
+        background: transparent !important;
+        border-color: transparent !important;
+        color: $body-color !important;
+
+        &:hover,
+        &:focus,
+        &:active {
+            background: rgba(0, 0, 0, 0.06) !important;
+            border-color: transparent !important;
+            color: $body-color !important;
+        }
+    }
+
+    // "Dilek listesine" yazısını gizle — sadece kalp ikonu
+    .btn .fwn,
+    .btn .d-md-inline {
+        display: none !important;
+    }
+}
+
+// =====================================================
 // GENEL: Yuvarlak köşeler sıfır (global güvence)
 // =====================================================
 
