@@ -1937,6 +1937,14 @@ body.lyt-cols-2 {
 // FOOTER (minimal, gallery-style)
 // =====================================================
 
+// Boş 4. kolon gizle (newsletter/tema seçici kaldırıldı), kalan 3 kolonu ortala
+.footer-main .row {
+    justify-content: center;
+}
+.footer-main .row > .col-12.col-lg-3 {
+    display: none;
+}
+
 #footer,
 .footer {
     background: $footer-bg;
