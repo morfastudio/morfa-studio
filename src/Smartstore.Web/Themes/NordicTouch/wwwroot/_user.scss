@@ -142,6 +142,31 @@ a {
 }
 
 // =====================================================
+// HESABIM: Sol navigasyon arka plan
+// =====================================================
+
+.my-account-menu {
+    background-color: $body-bg !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+    box-shadow: none !important;
+
+    .card-header {
+        background-color: $body-bg !important;
+        border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .list-group-item,
+    .list-group-item-action,
+    .menu-link {
+        background-color: $body-bg !important;
+
+        &:hover, &:focus {
+            background-color: rgba(0, 0, 0, 0.04) !important;
+        }
+    }
+}
+
+// =====================================================
 // GENEL: Yuvarlak köşeler sıfır (global güvence)
 // =====================================================
 
