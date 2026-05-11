@@ -87,7 +87,7 @@
         <div sm-if="Model.ShoppingCartEnabled" class="shopbar-tool" id="shopbar-cart" data-target="#cart-tab">
             <a asp-route="ShoppingCart" attrs="cartTogglerAttributes" data-summary-href="@Url.Action("CartSummary", "ShoppingCart", new { cart = true })">
                 <span class="shopbar-button-icon" aria-hidden="true">
-                    <i class="icm icm-bag"></i>
+                    <i class="fas fa-bag-shopping"></i>
                     <span class='@badgeCssClasses' attr-style='(Model.CartItemsCount == 0, "display: none")' data-bind-to="CartItemsCount">
                         @Model.CartItemsCount
                     </span>

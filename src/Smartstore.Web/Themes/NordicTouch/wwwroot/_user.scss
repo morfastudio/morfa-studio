@@ -95,6 +95,23 @@ a {
 }
 
 // =====================================================
+// HEADER: Sepet & wishlist badge konumu
+// =====================================================
+
+.label-cart-amount {
+    inset-inline-end: -10px;
+}
+
+// =====================================================
+// HEADER: Sepet ikonu outline efekti
+// =====================================================
+
+#shopbar-cart .shopbar-button-icon .fa-bag-shopping {
+    color: transparent;
+    -webkit-text-stroke: 1.5px $body-color;
+}
+
+// =====================================================
 // SCROLL TOP: Daha minimal
 // =====================================================
 
