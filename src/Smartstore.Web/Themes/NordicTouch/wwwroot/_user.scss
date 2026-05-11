@@ -120,7 +120,8 @@ a {
 // Çöp & kalp butonları: arka plan siteyle aynı (şeffaf) — sepet + offcanvas
 .cart-item-actions,
 .offcanvas-cart-item .col-auto {
-    .btn-secondary {
+    .btn-secondary,
+    .btn-primary {
         background: transparent !important;
         border-color: transparent !important;
         color: $body-color !important;
