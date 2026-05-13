@@ -326,7 +326,12 @@ label {
 // Top menubar — also restrained, low-contrast (announces lang/currency/help)
 .menubar-section {
     background-color: $body-bg;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+// Base Flex adds border via .menubar-light.menubar-section — override with matching specificity
+.menubar-light.menubar-section,
+.menubar-inverse.menubar-section {
+    border-bottom: 0 !important;
 }
 
 .menubar {
@@ -409,6 +414,7 @@ label {
 // Shopbar section: remove default padding (we control it inside)
 .shopbar-section {
     padding: 0;
+    overflow-x: clip; // prevent horizontal scroll from nav items without clipping dropdowns
 }
 
 // Reset Flex base .shopbar styles that conflict with our layout
@@ -508,10 +514,11 @@ label {
     max-height: 0;
     transition: max-height 0.3s ease;
     background: $header-bg;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 0; // border-top must not render when max-height:0 — it bleeds as a 1px line below the shopbar
 
     &.is-open {
         max-height: 80px;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
     }
 
     .nt-mobile-search-inner {
@@ -1012,6 +1019,7 @@ label {
     align-items: center;
     gap: 0;
     justify-content: flex-end;
+    overflow: visible; // Flex base sets overflow-y: hidden which makes overflow-x: auto and shows a scrollbar when badge overflows
 
     .shopbar-tool {
         position: relative;
@@ -2109,7 +2117,6 @@ table.table {
 
 #header {
     background: $header-bg;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 // =====================================================
