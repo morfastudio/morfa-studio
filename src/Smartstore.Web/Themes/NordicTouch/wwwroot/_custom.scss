@@ -518,7 +518,6 @@ label {
 
     &.is-open {
         max-height: 80px;
-        border-top: 1px solid rgba(0, 0, 0, 0.06);
     }
 
     .nt-mobile-search-inner {
@@ -2239,6 +2238,7 @@ table.table {
     outline: 1px solid rgba(0,0,0,0.4) !important;
     outline-offset: 2px !important;
 }
+
 
 // =====================================================
 // ÜRÜN KARTLARI: Art picture-block arka plan çok ince
