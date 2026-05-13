@@ -103,12 +103,17 @@ a {
 }
 
 // =====================================================
-// HEADER: Sepet ikonu outline efekti
+// HEADER: Tüm shopbar ikonları aynı outline kalınlığında
 // =====================================================
 
 #shopbar-cart .shopbar-button-icon .fa-bag-shopping {
     color: transparent;
     -webkit-text-stroke: 1.5px $body-color;
+}
+
+#shopbar-wishlist .shopbar-button-icon .icm-heart {
+    color: transparent;
+    -webkit-text-stroke: 1px $body-color;
 }
 
 // =====================================================
