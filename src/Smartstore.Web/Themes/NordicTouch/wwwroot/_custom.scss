@@ -1474,6 +1474,42 @@ label {
 // LISTING / SEARCH PAGE
 // =====================================================
 
+// Sort-in-facets: Smartstore renders a sort facet inside #faceted-search with d-lg-none.
+// We show it on desktop too (it lives inside the offcanvas) and hide the standalone sort dropdown.
+#faceted-search .facet-group.d-lg-none {
+    display: block !important;
+
+    // Convert horizontal badge row → vertical list
+    .facet-body-inner.offcanvas-hstack {
+        flex-direction: column !important;
+        overflow-x: visible !important;
+        align-items: stretch !important;
+        gap: 0 !important;
+    }
+
+    .badge-orderby {
+        border-radius: 0 !important;
+        width: 100%;
+        text-align: left;
+        padding: 0.7rem 0 !important;
+        background: transparent !important;
+        color: $body-color !important;
+        border: 0 !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.07) !important;
+        font-size: 0.75rem !important;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-weight: 400 !important;
+
+        &.selected { font-weight: 600 !important; }
+        &:last-child { border-bottom: 0 !important; }
+    }
+}
+
+.artlist-action--sort {
+    display: none !important;
+}
+
 // =====================================================
 // LISTING / SEARCH / MANUFACTURER: Tam genişlik galeri
 // body.lyt-cols-2 = sidebar'lı her sayfa
@@ -1550,7 +1586,7 @@ body.lyt-cols-2 {
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     padding-block: 1rem;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     margin-bottom: 2rem;
 
     .artlist-action-group--filtersort,

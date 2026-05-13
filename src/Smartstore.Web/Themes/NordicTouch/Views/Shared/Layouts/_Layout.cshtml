@@ -116,6 +116,23 @@
         // Smartstore'un public.search.js'i sadece <lg viewport'ta offcanvas oluşturuyor.
         // Biz sidebar'ı gizlediğimiz için desktop'ta da aynı davranışı sağlıyoruz.
         (function () {
+            // When active filters return 0 results, Smartstore doesn't render artlist-actions--top.
+            // Inject a fallback "Filter & Sort" button so the panel stays accessible.
+            function ensureFilterButton() {
+                if (!document.querySelector('#faceted-search') || document.querySelector('#toggle-filter-widget')) return;
+                var $btn = $(
+                    '<div class="artlist-action artlist-action--filter" style="margin-bottom:1.5rem">' +
+                        '<button id="toggle-filter-widget" type="button"' +
+                        ' class="btn btn-primary w-100 justify-content-between"' +
+                        ' data-title="Filter &amp; Sort" aria-controls="filter-widget" aria-expanded="false">' +
+                            '<span>Filter &amp; Sort</span>' +
+                            '<i class="fa fa-fw fa-sliders-h" aria-hidden="true"></i>' +
+                        '</button>' +
+                    '</div>'
+                );
+                $('#content-center').prepend($btn);
+            }
+
             function initDesktopFilter() {
                 var $btn = $('#toggle-filter-widget');
                 if (!$btn.length || $btn.data('nt-filter-init')) return;
@@ -154,9 +171,37 @@
                     .data('target', $offcanvas);
             }
 
+            var NT_FILTER_KEY = 'nt-filter-open';
+
+            // Intercept all filter/sort navigation inside the offcanvas — flag before page reload
+            $(document).on('click', '#filter-widget a[href]', function () {
+                var href = $(this).attr('href');
+                if (href && href !== '#') sessionStorage.setItem(NT_FILTER_KEY, '1');
+            });
+            // Facet checkboxes/radios navigate via setLocation on change
+            $(document).on('change click', '#filter-widget .facet-control-native', function () {
+                sessionStorage.setItem(NT_FILTER_KEY, '1');
+            });
+            // Custom range (price etc.) apply button
+            $(document).on('click', '#filter-widget .btn-custom-range', function () {
+                sessionStorage.setItem(NT_FILTER_KEY, '1');
+            });
+
             $(document).ready(function () {
                 // Kısa gecikme: Smartstore'un kendi filter init'inin bitmesini bekle
-                setTimeout(initDesktopFilter, 150);
+                setTimeout(function () {
+                    ensureFilterButton();
+                    initDesktopFilter();
+
+                    // Sayfa yenilendikten sonra offcanvas'ı otomatik aç
+                    if (sessionStorage.getItem(NT_FILTER_KEY)) {
+                        sessionStorage.removeItem(NT_FILTER_KEY);
+                        var $btn = $('#toggle-filter-widget');
+                        if ($btn.length) {
+                            setTimeout(function () { $btn.trigger('click'); }, 50);
+                        }
+                    }
+                }, 150);
             });
         })();
         </script>
