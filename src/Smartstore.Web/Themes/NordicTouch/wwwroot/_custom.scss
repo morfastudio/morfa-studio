@@ -589,9 +589,6 @@ label {
 
 .nt-category-card {
     background: transparent;
-    transition: opacity 0.25s ease;
-
-    &:hover { opacity: 0.82; }
 }
 
 .nt-category-link {
@@ -1242,7 +1239,7 @@ label {
         }
     }
 
-    &:hover .art-picture img { transform: scale(1.03); }
+    &:hover .art-picture img { transform: scale(1.03) translateZ(0); }
 }
 
 // Badges (LOW IN STOCK, NEW, etc.) — small black tag, top-left
