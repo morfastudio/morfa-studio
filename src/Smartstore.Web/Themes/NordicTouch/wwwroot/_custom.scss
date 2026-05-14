@@ -520,6 +520,7 @@ label {
 
     &.is-open {
         max-height: 80px;
+        overflow: visible;
         visibility: visible;
         pointer-events: auto;
         transition: max-height 0.3s ease, visibility 0s linear 0s;
