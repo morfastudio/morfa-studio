@@ -512,12 +512,17 @@ label {
 .nt-mobile-search {
     overflow: hidden;
     max-height: 0;
-    transition: max-height 0.3s ease;
+    visibility: hidden;
+    pointer-events: none;
+    transition: max-height 0.3s ease, visibility 0s linear 0.3s;
     background: $header-bg;
-    border-top: 0; // border-top must not render when max-height:0 — it bleeds as a 1px line below the shopbar
+    border-top: 0;
 
     &.is-open {
         max-height: 80px;
+        visibility: visible;
+        pointer-events: auto;
+        transition: max-height 0.3s ease, visibility 0s linear 0s;
     }
 
     .nt-mobile-search-inner {

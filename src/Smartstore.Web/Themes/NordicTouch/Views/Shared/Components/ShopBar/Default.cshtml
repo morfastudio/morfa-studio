@@ -100,7 +100,7 @@
 </div>
 
 @* ===== MOBILE SEARCH PANEL (small screens only) ===== *@
-<div id="nt-mobile-search" class="nt-mobile-search" aria-hidden="true">
+<div id="nt-mobile-search" class="nt-mobile-search" aria-hidden="true" style="display:none">
     <div class="nt-mobile-search-inner container">
         @await Component.InvokeAsync("SearchBox")
     </div>
@@ -145,6 +145,9 @@
             if (!toggler || !searchPanel) return;
 
             function open() {
+                searchPanel.style.display = 'block';
+                // Force layout recalc so the transition fires from max-height:0
+                searchPanel.offsetHeight;
                 searchPanel.classList.add("is-open");
                 searchPanel.setAttribute("aria-hidden", "false");
                 toggler.setAttribute("aria-expanded", "true");
@@ -156,6 +159,11 @@
                 searchPanel.classList.remove("is-open");
                 searchPanel.setAttribute("aria-hidden", "true");
                 toggler.setAttribute("aria-expanded", "false");
+                setTimeout(function () {
+                    if (!searchPanel.classList.contains("is-open")) {
+                        searchPanel.style.display = 'none';
+                    }
+                }, 300);
             }
 
             toggler.addEventListener("click", function (e) {
