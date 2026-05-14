@@ -480,11 +480,8 @@ label {
         font-weight: 500;
         white-space: nowrap;
         padding: 0.5rem 0.75rem;
-        transition: opacity 0.2s ease;
-
         &:hover,
         &:focus {
-            opacity: 0.6;
             text-decoration: none;
         }
     }
