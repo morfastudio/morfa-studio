@@ -2098,6 +2098,12 @@ body.lyt-cols-2 {
     border-radius: 0;
     border: 1px solid rgba(0, 0, 0, 0.06);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+
+    @include media-breakpoint-up(lg) {
+        min-width: 0;
+        max-width: 100%;
+        inset-inline-end: 0;
+    }
 }
 
 .offcanvas {
