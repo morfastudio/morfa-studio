@@ -2275,3 +2275,24 @@ table.table {
 .home-page .block-title {
     border: 0 !important;
 }
+
+// =====================================================
+// MOBİL HEADER: İkon sığdırma
+// =====================================================
+
+@include media-breakpoint-down(lg) {
+    .nt-shopbar.shopbar {
+        gap: 0.25rem;
+    }
+
+    .nt-shopbar-brand .brand {
+        font-size: 0.875rem;
+        letter-spacing: 0.15em;
+        max-width: 160px;
+    }
+
+    .nt-shopbar-tools.shopbar-tools .shopbar-button {
+        width: 2rem;
+        height: 2rem;
+    }
+}
