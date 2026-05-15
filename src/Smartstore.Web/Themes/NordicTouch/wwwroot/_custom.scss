@@ -653,6 +653,13 @@ label {
 // CART
 // =====================================================
 
+// Qty = 1 olduğunda minus butonu görsel olarak pasif
+.qty-input .numberinput-down.nt-qty-at-min {
+    pointer-events: none;
+    opacity: 0.25;
+    cursor: default;
+}
+
 // =====================================================
 // CHECKOUT STEPS (costep) overrides
 // =====================================================

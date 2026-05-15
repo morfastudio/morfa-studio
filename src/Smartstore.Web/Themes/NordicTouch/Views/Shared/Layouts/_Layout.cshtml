@@ -205,6 +205,38 @@
             });
         })();
         </script>
+
+        <script>
+        // NordicTouch: Sepette miktar 1 iken minus butonu pasif
+        (function () {
+            function updateMinusBtn(input) {
+                var $input = $(input);
+                var val = parseInt($input.val(), 10);
+                var min = parseInt($input.attr('min'), 10);
+                if (isNaN(min)) min = 1;
+                $input.closest('.qty-input').find('.numberinput-down')
+                    .toggleClass('nt-qty-at-min', val <= min);
+            }
+
+            function initAllQtyBtns(ctx) {
+                $((ctx || document)).find('.qty-input .numberinput').each(function () {
+                    updateMinusBtn(this);
+                });
+            }
+
+            $(document).ready(function () {
+                initAllQtyBtns();
+
+                $(document).on('change', '.qty-input .numberinput', function () {
+                    updateMinusBtn(this);
+                });
+
+                $(document).ajaxComplete(function () {
+                    initAllQtyBtns();
+                });
+            });
+        })();
+        </script>
     </div>
 
     <a href="#" id="scroll-top" class="scrollto d-flex align-items-center justify-content-center shadow-sm" aria-label="@T("Common.ScrollUp")">
