@@ -653,6 +653,13 @@ label {
 // CART
 // =====================================================
 
+// Qty input: sadece butonlarla değiştirilebilir, doğrudan yazılamaz
+.qty-input .numberinput {
+    pointer-events: none;
+    user-select: none;
+    caret-color: transparent;
+}
+
 // Qty = 1 olduğunda minus butonu görsel olarak pasif
 .qty-input .numberinput-down.nt-qty-at-min {
     pointer-events: none;

@@ -207,6 +207,11 @@
         </script>
 
         <script>
+        // NordicTouch: Qty input'a doğrudan yazılamaz
+        $(document).on('keydown paste', '.qty-input .numberinput', function (e) {
+            e.preventDefault();
+        });
+
         // NordicTouch: Sepette miktar 1 iken minus butonu pasif
         (function () {
             function updateMinusBtn(input) {

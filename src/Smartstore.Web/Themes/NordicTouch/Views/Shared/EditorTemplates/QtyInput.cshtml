@@ -50,7 +50,6 @@
 <div class="qty-input qty-input-spinner">
     <input asp-for="EnteredQuantity"
            type="number"
-           readonly
            attrs="@attributes"
            sm-control-size="@controlSize"
            sm-postfix="@(Model.EnteredQuantity > 1 ? Model.QuantityUnitNamePlural : Model.QuantityUnitName)"
