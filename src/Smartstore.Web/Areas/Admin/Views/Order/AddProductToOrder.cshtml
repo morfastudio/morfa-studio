@@ -1,20 +1,27 @@
 ﻿@using Smartstore.Core.Catalog.Products
+@using Smartstore.Core.Checkout.Tax
 
 @model AddOrderProductModel
+
+@inject TaxSettings TaxSettings
 
 @{
     ViewBag.Title = T("Admin.Orders.Products.AddNew.Title2", Model.Name, Model.OrderId);
 
     var warnings = ViewBag.Warnings as List<string>;
-    var primaryStoreCurrencyCode = (string)ViewBag.PrimaryStoreCurrencyCode;
 }
 
+<script src="~/admin/js/admin.taxcalculator.js" sm-target-zone="scripts" sm-key="tax-calculator"></script>
+
 @*We add enctype = "multipart/form-data" because "File upload" attribute control type requries it.*@
-<form method="post" asp-action="AddProductToOrder" asp-route-orderId="@Model.OrderId" asp-route-productId="@Model.ProductId" enctype="multipart/form-data">
+<form id="AddProductToOrderForm" method="post" asp-action="AddProductToOrder" asp-route-orderId="@Model.OrderId" asp-route-productId="@Model.ProductId" enctype="multipart/form-data">
+    @Html.HiddenFor(x => x.OrderId)
+    @Html.HiddenFor(x => x.ProductId)
+
     <div class="section-header">
         <div class="title">
             <a sm-backto asp-action="Edit" asp-route-id="@Model.OrderId" title="@T("Admin.Orders.Products.AddNew.BackToOrder")"></a>
-            <i class="far fa-chart-bar"></i>
+            <icon name="chart-bar" />
             <span>@ViewBag.Title</span>
         </div>
         <div class="options">
@@ -23,7 +30,14 @@
         </div>
     </div>
 
-    <div asp-validation-summary="All"></div>
+    <div sm-if="!warnings.IsNullOrEmpty()">
+        <div class="alert alert-danger">
+            @foreach (var warning in warnings)
+            {
+                <div>@Html.Raw(warning)</div>
+            }
+        </div>
+    </div>
 
     @if (Model.ProductType == ProductType.GroupedProduct)
     {
@@ -36,69 +50,13 @@
         return;
     }
 
-    <div sm-if="warnings?.Any() ?? false">
-        <div class="alert alert-danger">
-            @foreach (var warning in warnings)
-            {
-                <div>@Html.Raw(warning)</div>
-            }
-        </div>
+    <div id="AddProductToOrderPrices">
+        <partial name="_AddProductToOrder.Prices" />
     </div>
 
-    <div class="adminContent">
-        <div class="adminRow">
-            <div class="adminTitle">
-                <smart-label asp-for="UnitPriceInclTax" />
-            </div>
-            <div class="adminData">
-                <editor asp-for="UnitPriceInclTax" sm-postfix="@primaryStoreCurrencyCode" />
-            </div>
-        </div>
-        <div class="adminRow">
-            <div class="adminTitle">
-                <smart-label asp-for="UnitPriceExclTax" />
-            </div>
-            <div class="adminData">
-                <editor asp-for="UnitPriceExclTax" sm-postfix="@primaryStoreCurrencyCode" />
-            </div>
-        </div>
-        <div class="adminRow">
-            <div class="adminTitle">
-                <smart-label asp-for="TaxRate" />
-            </div>
-            <div class="adminData">
-                <editor asp-for="TaxRate" />
-            </div>
-        </div>
-        <div class="adminRow">
-            <div class="adminTitle">
-                <smart-label asp-for="Quantity" />
-            </div>
-            <div class="adminData">
-                <editor asp-for="Quantity" />
-            </div>
-        </div>
-        <div class="adminRow">
-            <div class="adminTitle">
-                <smart-label asp-for="PriceInclTax" />
-            </div>
-            <div class="adminData">
-                <editor asp-for="PriceInclTax" sm-postfix="@primaryStoreCurrencyCode" />
-            </div>
-        </div>
-        <div class="adminRow">
-            <div class="adminTitle">
-                <smart-label asp-for="PriceExclTax" />
-            </div>
-            <div class="adminData">
-                <editor asp-for="PriceExclTax" sm-postfix="@primaryStoreCurrencyCode" />
-            </div>
-        </div>
-    </div>
-
-    @if (Model.ProductVariantAttributes.Any())
+    @if (Model.ProductVariantAttributes.Count > 0)
     {
-        <partial name="_AddProductAttributes" />
+        <partial name="_AddProductToOrder.Attributes" />
     }
 
     @if (Model.GiftCard.IsGiftCard)
@@ -106,7 +64,7 @@
         var giftCardViewData = new ViewDataDictionary(ViewData);
         giftCardViewData.TemplateInfo.HtmlFieldPrefix = Model.GiftCardFieldPrefix;
 
-        <partial name="_AddProductGiftCardInfo" model="Model.GiftCard" view-data="giftCardViewData" />
+        <partial name="_AddProductToOrder.GiftCardInfo" model="Model.GiftCard" view-data="giftCardViewData" />
     }
 
     <div class="adminContent">
@@ -130,8 +88,8 @@
             <div class="adminTitle">
             </div>
             <div class="adminData">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa fa-plus"></i>
+                <button type="submit" class="btn btn-secondary confirm2" data-confirm-message="@T("Admin.Common.AskToProceed")">
+                    <icon name="plus"  />
                     <span>@T("Admin.Orders.Products.AddNew")</span>
                 </button>
             </div>
@@ -141,6 +99,44 @@
 
 <script sm-target-zone="scripts" data-origin="add-product-to-order">
     $(function () {
-        applyCommonPlugins($('#AddProductAttributeContainer'));
-    });
+		applyCommonPlugins($('#AddProductAttributeContainer'));
+
+		const taxCalc = new Smartstore.Admin.TaxCalculator({
+			rootSelector: '#AddProductToOrderForm',
+			pricesIncludeTax: @(TaxSettings.PricesIncludeTax.ToStringLower()),
+            decimals: @((int)ViewBag.PrimaryCurrencyDecimals),
+			res: {
+				@foreach (var key in new[]
+				{
+					"Admin.Common.TaxCalculator.Enable",
+					"Admin.Common.TaxCalculator.Disable"
+				})
+				{
+					<text>"@(Html.Raw(key))": @(T(key).JsValue),</text>
+				}
+			}
+		});
+
+		$('#AddProductToOrderForm').on('change', '#Quantity, .attribute-list, .attribute-list-item', () => {
+			$({}).ajax({
+				type: 'POST',
+				url: '@Url.Action("UpdateProductPrices")',
+				data: $('#AddProductToOrderForm').serialize(),
+				success: (response) => {
+					if (response.success) {
+						taxCalc.lock(true);
+
+						try {
+							const $elPrices = $('#AddProductToOrderPrices');
+							$elPrices.html(response.prices);
+							applyCommonPlugins($elPrices);
+						}
+						finally {
+							taxCalc.lock(false);
+						}
+					}
+				}
+			});
+		});
+	});
 </script>

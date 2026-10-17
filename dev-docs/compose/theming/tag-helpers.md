@@ -810,6 +810,22 @@ Here is an excerpt from _Smartstore.Web/Areas/Admin/Views/ActivityLog\_Grid.Acti
 ```
 {% endcode %}
 
+Icon concepts or explicit addresses can be used in column headers:
+
+```cshtml
+<column for="AttachmentsCount" icon="paperclip" title="" />
+```
+
+For dynamic icons in a display template, bind the concept or address to the
+`sm-icon` custom element. Use an explicit closing tag so the browser preserves
+the surrounding template markup correctly:
+
+```cshtml
+<display-template>
+    <sm-icon :name="item.row.Icon"></sm-icon>
+</display-template>
+```
+
 </details>
 
 <details>

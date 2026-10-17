@@ -228,8 +228,8 @@ public class ProductsController : WebApiController<Product>
     [ProducesResponseType(typeof(ProductCategory), Status200OK)]
     [ProducesResponseType(typeof(ProductCategory), Status201Created)]
     [ProducesResponseType(Status404NotFound)]
-    public Task<IActionResult> PostProductCategories(int key, 
-        int relatedkey /*categoryId*/, 
+    public Task<IActionResult> PostProductCategories(int key,
+        int relatedkey /*categoryId*/,
         [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] ProductCategory? model = default)
     {
         model ??= new();
@@ -598,6 +598,7 @@ public class ProductsController : WebApiController<Product>
                                 Name = val.Name,
                                 Alias = val.Alias,
                                 Color = val.Color,
+                                AdditionalColors = val.AdditionalColors,
                                 PriceAdjustment = val.PriceAdjustment,
                                 WeightAdjustment = val.WeightAdjustment,
                                 IsPreSelected = val.IsPreSelected,
@@ -611,6 +612,7 @@ public class ProductsController : WebApiController<Product>
                         {
                             value.Alias = val.Alias;
                             value.Color = val.Color;
+                            value.AdditionalColors = val.AdditionalColors;
                             value.PriceAdjustment = val.PriceAdjustment;
                             value.WeightAdjustment = val.WeightAdjustment;
                             value.IsPreSelected = val.IsPreSelected;

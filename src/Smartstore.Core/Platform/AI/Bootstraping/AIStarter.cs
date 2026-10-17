@@ -1,30 +1,50 @@
-﻿using Autofac;
+﻿using System.Net;
+using System.Net.Http;
+using Autofac;
 using Smartstore.Core.AI;
 using Smartstore.Core.AI.Metadata;
 using Smartstore.Core.AI.Prompting;
 using Smartstore.Engine.Builders;
+using Smartstore.Net.Http;
 
-namespace Smartstore.Core.Bootstrapping
+namespace Smartstore.Core.Bootstrapping;
+
+internal sealed class AIStarter : StarterBase
 {
-    internal sealed class AIStarter : StarterBase
+    public override bool Matches(IApplicationContext appContext)
+        => appContext.IsInstalled;
+
+    public override void ConfigureServices(IServiceCollection services, IApplicationContext appContext)
     {
-        public override bool Matches(IApplicationContext appContext) 
-            => appContext.IsInstalled;
-
-        public override void ConfigureContainer(ContainerBuilder builder, IApplicationContext appContext)
-        {
-            // Register all prompt generators.
-            var promptGeneratorTypes = appContext.TypeScanner.FindTypes<IAIPromptGenerator>();
-            foreach (var type in promptGeneratorTypes)
+        services.AddHttpClient("AIRemoteMetadata")
+            .AddSmartstoreUserAgent()
+            .ConfigurePrimaryHttpMessageHandler(c => new HttpClientHandler
             {
-                builder.RegisterType(type).As<IAIPromptGenerator>().Keyed<IAIPromptGenerator>(type).InstancePerLifetimeScope();
-            }
+                AutomaticDecompression = DecompressionMethods.GZip
+            })
+            .ConfigureHttpClient(client =>
+            {
+                //client.BaseAddress = new Uri("http://localhost:59318/");
+                client.BaseAddress = new Uri("https://smartstore.com/");
+                client.Timeout = TimeSpan.FromSeconds(2);
+            });
+    }
 
-            builder.RegisterType<JsonAIMetadataLoader>().As<IAIMetadataLoader>().SingleInstance();
-            builder.RegisterType<DefaultAIChatCache>().As<IAIChatCache>().SingleInstance();
-            builder.RegisterType<AIMessageBuilder>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<AIMessageResources>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<AIProviderFactory>().As<IAIProviderFactory>().InstancePerLifetimeScope();
+    public override void ConfigureContainer(ContainerBuilder builder, IApplicationContext appContext)
+    {
+        // Register all prompt generators.
+        var promptGeneratorTypes = appContext.TypeScanner.FindTypes<IAIPromptGenerator>();
+        foreach (var type in promptGeneratorTypes)
+        {
+            builder.RegisterType(type).As<IAIPromptGenerator>().Keyed<IAIPromptGenerator>(type).InstancePerLifetimeScope();
         }
+
+        builder.RegisterType<RemoteAIMetadataLoader>().As<IRemoteAIMetadataLoader>().SingleInstance();
+        builder.RegisterType<DefaultAIMetadataLoader>().As<IAIMetadataLoader>().SingleInstance();
+        builder.RegisterType<DefaultAIChatCache>().As<IAIChatCache>().SingleInstance();
+        builder.RegisterType<AIMessageBuilder>().AsSelf().InstancePerLifetimeScope();
+        builder.RegisterType<AIMessageResources>().AsSelf().InstancePerLifetimeScope();
+        builder.RegisterType<AIProviderFactory>().As<IAIProviderFactory>().InstancePerLifetimeScope();
+        builder.RegisterType<DefaultLlmsGenerator>().As<ILlmsGenerator>().InstancePerLifetimeScope();
     }
 }

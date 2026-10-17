@@ -3,8 +3,8 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using Smartstore.Collections.JsonConverters;
 using System.Text.Json.Serialization;
+using Smartstore.Collections.JsonConverters;
 
 namespace Smartstore.Collections;
 
@@ -315,7 +315,6 @@ public class Multimap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, ICollection
     public virtual IEnumerator<KeyValuePair<TKey, ICollection<TValue>>> GetEnumerator()
         => _dict.GetEnumerator();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void CheckNotReadonly()
     {
         if (_isReadonly)
@@ -332,7 +331,7 @@ public class Multimap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, ICollection
         {
             map.AddRange(group.Key, group);
         }
-                
+
         return map;
     }
 }

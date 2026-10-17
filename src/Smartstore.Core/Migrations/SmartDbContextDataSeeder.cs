@@ -1,4 +1,7 @@
-using Smartstore.Core.Common.Configuration;
+using Smartstore.Core.Catalog;
+using Smartstore.Core.Catalog.Products;
+using Smartstore.Core.Configuration;
+using Smartstore.Core.Theming;
 using Smartstore.Data.Migrations;
 using Smartstore.Utilities;
 
@@ -13,273 +16,407 @@ public class SmartDbContextDataSeeder : IDataSeeder<SmartDbContext>
     {
         await context.MigrateLocaleResourcesAsync(MigrateLocaleResources);
         await MigrateSettingsAsync(context, cancelToken);
+        await MigrateMessageTemplatesAsync(context, cancelToken);
     }
 
-    public Task MigrateSettingsAsync(SmartDbContext context, CancellationToken cancelToken = default)
+    public async Task MigrateSettingsAsync(SmartDbContext context, CancellationToken cancelToken = default)
     {
-        return context.MigrateSettingsAsync(builder =>
+        await context.MigrateSettingsAsync(builder =>
         {
-            builder.Add(TypeHelper.NameOf<CommonSettings>(x => x.MinLogLevelToRetain, true), LogLevel.Error);
+            builder.Add(TypeHelper.NameOf<ThemeSettings>(x => x.KeepSassCompilerInMemory, true), "False");
         });
+
+        var settings = context.Set<Setting>();
+        const string oldName1 = "TaxSettings.ShowLegalHintsInProductDetails";
+        const string oldName2 = "TaxSettings.ShowLegalHintsInProductList";
+
+        var oldSettings = await settings
+            .Where(x => x.Name == oldName1 || x.Name == oldName2)
+            .ToListAsync(cancelToken);
+        var oldSettings1 = oldSettings.Where(x => x.Name == oldName1).ToList();
+        var oldSettings2 = oldSettings.Where(x => x.Name == oldName2).ToList();
+
+        await MigrateLegalInfo(oldSettings1, TypeHelper.NameOf<CatalogSettings>(x => x.LegalInfoInProductDetail, true));
+        await MigrateLegalInfo(oldSettings2, TypeHelper.NameOf<CatalogSettings>(x => x.LegalInfoInLists, true));
+
+        if (oldSettings1.Count > 0 || oldSettings2.Count > 0)
+        {
+            await context.SaveChangesAsync(cancelToken);
+        }
+
+        async Task MigrateLegalInfo(List<Setting> oldSettings, string newName)
+        {
+            if (oldSettings.Count == 0)
+            {
+                return;
+            }
+
+            var storeIds = oldSettings.ToDistinctArray(x => x.StoreId);
+            var existingNewSettings = await settings
+                .Where(x => x.Name == newName && storeIds.Contains(x.StoreId))
+                .Select(x => x.StoreId)
+                .ToListAsync(cancelToken);
+
+            foreach (var oldSetting in oldSettings.Where(x => !existingNewSettings.Contains(x.StoreId)))
+            {
+                settings.Add(new()
+                {
+                    Name = newName,
+                    StoreId = oldSetting.StoreId,
+                    Value = (oldSetting.Value.Convert<bool>() ? ProductLegalInfo.All : ProductLegalInfo.None).Convert(string.Empty)
+                });
+            }
+
+            settings.RemoveRange(oldSettings);
+        }
+    }
+
+    public async Task MigrateMessageTemplatesAsync(SmartDbContext context, CancellationToken cancelToken = default)
+    {
+        var save = false;
+        var withdrawalTemplates = await context.MessageTemplates
+            .Where(x => x.Name == "Withdrawal.CustomerNotification" || x.Name == "Withdrawal.MerchantNotification" || x.Name == "Withdrawal.ProceedLink")
+            .ToListAsync(cancelToken);
+
+        foreach (var template in withdrawalTemplates)
+        {
+            var modelNames = template.ModelTypes.SplitSafe(',').Distinct().ToArray();
+            if (!modelNames.Contains("Order"))
+            {
+                template.ModelTypes = template.ModelTypes.Grow("Order", ", ");
+                save = true;
+            }
+        }
+
+        if (save)
+        {
+            await context.SaveChangesAsync(cancelToken);
+        }
     }
 
     public void MigrateLocaleResources(LocaleResourcesBuilder builder)
     {
-        builder.AddOrUpdate("Admin.Orders.Products.AppliedDiscounts",
-            "The following discounts were applied to the products: {0}.",
-            "Auf die Produkte wurden die folgenden Rabatte gewährt: {0}.");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Title", "Migrate icons", "Icons migrieren");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Start", "Start migration", "Migration starten");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Hint",
+            "Converts legacy Font Awesome icons in menus and HTML content to the new icon format. Already migrated icons remain unchanged. Migration usually takes just a few seconds, but may take several minutes for large datasets. Keep this page open until the migration finishes.",
+            "Überführt bisherige Font-Awesome-Icons in Menüs und HTML-Inhalten in das neue Icon-Format. Bereits migrierte Icons bleiben unverändert. Die Migration dauert meist nur wenige Sekunden, bei großen Datenbeständen auch mehrere Minuten. Lassen Sie diese Seite bis zum Abschluss geöffnet.");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Started", "Icon migration is running…", "Die Icon-Migration läuft…");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Completed",
+            "Completed: {0} records checked, {1} icons migrated, {2} icons not migrated.",
+            "Abgeschlossen: {0} Datensätze geprüft, {1} Icons migriert, {2} Icons nicht migriert.");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Failed",
+            "The migration could not be started or the connection was interrupted. You can start it again.",
+            "Die Migration konnte nicht gestartet werden oder die Verbindung wurde unterbrochen. Sie können sie erneut starten.");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Migrated", "Migrated", "Migriert");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Warning", "Warning", "Hinweis");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.NotMigrated", "Not migrated", "Nicht migriert");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Columns.Entity", "Entity", "Entität");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Columns.RecordId", "Record ID", "Datensatz-ID");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Columns.Field", "Field", "Feld");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Columns.Message", "Message", "Meldung");
+        builder.AddOrUpdate("Admin.System.Maintenance.Icons.Columns.NewValue", "New icon value", "Neuer Icon-Wert");
 
-        builder.AddOrUpdate("Identity.Error.PasswordRequiresDigit",
-            "At least one number (0–9)", 
-            "Mindestens eine Ziffer (0–9)");
+        builder.AddOrUpdate("Smartstore.AI.Prompts.UseImagePlaceholders",
+            "If an image is to be inserted, output this HTML placeholder: <div class=\"mb-3\"><sm-icon name=\"file-image\" size=\"xl\" class=\"ai-preview-file\" title=\"SECTION_HEADING\"></sm-icon></div>. Replace SECTION_HEADING with the associated section heading, escaped for an HTML attribute. Keep the element names and all other attributes exactly as shown. The sm-icon element must remain empty and have an explicit closing tag; do not replace it with an i, img or svg element or add Font Awesome classes.",
+            "Wenn ein Bild einzufügen ist, gib diesen HTML-Platzhalter aus: <div class=\"mb-3\"><sm-icon name=\"file-image\" size=\"xl\" class=\"ai-preview-file\" title=\"ABSCHNITTSÜBERSCHRIFT\"></sm-icon></div>. Ersetze ABSCHNITTSÜBERSCHRIFT durch die zugehörige Abschnittsüberschrift, korrekt für ein HTML-Attribut maskiert. Behalte die Elementnamen und alle anderen Attribute exakt bei. Das sm-icon-Element muss leer bleiben und ein explizites schließendes Tag haben; ersetze es nicht durch ein i-, img- oder svg-Element und ergänze keine Font-Awesome-Klassen.");
 
-        builder.AddOrUpdate("Identity.Error.PasswordRequiresLower",
-            "At least one lowercase letter (a–z)",
-            "Mindestens ein Kleinbuchstabe (a–z)");
+        builder.AddOrUpdate("ShoppingCart.Mini.EmptyCart.Info",
+            "You have not added any product to your cart yet. Use the {0} icon to add a product to your cart.",
+            "Sie haben noch keine Produkte in Ihren Warenkorb gelegt.<br /> Benutzen Sie das {0} Symbol, um ein Produkt in den Warenkorb zu legen.");
+        builder.AddOrUpdate("ShoppingCart.Mini.EmptyWishlist.Info",
+            "You have not added any product to your wishlist yet. Use the {0} icon to add a product to your wishlist.",
+            "Sie haben noch keine Produkte auf Ihrer Wunschliste vermerkt.<br /> Benutzen Sie das {0} Symbol, um ein Produkt in Ihrer Wunschliste zu vermerken.");
+        builder.AddOrUpdate("ShoppingCart.Mini.EmptyCompare.Info",
+            "You have not added any product to your compare list yet. Use the {0} icon to add a product to your compare list.",
+            "Sie haben noch keine Produkte in Ihrer Vergleichsliste.<br /> Benutzen Sie das {0} Symbol, um ein Produkt in die Vergleichsliste aufzunehmen.");
 
-        builder.AddOrUpdate("Identity.Error.PasswordRequiresNonAlphanumeric",
-            "At least one special character (e.g. !@#$)",
-            "Mindestens ein Sonderzeichen (z.B. !@#$)");
+        builder.AddOrUpdate("Common.Select.AddPlaceholder", "＋ Add…", "＋ Hinzufügen…");
 
-        builder.AddOrUpdate("Identity.Error.PasswordRequiresUniqueChars",
-            "At least {0} unique characters",
-            "Mindestens {0} eindeutige Zeichen");
+        builder.AddOrUpdate("Enums.QuantizationMethod.Octree", "Hexadecatree (formerly Octree)", "Hexadecatree (vormals Octree)");
+        builder.AddOrUpdate("Enums.JpegColorType.YCbCrRatio422", "YCbCr 4:2:2", "YCbCr 4:2:2");
+        builder.AddOrUpdate("Enums.JpegColorType.YCbCrRatio411", "YCbCr 4:1:1", "YCbCr 4:1:1");
+        builder.AddOrUpdate("Enums.JpegColorType.YCbCrRatio410", "YCbCr 4:1:0", "YCbCr 4:1:0");
+        builder.AddOrUpdate("Admin.Configuration.Settings.Media.GifQuantizationMethod", "GIF palette quantization", "GIF-Palettenquantisierung");
 
-        builder.AddOrUpdate("Identity.Error.PasswordRequiresUpper",
-            "At least one uppercase letter (A–Z)",
-            "Mindestens ein Großbuchstabe (A–Z)");
+        builder.AddOrUpdate("Admin.Configuration.Settings.Media.JpegColorType",
+            "JPEG color type",
+            "JPEG-Farbtyp",
+            "Leave empty for automatic selection.",
+            "Leer lassen für automatische Auswahl.");
+        builder.AddOrUpdate("Admin.Configuration.Settings.Media.PngQuantizationMethod",
+            "PNG palette quantization",
+            "PNG-Palettenquantisierung",
+            "Only affects palette-based PNG images. Has no effect on RGB or RGBA images.",
+            "Wirkt nur auf PNG-Bilder mit Farbpalette. Hat bei RGB- und RGBA-Bildern keine Wirkung.");
 
-        builder.AddOrUpdate("Identity.Error.PasswordTooShort",
-            "At least {0} characters",
-            "Mindestens {0} Zeichen");
+        builder.AddOrUpdate("Admin.IconBrowser.SelectSource", "Select source", "Quelle wählen",
+            "Select an icon source", "Icon-Quelle wählen");
+        builder.AddOrUpdate("Admin.IconBrowser.Kits", "Kits", "Kits");
+        builder.AddOrUpdate("Admin.IconBrowser.Libraries", "Libraries", "Bibliotheken");
+        builder.AddOrUpdate("Admin.IconBrowser.KitTitle", "Kit: {0}", "Kit: {0}");
+        builder.AddOrUpdate("Admin.IconBrowser.LibraryTitle", "Library: {0}", "Bibliothek: {0}");
+        builder.AddOrUpdate("Admin.IconBrowser.Icon", "Icon", "Icon");
+        builder.AddOrUpdate("Admin.IconBrowser.Search", "Search icons", "Icons suchen");
+        builder.AddOrUpdate("Admin.IconBrowser.Size", "Size", "Größe");
+        builder.Delete("Admin.IconBrowser.Color", "Admin.IconBrowser.FlipHorizontal", "Admin.IconBrowser.FlipVertical", "Admin.IconBrowser.Rotation", "Admin.IconBrowser.Animation", "Admin.IconBrowser.StrokeWidth", "Admin.IconBrowser.NoAnimation");
+        builder.AddOrUpdate("Common.MoreOptions", "More options", "Weitere Optionen");
+        builder.AddOrUpdate("Admin.Catalog.Categories.Fields.Icon",
+            "Icon",
+            "Icon",
+            "The icon appears in the category navigation, in the main menu including dropdowns, in the mobile menu and in the category tree in the administration.",
+            "Das Icon erscheint in der Kategorienavigation, im Hauptmenü einschließlich Dropdowns, im mobilen Menü sowie im Kategoriebaum der Administration.");
 
-        builder.AddOrUpdate("Account.Register.Result.MeetPasswordRules",
-            "Password must meet these rules: {0}",
-            "Passwort muss diese Regeln erfüllen: {0}");
+        builder.AddOrUpdate("Admin.Design.Color", "Color", "Farbe");
+        builder.AddOrUpdate("Admin.Design.FlipHorizontal", "Flip horizontally", "Horizontal spiegeln");
+        builder.AddOrUpdate("Admin.Design.FlipVertical", "Flip vertically", "Vertikal spiegeln");
+        builder.AddOrUpdate("Admin.Design.Rotation", "Rotation", "Rotation");
+        builder.AddOrUpdate("Admin.Design.Animation", "Animation", "Animation");
+        builder.AddOrUpdate("Admin.Design.StrokeWidth", "Stroke width", "Strichstärke");
+        builder.AddOrUpdate("Admin.Design.NoAnimation", "No animation", "Keine Animation");
+        builder.AddOrUpdate("Admin.IconBrowser.Options", "Icon options", "Icon-Optionen");
+        builder.AddOrUpdate("Admin.IconBrowser.External", "provided by a module", "von einem Modul bereitgestellt");
 
-        builder.AddOrUpdate("Admin.OrderNotice.OrderPlacedUcp",
-            "The order was placed using UCP (Agentic Commerce) \"{0}\". The payment token {1} was processed without a user interface.",
-            "Bestellung ist über UCP (Agentic Commerce) \"{0}\" eingegangen. Das Zahlungstoken {1} wurde ohne Benutzeroberfläche verarbeitet.");
+        builder.AddOrUpdate("Admin.Themes.Info.Flex",
+            "A clean, versatile storefront with bright surfaces, clear typography and a product-focused layout. The flexible foundation for the Flex theme family.",
+            "Ein klarer, vielseitiger Shop mit hellen Flächen, gut lesbarer Typografie und einem Layout, das Ihre Produkte in den Mittelpunkt stellt. Die flexible Basis der Flex-Theme-Familie.");
+        builder.AddOrUpdate("Admin.Themes.Info.FlexBlack",
+            "A distinctive boxed storefront with slim Barlow Semi Condensed typography, a black service bar and layered graphite navigation. Crisp white content and soft neutral panels create a restrained, contemporary contrast.",
+            "Ein markantes Box-Layout mit schlanker Barlow-Semi-Condensed-Typografie, schwarzer Serviceleiste und abgestuften Graphittönen in der Navigation. Weiße Inhaltsflächen und sanfte Neutraltöne sorgen für einen zurückhaltenden, modernen Kontrast.");
+        builder.AddOrUpdate("Admin.Themes.Info.FlexBlue",
+            "A signature all-blue header, crisp white product surfaces and warm orange actions. Soft blue details and a deep navy footer give this classic a clear, contemporary feel.",
+            "Ein durchgehend blauer Header, klare weiße Produktflächen und warme orangefarbene Akzente. Sanfte Blautöne und ein tiefblauer Footer verleihen diesem Klassiker einen zeitgemäßen Charakter.");
+        builder.AddOrUpdate("Admin.Themes.Info.FlexSorbet",
+            "A fresh editorial palette of aubergine, lime and mint on warm porcelain, with expressive serif headings.",
+            "Eine frische Kombination aus Aubergine, Limette und Mint auf warmem Porzellanweiß. Ausdrucksstarke Serifenschriften setzen die Überschriften in Szene.");
+        builder.AddOrUpdate("Admin.Themes.Info.FlexTidal",
+            "Atlantic ink, vivid coral and glacial blue. Crisp typography, clean geometry and bright product surfaces.",
+            "Atlantikblau, lebendiges Korallrot und kühles Eisblau. Klare Typografie, geradlinige Formen und helle Produktflächen.");
+        builder.AddOrUpdate("Admin.Themes.Info.FlexAfterglow",
+            "Graphite nights with electric mint, soft orchid and apricot accents. A calm dark canvas with luminous details.",
+            "Dunkle Graphittöne mit leuchtendem Mint, sanftem Orchideenlila und Apricot. Ein ruhiges Dark Theme mit strahlenden Akzenten.");
+        builder.AddOrUpdate("Admin.Themes.Info.FlexLumen",
+            "A bright white canvas with iris-blue actions, soft lavender surfaces and petrol accents. Familiar, airy and quietly modern.",
+            "Strahlendes Weiß mit irisblauen Akzenten, sanften Lavendelflächen und Petrol. Vertraut, luftig und dezent modern.");
+        builder.AddOrUpdate("Admin.Themes.Info.FlexRiso",
+            "Inspired by risograph prints: cobalt ink, fluorescent pink and sunflower yellow on bright white paper. Condensed DIN-style headings and playful off-register accents.",
+            "Inspiriert vom Risographie-Druck: Kobaltblau, Neonpink und Sonnengelb auf strahlend weißem Papier. Kompakte Überschriften im DIN-Stil und verspielte, leicht versetzte Farbakzente.");
 
-        builder.AddOrUpdate("Order.Product(s).OrderedQuantity", "Ordered", "Bestellt");
+        builder.AddOrUpdate("Admin.Configuration.Themes.Option.KeepSassCompilerInMemory",
+            "Keep Sass compiler in memory",
+            "Sass-Compiler im Arbeitsspeicher halten",
+            "Recommended while actively editing Sass files or changing theme variables in the admin area. Keeping the Dart Sass compiler running speeds up repeated compilations but uses additional memory. Otherwise, leave this disabled; an unused compiler is stopped after a short idle period.",
+            "Empfohlen, wenn Sie gerade intensiv Sass-Dateien bearbeiten oder Theme-Variablen im Backend ändern. Der Dart-Sass-Compiler bleibt aktiv und beschleunigt wiederholte Kompilierungen, benötigt aber zusätzlichen Arbeitsspeicher. Ansonsten deaktiviert lassen; ein ungenutzter Compiler wird nach kurzer Zeit beendet.");
 
-        builder.AddOrUpdate("Admin.AI.TextCreation.Organize",
-            "Organize",
-            "Gliedern");
-
-        builder.AddOrUpdate("Smartstore.AI.Prompts.EnsureLogicalFlow",
-            "Add headings (h2-h6) where appropriate, break long paragraphs, use lists for enumerations, ensure logical flow.",
-            "Füge passende Überschriften (h2-h6) ein, unterteile lange Absätze, nutze Listen für Aufzählungen und stelle einen logischen Ablauf sicher.");
-
-        builder.AddOrUpdate("Smartstore.AI.Prompts.AssignIdToHeader",
-            "Assign each heading a unique, concise id attribute in kebab-case format based on core content keywords. On ID collision: number them (e.g., id=\"benefits-1\", id=\"benefits-2\").",
-            "Vergib für jede Überschrift ein eindeutiges, prägnantes id-Attribut im \"kebab-case\"-Format, das auf den Kern-Keywords des Textinhalts basiert. Bei ID-Kollision: nummeriere (z.B. id=\"vorteile-1\", id=\"vorteile-2\").");
-
-        builder.AddOrUpdate("Smartstore.AI.Prompts.CleanupMarkup",
-            "Remove inline styles, empty elements, unnecessary span/div/font wrappers, and redundant nesting.",
-            "Entferne Inline-Styles, leere Elemente, überflüssige span/div/font-Umhüllungen und unnötige Verschachtelungen.");
-
-        builder.AddOrUpdate("Smartstore.AI.Prompts.PreserveSemantic",
-            "Keep all semantic HTML intact (including tables, blockquotes, images, code blocks, etc.). Preserve CSS classes, links, and attributes.",
-            "Behalte sämtliche semantischen HTML-Elemente bei (inkl. Tabellen, Blockquotes, Bilder, Code-Blöcke etc.). Erhalte CSS-Klassen, Links und Attribute.");
-
-        builder.AddOrUpdate("Smartstore.AI.Prompts.OnlyImproveStructure",
-            "Only improve structure—don't remove content or meaningful markup.",
-            "Verbessere ausschließlich die Struktur – keine Inhalte oder bedeutsames Markup entfernen.");
-
-        builder.AddOrUpdate("Admin.AI.TopicGenerate", "Generate {0}", "{0} generieren");
-        builder.AddOrUpdate("Admin.AI.TopicOptimize", "Optimize {0}", "{0} optimieren");
-        builder.AddOrUpdate("Admin.AI.Topic.Text", "Text", "Text");
-        builder.AddOrUpdate("Admin.AI.Topic.Image", "Image", "Bild");
-        builder.AddOrUpdate("Admin.AI.Topic.ShortDesc", "Short Description", "Kurzbeschreibung");
-        builder.AddOrUpdate("Admin.AI.Topic.MetaTitle", "Title-Tag", "Title-Tag");
-        builder.AddOrUpdate("Admin.AI.Topic.MetaDesc", "Meta Description", "Meta Description");
-        builder.AddOrUpdate("Admin.AI.Topic.MetaKeywords", "Meta Keywords", "Meta Keywords");
-        builder.AddOrUpdate("Admin.AI.Topic.FullDesc", "Full Description", "Langtext");
         builder.Delete(
-            "Admin.AI.EditHtml", 
-            "Admin.AI.CreateImage", 
-            "Admin.AI.CreateText",
-            "Admin.AI.CreateShortDesc",
-            "Admin.AI.CreateFullDesc",
-            "Admin.AI.CreateMetaTitle",
-            "Admin.AI.CreateMetaDesc",
-            "Admin.AI.CreateMetaKeywords");
+            "Admin.Configuration.Settings.Performance.KeepSassCompilerInMemory",
+            "Admin.Configuration.Settings.Performance.KeepSassCompilerInMemory.Hint");
 
-        builder.AddOrUpdate("Order.Product(s).OrderedQuantity", "Ordered", "Bestellt");
+        builder.Delete(
+            "Admin.Orders.Products.AddNew.UnitPriceInclTax.Hint",
+            "Admin.Orders.Products.AddNew.UnitPriceExclTax.Hint",
+            "Admin.Orders.Products.AddNew.SubTotalInclTax.Hint",
+            "Admin.Orders.Products.AddNew.SubTotalExclTax.Hint",
+            "Admin.Orders.Products.Edit",
+            "Admin.Orders.Products.Edit.InclTax",
+            "Admin.Orders.Products.Edit.ExclTax",
+            "Admin.Orders.Fields.OrderShippingInclTax.Hint",
+            "Admin.Orders.Fields.OrderSubTotalDiscountInclTax.Hint",
+            "Admin.Orders.Fields.OrderSubtotalInclTax.Hint",
+            "Admin.Orders.Fields.OrderShippingExclTax.Hint",
+            "Admin.Orders.Fields.OrderSubTotalDiscountExclTax.Hint",
+            "Admin.Orders.Fields.OrderSubtotalExclTax.Hint");
 
-        builder.AddOrUpdate("ReturnCase.EntireOrder", "Entire order", "Gesamte Bestellung");
-        builder.AddOrUpdate("ReturnCase.CertainItems", "Certain items", "Bestimmte Artikel");
+        builder.AddOrUpdate("Admin.Orders.Products.AddNew.UnitPriceInclTax", "Unit price", "Einzelpreis");
+        builder.AddOrUpdate("Admin.Orders.Products.AddNew.UnitPriceExclTax", "Unit price", "Einzelpreis");
+        builder.AddOrUpdate("Admin.Orders.Products.AddNew.SubTotalInclTax", "Total", "Gesamt");
+        builder.AddOrUpdate("Admin.Orders.Products.AddNew.SubTotalExclTax", "Total", "Gesamt");
+
+        builder.AddOrUpdate("Admin.Orders.Fields.Edit.InclTax", "{0} gross", "{0} brutto");
+        builder.AddOrUpdate("Admin.Orders.Fields.Edit.ExclTax", "{0} net", "{0} netto");
+        builder.AddOrUpdate("Admin.Common.TaxPercent", "tax %", "Steuer %");
+
+        builder.AddOrUpdate("Admin.Orders.Fields.OrderShippingInclTax", "Order shipping (gross)", "Versandkosten (brutto)");
+        builder.AddOrUpdate("Admin.Orders.Fields.OrderShippingExclTax", "Order shipping (net)", "Versandkosten (netto)");
+
+        builder.AddOrUpdate("Admin.Orders.Fields.OrderSubTotalDiscountInclTax", "Order subtotal discount (gross)", "Rabatt für Auftragszwischensumme (brutto)");
+        builder.AddOrUpdate("Admin.Orders.Fields.OrderSubTotalDiscountExclTax", "Order subtotal discount (net)", "Rabatt für Auftragszwischensumme (netto)");
+
+        builder.AddOrUpdate("Admin.Orders.Fields.OrderSubtotalInclTax", "Order subtotal (gross)", "Auftragszwischensumme (brutto)");
+        builder.AddOrUpdate("Admin.Orders.Fields.OrderSubtotalExclTax", "Order subtotal (net)", "Auftragszwischensumme (netto)");
+
+        builder.AddOrUpdate("Admin.Orders.Products.Total")
+            .Value("de", "Gesamt");
+
+        builder.AddOrUpdate("Admin.Common.TaxCalculator.Enable",
+            "Enable automatic gross-to-net conversion",
+            "Automatische Brutto-/Netto-Umrechnung aktivieren");
+
+        builder.AddOrUpdate("Admin.Common.TaxCalculator.Disable",
+            "Disable automatic gross-to-net conversion",
+            "Automatische Brutto-/Netto-Umrechnung deaktivieren");
+
+        builder.AddOrUpdate("Admin.Common.TaxCalculator.NoCalculation",
+            "An automatic gross-to-net conversion is not possible (e.g. due to varying tax rates).",
+            "Eine automatische Brutto-/Netto-Umrechnung ist nicht möglich (z.B. aufgrund unterschiedlicher Steuersätze).");
+
+        builder.AddOrUpdate("Admin.DataExchange.Export.Filter.IsPublished.Hint",
+            "Specifies whether only published objects are exported, provided the object has a publishing setting.",
+            "Legt fest, ob nur Objekte, die veröffentlicht wurden, exportiert werden, sofern das Objekt eine Einstellung zur Veröffentlichung besitzt.");
+
+        builder.AddOrUpdate("Footer.Info", "Information", "Informationen");
+
+        builder.AddOrUpdate("Smartstore.AI.Prompts.DontUseHtml",
+            "Return plain text only. Do not use HTML tags.",
+            "Gib ausschließlich Klartext zurück. Verwende keine HTML-Tags.");
 
         builder.AddOrUpdate("ReturnCase.WithdrawEntireOrder",
-            "I would like to withdraw the entire order:",
-            "Ich möchte die gesamte Bestellung stornieren:");
+            "I want to withdraw the contract for the entire order:",
+            "Ich möchte den Vertrag für die gesamte Bestellung widerrufen:");
         builder.AddOrUpdate("ReturnCase.WithdrawItems",
-            "I would like to withdraw the following items:", 
-            "Ich möchte folgende Artikel stornieren:");
+            "I want to withdraw the contract for the following items:",
+            "Ich möchte den Vertrag für die folgenden Artikel widerrufen:");
 
-        builder.AddOrUpdate("Account.CustomerOrders.ReturnItems", "Return items", "Artikel zurücksenden");
+        builder.AddOrUpdate("ReturnCase.ReturnEntireOrder",
+            "I want to return the entire order:",
+            "Ich möchte die gesamte Bestellung zurücksenden:");
+        builder.AddOrUpdate("ReturnCase.ReturnItems",
+            "I want to return the following items:",
+            "Ich möchte die folgenden Artikel zurücksenden:");
 
-        builder.Delete("Admin.ReturnRequests.Updated",
-            "Admin.ReturnRequests.Deleted");
+        builder.AddOrUpdate("Admin.Configuration.Settings.Catalog.DisplayAllImagesNumber",
+            "Only show selected variant images from this number of images",
+            "Ab dieser Bildanzahl nur Bilder der gewählten Variante anzeigen",
+            "Once this number of images has been reached, only the product images of the selected variant are displayed. If fewer images are available, all the product images are shown.",
+            "Sobald diese Bildanzahl erreicht ist, werden nur noch die Produktbilder der gewählten Variante angezeigt. Bei weniger Bildern werden hingegen alle Produktbilder angezeigt.");
 
-        builder.AddOrUpdate("ReturnRequests.NoItemsSubmitted",
-            "Please select the items you wish to return and specify the quantity.",
-            "Wählen Sie bitte die Artikel und die Menge aus, die Sie zurücksenden möchten.");
+        builder.AddOrUpdate("Order.PlaceOrderError",
+            "The order could not be completed due to an unexpected error. Customer ID: {0}.",
+            "Die Bestellung konnte aufgrund eines unerwarteten Fehlers nicht abgeschlossen werden. Kunden-ID: {0}.");
 
-        builder.AddOrUpdate("ReturnRequests.Submit", "Submit return request", "Retourenantrag absenden");
-        builder.AddOrUpdate("ReturnRequests.Submitted", "A return request has been submitted.", "Der Retourenantrag wurde übermittelt.");
+        builder.AddOrUpdate("Order.AlreadyExists",
+            "The order has already been created. Customer ID: {0}.",
+            "Die Bestellung wurde bereits angelegt. Kunden-ID: {0}.");
 
-        builder.AddOrUpdate("Admin.ReturnRequests.Fields.ID",
-            "ID",
-            "ID",
-            "ID of the withdrawal or return",
-            "ID des Widerrufs bzw. der Retoure");
+        builder.AddOrUpdate("Admin.Configuration.Payment.Methods.NoMatchingCartHash",
+            "Cannot recover order. The current cart hash {0} does not match the original cart hash {1}.",
+            "Die Bestellung kann nicht wiederhergestellt werden. Der aktuelle Warenkorb-Hash {0} stimmt nicht mit dem ursprünglichen Warenkorb-Hash {1} überein.");
 
-        builder.AddOrUpdate("Admin.Common.SuccessfullySaved",
-            "The changes have been saved successfully.",
-            "Die Änderungen wurden erfolgreich gespeichert.");
-        builder.AddOrUpdate("Admin.Common.SuccessfullyDeleted",
-            "The entries were successfully deleted.",
-            "Die Einträge wurden erfolgreich gelöscht.");
+        builder.AddOrUpdate("Admin.Configuration.Payment.Methods.NoMatchingCartTotal",
+            "Cannot recover order. The current cart total {0} does not match the paid amount {1}.",
+            "Die Bestellung kann nicht wiederhergestellt werden. Der aktuelle Warenkorb-Gesamtbetrag {0} stimmt nicht mit dem bezahlten Betrag {1} überein.");
 
-        builder.AddOrUpdate("Account.PasswordRecovery.EmailHasBeenSent",
-            "If there is an account associated with this email, we have sent a link to reset your password.",
-            "Falls ein Konto mit dieser E-Mail-Adresse verknüpft ist, haben wir Ihnen soeben Anweisungen zum Zurücksetzen Ihres Passworts zugeschickt.");
+        builder.AddOrUpdate("Admin.Configuration.Payment.Methods.EnableOrderRecovery",
+            "Recover missing orders",
+            "Fehlende Aufträge wiederherstellen",
+            "Specifies whether a missing order should be recovered when a webhook notification about a successful payment is received.",
+            "Legt fest, ob ein fehlender Auftrag wiederhergestellt werden soll, wenn eine Webhook-Nachricht über eine erfolgreiche Zahlung eingeht.");
 
-        builder.AddOrUpdate("Admin.Configuration.Settings.Order.ReturnRequestsEnabled")
-            .Value("en", "Return requests enabled");
+        builder.AddOrUpdate("Admin.Configuration.Payment.Methods.OrderRecoveryMinAgeSeconds",
+            "Recover missing order x seconds after payment",
+            "Fehlenden Auftrag x Sekunden nach Zahlung wiederherstellen",
+            "Specifies how many seconds must elapse after payment before a missing order is recovered. The value should not be too small, so that the order process has enough time to be completed. The default is 10 seconds.",
+            "Legt fest, wie viele Sekunden nach Zahlung vergehen müssen, damit ein fehlender Auftrag wiederhergestellt wird. Der Wert sollte nicht zu klein sein, um dem Bestellvorgang genügend Zeit für den Abschluss zu geben. Standard ist 10 Sekunden.");
 
-        builder.Delete("Admin.Configuration.Settings.Order.ReturnRequestsEnabled.Hint",
-            "Admin.Configuration.Settings.Order.OrderSettings",
-            "Admin.Configuration.Settings.Order.ReturnRequestsDescription2");
+        builder.AddOrUpdate("Admin.Configuration.Payment.Methods.OrderRecoveryMaxAgeHours",
+            "Recover missing orders only up to x hours after payment",
+            "Fehlenden Auftrag nur bis x Stunden nach Zahlung wiederherstellen",
+            "Specifies how many hours after a payment is completed a missing order may be automatically recovered. If the payment is older than the specified value, automatic recovery will no longer be performed. 0 means unlimited age. The default is 24 hours.",
+            "Legt fest, wie viele Stunden nach Abschluss einer Zahlung ein fehlender Auftrag automatisch wiederhergestellt werden darf. Ist die Zahlung älter als der angegebene Wert, wird keine automatische Wiederherstellung mehr durchgeführt. 0 bedeutet unbegrenztes Alter. Standard ist 24 Stunden.");
 
-        builder.AddOrUpdate("Admin.Configuration.Settings.Order.NumberOfDaysReturnRequestAvailable",
-            "Allowed period for return requests (in days)",
-            "Erlaubter Zeitraum für Retourenanträge (in Tagen)");
+        builder.AddOrUpdate("Admin.Catalog.Products.Deleted",
+            "The product was moved to the recycle bin.",
+            "Das Produkt wurde in den Papierkorb verschoben.");
 
-        builder.AddOrUpdate("Admin.Configuration.Settings.Order.NumberOfDaysReturnRequestAvailable.Hint",
-            "The number of days after order completion during which customers can submit return requests."
-            + " This applies to RMA return requests only and not to legal withdrawal. The value 0 means \"unlimited\".",
-            "Die Anzahl der Tage nach Abschluss der Bestellung, während der Kunden Retourenanträge einreichen können."
-            + " Dies gilt nur für Retourenanträge im Rahmen des RMA-Verfahrens und nicht für den gesetzlichen Widerruf. Der Wert 0 bedeutet \"unbegrenzt\".");
+        builder.AddOrUpdate("ActivityLog.DeleteProduct",
+            "Product ('{0}') has been moved to the recycle bin",
+            "Produkt ('{0}') in den Papierkorb verschoben");
 
-        builder.AddOrUpdate("Admin.Configuration.Settings.Order.ReturnRequestReasons.Hint")
-            .Value("de", "Eine kommaseparierte Liste von Retourengründen, die der Benutzer auswählen kann, wenn er einen Retourenantrag übermittelt.");
+        builder.AddOrUpdate("Admin.Configuration.Settings.Price.RulesCalculateIncludingTax",
+            "Cart rules calculate amounts including tax",
+            "Warenkorbregeln berechnen Beträge inklusive Steuer",
+            "Specifies whether shopping cart rules calculate amounts as inclusive of or exclusive of tax. If not specified (default), the tax settings for the respective shopping cart or customer apply.",
+            "Legt fest, ob Warenkorbregeln die Beträge inklusive oder exklusive Umsatzsteuer berechnen. Falls nicht festgelegt (Standard), gelten die Steuereinstellungen des jeweiligen Warenkorbs bzw. Kunden.");
 
-        builder.AddOrUpdate("Admin.Configuration.Settings.Order.ReturnRequestActions")
-            .Value("en", "Available return actions");
-       
-        builder.AddOrUpdate("Admin.Configuration.Settings.Order.ReturnRequestActions.Hint",
-            "A comma-separated list of the actions that a customer will be able to select when submitting a return request. This is not used for legal withdrawal.",
-            "Eine kommaseparierte Liste von Aktionen, aus denen der Benutzer wählen kann, wenn er einen Retourenantrag übermittelt. Beispiel: \"Ersatz\", \"Gutschein\" usw."
-            + " Dies wird nicht für den gesetzlichen Widerruf verwendet.");
+        #region product legal info
 
-        builder.AddOrUpdate("Admin.Configuration.Settings.Order.ReturnRequestSettings", "Returns", "Retouren");
+        builder.AddOrUpdate("Products.ShippingInfo",
+            "plus shipping",
+            "zzgl. Versandkosten");
 
-        builder.AddOrUpdate("Admin.Configuration.Settings.GeneralCommon.CaptchaShowOnTargets.Option.Withdrawal", "Withdrawal", "Widerruf");
+        builder.AddOrUpdate("Products.ShippingInfoUrl",
+            "plus <a href=\"{0}\">shipping</a>",
+            "zzgl. <a href=\"{0}\">Versandkosten</a>");
 
-        var prefix = "Admin.Configuration.Settings.Resiliency";
+        builder.AddOrUpdate("Products.ShippingInfoWithSurcharge",
+            "plus shipping and a <b>{0}</b> shipping surcharge",
+            "zzgl. Versandkosten und <b>{0}</b> Versandaufschlag");
 
-        builder.AddOrUpdate($"{prefix}.QueuedMailSending", "Mail Sending", "E-Mail-Versand");
-        builder.AddOrUpdate($"{prefix}.QueuedMailSendingNotes",
-            "Limits how many queued emails can be sent within a specific time window to prevent overload during email bursts.",
-            "Begrenzt die Anzahl der E-Mails, die innerhalb eines bestimmten Zeitfensters versendet werden können, um Überlastung bei E-Mail-Spitzen zu verhindern.");
+        builder.AddOrUpdate("Products.ShippingInfoUrlWithSurcharge",
+            "plus <a href=\"{0}\">shipping</a> and a <b>{1}</b> shipping surcharge",
+            "zzgl. <a href=\"{0}\">Versandkosten</a> und <b>{1}</b> Versandaufschlag");
 
-        builder.AddOrUpdate($"{prefix}.MailSendRateWindow",
-            "Time window (hh:mm:ss)",
-            "Zeitfenster (hh:mm:ss)",
-            "The time period for measuring the queued mail send rate (e.g., 1 minute).",
-            "Der Zeitraum für die Messung der E-Mail-Versandrate (z.B. 1 Minute).");
+        builder.AddOrUpdate("Products.ShippingSurchargeInfo",
+            "plus <b>{0}</b> shipping surcharge",
+            "zzgl. <b>{0}</b> Versandaufschlag");
 
-        builder.AddOrUpdate($"{prefix}.MailSendRateLimit",
-            "Limit",
-            "Grenzwert",
-            "The maximum number of queued emails that may be sent during the time window. Empty value means there is no limit.",
-            "Die maximale Anzahl von E-Mails, die während des Zeitfensters versendet werden dürfen. Ein leerer Wert bedeutet: keine Begrenzung.");
+        builder.AddOrUpdate("Products.FreeShippingInfo",
+            "free shipping",
+            "versandkostenfrei");
 
-        builder.AddOrUpdate("Admin.Rules.FilterDescriptor.AllProductsWithDeliveryTimeInCart",
-            "All products with delivery time in cart",
-            "Alle Produkte mit Lieferzeit im Warenkorb");
+        builder.AddOrUpdate("Products.TaxLegalInfo", "Prices {0}", "Preise {0}");
 
-        builder.AddOrUpdate("Common.Unlimited", "Unlimited", "Unbegrenzt");
+        builder.AddOrUpdate("Common.AdditionalShippingSurcharge",
+            "Plus <b>{0}</b> shipping surcharge",
+            "zzgl. <b>{0}</b> Versandaufschlag");
 
-        builder.AddOrUpdate("RewardPoints.PointsForPurchasesInfo",
-            "For every {0} net order value, {1} points are awarded.",
-            "Für einen Auftragswert von je {0} netto werden {1} Punkte gewährt.");
+        builder.AddOrUpdate("Admin.Configuration.Settings.Catalog.LegalInfoInProductDetail",
+            "Legal information on product page",
+            "Rechtliche Hinweise auf der Produktseite",
+            "Specifies which tax and shipping cost notes are displayed on the product page. If nothing is selected, no note is displayed. An additional shipping charge is always displayed.",
+            "Legt fest, welche Hinweise zu Steuer und Versandkosten auf der Produktseite angezeigt werden. Ohne Auswahl wird kein Hinweis angezeigt. Ein Transportzuschlag wird immer angezeigt.");
 
-        builder.AddOrUpdate("Admin.Configuration.Settings.GeneralCommon.GoogleRecaptcha.Info",
-            "Manage keys and domains in the <a class='fwm' href='https://www.google.com/recaptcha/admin' target='_blank'>reCAPTCHA Admin Console</a>. v3 runs invisibly with a risk score; optional step-up challenges can be enabled if needed.",
-            "Keys und Domains verwalten Sie in der <a class='fwm' href='https://www.google.com/recaptcha/admin' target='_blank'>reCAPTCHA Admin Console</a>. Bei v3 erfolgt die Bewertung unsichtbar per Score; Step-Up-Prüfungen sind optional möglich.");
+        builder.AddOrUpdate("Admin.Configuration.Settings.Catalog.LegalInfoInLists",
+            "Legal information in product lists",
+            "Rechtliche Hinweise in Produktlisten",
+            "Specifies which tax and shipping cost notes are displayed in the list view and in the product comparison. If nothing is selected, no note is displayed.",
+            "Legt fest, welche Hinweise zu Steuer und Versandkosten in der Listenansicht und im Produktvergleich angezeigt werden. Ohne Auswahl wird kein Hinweis angezeigt.");
 
-        builder.AddOrUpdate("Enums.VatNumberStatus.ServiceUnavailable",
-            "Online checks are currently unavailable",
-            "Onlineprüfung derzeit nicht möglich");
+        builder.AddOrUpdate("Enums.ProductLegalInfo.Tax", "Tax note (incl./excl. VAT)", "Steuerhinweis (inkl./zzgl. MwSt.)");
+        builder.AddOrUpdate("Enums.ProductLegalInfo.Shipping", "Shipping cost note", "Versandkostenhinweis");
 
-        builder.AddOrUpdate("Admin.Customers.Customers.Fields.VatNumberStatus", 
-            "VAT number status", 
-            "Status der Steuernummer");
+        builder.Delete(
+            "Tax.LegalInfoProductDetail",
+            "Tax.LegalInfoProductDetail2",
+            "Tax.LegalInfoShort",
+            "Tax.LegalInfoShort2",
+            "Tax.LegalInfoShort3",
+            "Admin.Configuration.Settings.Tax.ShowLegalHintsInProductDetails",
+            "Admin.Configuration.Settings.Tax.ShowLegalHintsInProductDetails.Hint",
+            "Admin.Configuration.Settings.Tax.ShowLegalHintsInProductList",
+            "Admin.Configuration.Settings.Tax.ShowLegalHintsInProductList.Hint",
+            "Admin.Configuration.Settings.Tax.ShowLegalHintsInProductGrid",
+            "Admin.Configuration.Settings.Tax.ShowLegalHintsInProductGrid.Hint");
 
-        builder.AddOrUpdate("Admin.Customers.Customers.Fields.VatNumber.MarkAs",
-            "Mark as",
-            "Markieren als");
+        #endregion
 
-        builder.AddOrUpdate("Admin.Customers.CheckVatNumber",
-            "Check online",
-            "Online prüfen",
-            "Checks the VAT number online and updates its status.",
-            "Prüft die Steuernummer online und aktualisiert deren Status.");
+        builder.AddOrUpdate("Products.EmailAFriend.LoginNote",
+            "Please log in to use this function. <a href=\"{0}\" rel=\"nofollow\">Login now</a>",
+            "Bitte melden Sie sich an, um diese Funktion nutzen zu können. <a href=\"{0}\" rel=\"nofollow\">Jetzt anmelden</a>");
 
-        builder.AddOrUpdate("Admin.Customers.VatNumberValidationError",
-            "The following error occurred while verifying the VAT number online: {0}",
-            "Bei der Onlineprüfung der Steuernummer ist folgender Fehler aufgetreten: {0}");
+        builder.AddOrUpdate("Admin.Common.InvalidFileName", "Invalid file name \"{0}\".", "Ungültiger Dateiname \"{0}\".");
 
-        builder.AddOrUpdate("Admin.Configuration.Settings.Catalog.ShippingMetadataInProductDetail",
-            "Shipping information for search engines",
-            "Versandinformationen für Suchmaschinen",
-            "This specifies whether structured shipping information is added for products with free shipping for search engines."
-            + " Other shipping costs are not included as these are based on information provided by customers and cannot be clearly assigned to a single product.",
-            "Legt fest, ob für Produkte mit kostenlosem Versand strukturierte Versandinformationen für Suchmaschinen hinzugefügt werden."
-            + " Andere Versandkosten werden nicht berücksichtigt, da sie auf Kundenangaben basieren und sich nicht eindeutig einem einzelnen Produkt zuordnen lassen.");
+        builder.AddOrUpdate("Admin.Configuration.Settings.Performance.MaxVariantPriceCalculations",
+            "Maximum number of price calculations for color and image swatches",
+            "Maximale Anzahl an Preisberechnungen bei Farb- und Bildmustern",
+            "Maximum number of full price calculations for color and image swatches, provided that attribute combinations with fixed prices exist. If this limit is exceeded, the prices for swatches are hidden.",
+            "Maximale Anzahl vollständiger Preisberechnungen bei Farb- und Bildmustern, sofern Attributkombinationen mit festen Preisen existieren. Bei Überschreitung dieser Grenze werden die Preise für Farb- und Bildmuster ausgeblendet.");
 
-        builder.AddOrUpdate("RewardPoints.Message.EarnedForNewsletterSubscription",
-            "Earned reward points for signing up for the newsletter in the \"{0}\" store.",
-            "Erhaltene Bonuspunkte für die Newsletter-Anmeldung im Shop \"{0}\".");
+        builder.AddOrUpdate("Admin.Catalog.Products.ProductVariantAttributes.AttributeCombinations.SelectAttributes",
+            "Set the attributes for the combination.",
+            "Legen Sie die Attribute für die Kombination fest");
 
-        builder.AddOrUpdate("Admin.Configuration.Settings.RewardPoints.PointsForNewsletterSubscription",
-            "Points for subscribing to the newsletter",
-            "Punkte für das Abonnieren des Newsletters",
-            "Specifies how many reward points registered customers will receive as a one-time bonus for subscribing to the newsletter.",
-            "Legt fest, wie viele Bonuspunkte registrierte Kunden einmalig für das Abonnieren des Newsletters erhalten.");
-
-        builder.AddOrUpdate("Admin.Configuration.Settings.RewardPoints.Description",
-            "The reward points program allows customers to earn points for certain actions, such as registering or placing orders.",
-            "Das Bonuspunkteprogramm ermöglicht es Kunden, für bestimmte Aktionen Punkte zu sammeln, beispielsweise für Registrierungen oder Bestellungen.");
-
-        builder.AddOrUpdate("Admin.Configuration.Settings.CustomerUser.NewsletterEnabled.Hint",
-            "Specifies whether the option to subscribe to the newsletter is displayed.",
-            "Legt fest, ob die Option zum Abonnieren des Newsletters angezeigt wird.");
-
-        builder.AddOrUpdate("Common.Print", "Print", "Drucken");
-
-        builder.AddOrUpdate("Admin.Configuration.Settings.Order.ReturnRequestsDescription1",
-            "Customers can use the returns system to request the return of items. Unlike withdrawal, returns are only possible for completed orders.",
-            "Über das Retourensystem können Kunden die Rücksendung von Artikeln beantragen. Im Gegensatz zum Widerruf ist eine Retoure nur für abgeschlossene Aufträge möglich.");
-
-        builder.AddOrUpdate("Admin.Configuration.Settings.Price.ShowRequiredProductPricesWithMainProduct",
-            "Show additional prices with main product",
-            "Zusatzpreise beim Hauptprodukt anzeigen",
-            "Specifies whether the prices of automatically added required products are displayed below the price of the main product, for example \"+ €3.00 deposit\"."
-            + " This makes additional mandatory costs, such as deposits or required accessories, visible before the customer proceeds to the shopping cart.",
-            "Legt fest, ob Preise automatisch hinzugefügter erforderlicher Produkte unterhalb des Preises des Hauptprodukts angezeigt werden, beispielsweise \"+ 3,00 € Pfand\"."
-            + " Dadurch werden zusätzliche Pflichtkosten wie Pfand oder erforderliches Zubehör bereits vor dem Warenkorb sichtbar.");
-
-        builder.AddOrUpdate("Products.RequiredProductPriceInfo",
-            "<span>+ {0} <span title=\"{1}\">{2}</span></span>",
-            "<span>+ {0} <span title=\"{1}\">{2}</span></span>");
-
-        builder.AddOrUpdate("Common.Preset", "Preset", "Voreinstellung");
-
-        
+        builder.AddOrUpdate("Admin.Rules.FilterDescriptor.DiscountApplied", "Discount code applied", "Rabattcode angewendet");
+        builder.AddOrUpdate("Admin.Rules.FilterDescriptor.GiftCardApplied", "Gift card applied", "Geschenkgutschein angewendet");
     }
 }

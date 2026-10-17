@@ -1,7 +1,6 @@
-﻿@using Smartstore.Core.Catalog
-@using Smartstore.Core.Catalog.Products
-@using Smartstore.Core.Catalog.Pricing
-@using Smartstore.Admin.Models.Catalog
+﻿@using Smartstore.Admin.Models.Catalog
+@using Smartstore.Core.Catalog
+@using Smartstore.Core.Catalog.Attributes
 
 @model CatalogSettingsModel
 
@@ -13,12 +12,12 @@
 <form asp-action="CatalogSettings">
     <div class="section-header">
         <div class="title">
-            <i class="fa fa-book"></i>
+            <icon name="book" />
             @T("Admin.Configuration.Settings.Catalog")
         </div>
         <div class="options">
-            <button type="submit" name="save" value="save" class="btn btn-warning">
-                <i class="fa fa-check"></i>
+            <button type="submit" name="save" value="save" class="btn btn-primary">
+                <icon name="check" />
                 <span>@T("Admin.Common.Save")</span>
             </button>
         </div>
@@ -388,6 +387,17 @@
                 </div>
                 <div class="adminRow">
                     <div class="adminTitle">
+                        <smart-label asp-for="LegalInfoInLists" />
+                    </div>
+                    <div class="adminData">
+                        <setting-editor asp-for="LegalInfoInLists">
+                            <select asp-for="LegalInfoInLists" asp-items="ViewBag.ProductLegalInfos" multiple="multiple"></select>
+                        </setting-editor>
+                        <span asp-validation-for="LegalInfoInLists"></span>
+                    </div>
+                </div>
+                <div class="adminRow">
+                    <div class="adminTitle">
                         <smart-label asp-for="ShowShortDescriptionInGridStyleLists" />
                     </div>
                     <div class="adminData">
@@ -606,6 +616,17 @@
                 </div>
                 <div class="adminRow">
                     <div class="adminTitle">
+                        <smart-label asp-for="LegalInfoInProductDetail" />
+                    </div>
+                    <div class="adminData">
+                        <setting-editor asp-for="LegalInfoInProductDetail">
+                            <select asp-for="LegalInfoInProductDetail" asp-items="ViewBag.ProductLegalInfos" multiple="multiple"></select>
+                        </setting-editor>
+                        <span asp-validation-for="LegalInfoInProductDetail"></span>
+                    </div>
+                </div>
+                <div class="adminRow">
+                    <div class="adminTitle">
                         <smart-label asp-for="ShowManufacturerInProductDetail" />
                     </div>
                     <div class="adminData">
@@ -665,6 +686,28 @@
                     <div class="adminData">
                         <setting-editor asp-for="ShowProductTags"></setting-editor>
                         <span asp-validation-for="ShowProductTags"></span>
+                    </div>
+                </div>
+                <div class="adminRow">
+                    <div class="adminTitle">
+                        <smart-label asp-for="DefaultSwatchSize" />
+                    </div>
+                    <div class="adminData">
+                        <setting-editor asp-for="DefaultSwatchSize">
+                            <editor asp-for="DefaultSwatchSize" />
+                        </setting-editor>
+                        <span asp-validation-for="DefaultSwatchSize"></span>
+                    </div>
+                </div>
+                <div class="adminRow">
+                    <div class="adminTitle">
+                        <smart-label asp-for="DefaultSwatchShape" />
+                    </div>
+                    <div class="adminData">
+                        <setting-editor asp-for="DefaultSwatchShape">
+                            <select asp-for="DefaultSwatchShape" asp-items="Html.GetLocalizedEnumSelectList(typeof(SwatchShape))"></select>
+                        </setting-editor>
+                        <span asp-validation-for="DefaultSwatchShape"></span>
                     </div>
                 </div>
             </div>

@@ -40,10 +40,10 @@ public class StripeController : ModuleController
     private readonly IRoundingHelper _roundingHelper;
     private readonly IOrderProcessingService _orderProcessingService;
     private readonly StripeHelper _stripeHelper;
-    
+
     public StripeController(
-        SmartDbContext db, 
-        StripeSettings settings, 
+        SmartDbContext db,
+        StripeSettings settings,
         ICheckoutStateAccessor checkoutStateAccessor,
         ICheckoutWorkflow checkoutWorkflow,
         IShoppingCartService shoppingCartService,
@@ -215,7 +215,9 @@ public class StripeController : ModuleController
     public async Task<IActionResult> ConfirmOrder(string formData)
     {
         string redirectUrl = null;
+        string clientSecret = null;
         var messages = new List<string>();
+        var requiresAction = false;
         var success = false;
 
         try
@@ -240,7 +242,7 @@ public class StripeController : ModuleController
                 if (await _orderProcessingService.IsMinimumOrderPlacementIntervalValidAsync(customer, store))
                 {
                     var state = _checkoutStateAccessor.CheckoutState.GetCustomState<StripeCheckoutState>();
-                    var cartTotal = await _orderCalculationService.GetShoppingCartTotalAsync(cart, true);
+                    var cartTotal = await _orderCalculationService.GetShoppingCartTotalAsync(cart, ShoppingCartTotalOptions.Default);
                     var convertedTotal = cartTotal.ConvertedAmount.Total.Value;
 
                     var paymentIntentService = new PaymentIntentService();
@@ -248,7 +250,7 @@ public class StripeController : ModuleController
 
                     var shippingOption = customer.GenericAttributes.Get<ShippingOption>(SystemCustomerAttributeNames.SelectedShippingOption, store.Id);
                     var shipping = shippingOption != null
-                        ? await GetShippingAddressAsync(customer, shippingOption.Name) 
+                        ? await GetShippingAddressAsync(customer, shippingOption.Name)
                         : null;
 
                     if (!state.PaymentIntentId.HasValue())
@@ -286,21 +288,36 @@ public class StripeController : ModuleController
                         paymentIntent = await paymentIntentService.UpdateAsync(state.PaymentIntentId, intentUpdateOptions);
                     }
 
-                    var confirmOptions = new PaymentIntentConfirmOptions
-                    {
-                        ReturnUrl = store.GetAbsoluteUrl(Url.Action("RedirectionResult", "Stripe").TrimStart('/'))
-                    };
-
+                    var confirmOptions = CreateConfirmOptions(store);
                     paymentIntent = await paymentIntentService.ConfirmAsync(paymentIntent.Id, confirmOptions);
 
-                    if (paymentIntent.NextAction?.RedirectToUrl?.Url?.HasValue() == true)
-                    {
-                        redirectUrl = paymentIntent.NextAction.RedirectToUrl.Url;
-                    }
+                    var paymentCompleted = IsPaymentCompleted(paymentIntent);
+                    redirectUrl = paymentIntent.Status == "requires_action"
+                        ? paymentIntent.NextAction?.RedirectToUrl?.Url
+                        : null;
 
-                    success = true;
-                    state.IsConfirmed = true;
-                    state.FormData = formData.EmptyNull();
+                    if (paymentCompleted || redirectUrl.HasValue())
+                    {
+                        success = true;
+                        state.IsConfirmed = true;
+                        state.FormData = formData.EmptyNull();
+                    }
+                    else if (paymentIntent.Status == "requires_action" && paymentIntent.ClientSecret.HasValue())
+                    {
+                        success = true;
+                        requiresAction = true;
+                        clientSecret = paymentIntent.ClientSecret;
+                        state.FormData = formData.EmptyNull();
+                    }
+                    else
+                    {
+                        Logger.Warn(
+                            "Stripe payment intent {0} cannot complete checkout with status '{1}' and next action '{2}'.",
+                            paymentIntent.Id,
+                            paymentIntent.Status,
+                            paymentIntent.NextAction?.Type);
+                        messages.Add(T("Payment.PaymentFailure"));
+                    }
                 }
                 else
                 {
@@ -318,7 +335,59 @@ public class StripeController : ModuleController
             messages.Add(ex.Message);
         }
 
-        return Json(new { success, redirectUrl, messages });
+        return Json(new { success, redirectUrl, requiresAction, clientSecret, messages });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CompletePayment(string formData)
+    {
+        var state = _checkoutStateAccessor.CheckoutState.GetCustomState<StripeCheckoutState>();
+        if (!state.PaymentIntentId.HasValue())
+        {
+            return Json(new { success = false, messages = new[] { T("Payment.MissingCheckoutState", "StripeCheckoutState." + nameof(state.PaymentIntentId)) } });
+        }
+
+        try
+        {
+            var paymentIntentService = new PaymentIntentService();
+            var paymentIntent = await paymentIntentService.GetAsync(state.PaymentIntentId);
+
+            if (paymentIntent.Status == "requires_confirmation")
+            {
+                paymentIntent = await paymentIntentService.ConfirmAsync(
+                    paymentIntent.Id,
+                    CreateConfirmOptions(Services.StoreContext.CurrentStore));
+            }
+
+            if (IsPaymentCompleted(paymentIntent))
+            {
+                state.IsConfirmed = true;
+                state.FormData = formData.EmptyNull();
+
+                return Json(new { success = true });
+            }
+
+            Logger.Warn(
+                "Stripe payment intent {0} cannot complete checkout with status '{1}' and next action '{2}'.",
+                paymentIntent.Id,
+                paymentIntent.Status,
+                paymentIntent.NextAction?.Type);
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex);
+        }
+
+        return Json(new { success = false, messages = new[] { T("Payment.PaymentFailure") } });
+    }
+
+    private PaymentIntentConfirmOptions CreateConfirmOptions(Store store)
+    {
+        return new PaymentIntentConfirmOptions
+        {
+            ReturnUrl = store.GetAbsoluteUrl(Url.Action("RedirectionResult", "Stripe").TrimStart('/')),
+            UseStripeSdk = true
+        };
     }
 
     private async Task<ChargeShippingOptions> GetShippingAddressAsync(Core.Identity.Customer customer, string carrier)
@@ -345,27 +414,21 @@ public class StripeController : ModuleController
     {
         var error = false;
         string message = null;
-        var success = redirect_status == "succeeded" || redirect_status == "pending" || !redirect_status.HasValue();
 
         //Logger.LogInformation($"Stripe redirection result: '{redirect_status}'");
 
-        // INFO: In case of declined payment when checking card data with 3D Secure redirection
-        // we must check the status of the payment intend for 'requires_payment_method' which means the payment was declined.
         var paymentIntentService = new PaymentIntentService();
         PaymentIntent paymentIntent = await paymentIntentService.GetAsync(payment_intent);
+        var state = _checkoutStateAccessor.CheckoutState.GetCustomState<StripeCheckoutState>();
 
-        if (success && paymentIntent.Status != "requires_payment_method")
+        if (state.PaymentIntentId.EqualsNoCase(paymentIntent.Id) && IsPaymentCompleted(paymentIntent))
         {
-            var state = _checkoutStateAccessor.CheckoutState.GetCustomState<StripeCheckoutState>();
-            if (state.PaymentIntentId.HasValue())
-            {
-                state.SubmitForm = true;
-            }
-            else
-            {
-                error = true;
-                message = T("Payment.MissingCheckoutState", "StripeCheckoutState." + nameof(state.PaymentIntentId));
-            }
+            state.SubmitForm = true;
+        }
+        else if (!state.PaymentIntentId.HasValue())
+        {
+            error = true;
+            message = T("Payment.MissingCheckoutState", "StripeCheckoutState." + nameof(state.PaymentIntentId));
         }
         else
         {
@@ -383,6 +446,11 @@ public class StripeController : ModuleController
 
         return RedirectToAction(nameof(CheckoutController.Confirm), "Checkout");
     }
+
+    private static bool IsPaymentCompleted(PaymentIntent paymentIntent)
+        => paymentIntent.Status == "succeeded" ||
+            paymentIntent.Status == "requires_capture" ||
+            paymentIntent.Status == "processing";
 
     [HttpPost]
     public IActionResult StorePaymentMethodId(string paymentMethodId)
@@ -420,11 +488,13 @@ public class StripeController : ModuleController
                 {
                     var settings = await Services.SettingFactory.LoadSettingsAsync<StripeSettings>(order.StoreId);
 
-                    // INFO: This can also be a partial capture.
-                    decimal convertedAmount = paymentIntent.Amount / 100M;
+                    var orderTotal = _currencyService.ConvertToExchangeRate(
+                        order.OrderTotal,
+                        order.CurrencyRate,
+                        order.CustomerCurrencyCode);
 
                     // Check if full order amount was captured.
-                    if (order.OrderTotal == convertedAmount)
+                    if (_roundingHelper.ToSmallestCurrencyUnit(orderTotal) == paymentIntent.Amount)
                     {
                         if (settings.CaptureMethod == "automatic" && order.CanMarkOrderAsPaid())
                         {
@@ -454,22 +524,36 @@ public class StripeController : ModuleController
 
                 if (order != null)
                 {
-                    decimal convertedAmount = charge.Amount / 100M;
+                    var customerCurrency = _currencyService.CreateMoney(decimal.Zero, order.CustomerCurrencyCode).Currency;
 
-                    if (order.OrderTotal == convertedAmount)
+                    // Stripe amounts use currency-specific integer minor units, e.g. factor 1 for JPY and 100 for EUR.
+                    var factor = _roundingHelper.ToSmallestCurrencyUnit(1M, customerCurrency);
+                    decimal amountInCustomerCurrency = charge.AmountRefunded / (decimal)factor;
+                    var totalRefunded = _roundingHelper.Round(amountInCustomerCurrency / order.CurrencyRate, _currencyService.PrimaryCurrency);
+                    var amountToRefund = Math.Min(totalRefunded - order.RefundedAmount, order.OrderTotal - order.RefundedAmount);
+
+                    if (amountToRefund <= decimal.Zero)
                     {
-                        if (order.CanRefundOffline())
-                        {
-                            await _orderProcessingService.RefundOfflineAsync(order);
-                        }
+                        return Ok();
                     }
-                    else if (order.CanPartiallyRefundOffline(convertedAmount))
+
+                    if (charge.Refunded && order.CanRefundOffline())
                     {
-                        await _orderProcessingService.PartiallyRefundOfflineAsync(order, convertedAmount);
+                        await _orderProcessingService.RefundOfflineAsync(order);
+                    }
+                    else if (order.CanPartiallyRefundOffline(amountToRefund))
+                    {
+                        await _orderProcessingService.PartiallyRefundOfflineAsync(order, amountToRefund);
+
+                        if (charge.Refunded)
+                        {
+                            order.PaymentStatus = PaymentStatus.Refunded;
+                            await _db.SaveChangesAsync();
+                        }
                     }
                 }
             }
-            else if (stripeEvent.Type == EventTypes.PaymentIntentCanceled || 
+            else if (stripeEvent.Type == EventTypes.PaymentIntentCanceled ||
                      stripeEvent.Type == EventTypes.PaymentIntentPaymentFailed)
             {
                 var paymentIntent = stripeEvent.Data.Object as PaymentIntent;

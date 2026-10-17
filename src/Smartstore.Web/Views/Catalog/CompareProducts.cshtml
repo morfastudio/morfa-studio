@@ -25,7 +25,7 @@
     var hasSkus = Model.ShowSku && Model.Items.Any(x => x.Sku.HasValue());
     var hasDescriptions = Model.ShowDescription && Model.Items.Any(x => x.ShortDescription.Value.HasValue());
     var hasDimensions = Model.Items.Any(x => x.Dimensions.HasValue());
-    var hasWeight = Model.Items.Any(x => x.Weight.HasValue());
+    var hasWeight = Model.Items.Any(x => !x.Weight.IsEmpty);
 }
 
 <div class="page compare-products-page">
@@ -42,7 +42,7 @@
                     aria-label="@T("Products.Compare.Clear")"
                     data-type="compare"
                     data-action="remove">
-                <i class="far fa-trash-can" aria-hidden="true"></i>
+                <icon name="trash" aria-hidden="true" />
                 <span>@T("Products.Compare.Clear")</span>
             </button>
         </div>
@@ -76,7 +76,7 @@
                                                     aria-describedby="sr-desc-empty"
                                                     data-type="cart"
                                                     data-action="add">
-                                                <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
+                                                <icon name="cart-add"  aria-hidden="true" />
                                             </button>
                                         }
                                         @if (showWishlist)
@@ -89,7 +89,7 @@
                                                     aria-describedby="sr-desc-empty"
                                                     data-type="wishlist"
                                                     data-action="add">
-                                                <i class="fal fa-heart" aria-hidden="true"></i>
+                                                <icon name="heart"  aria-hidden="true" />
                                             </button>
                                         }
                                     </div>
@@ -102,7 +102,7 @@
                                                 aria-describedby="sr-desc-empty"
                                                 data-type="compare"
                                                 data-action="remove">
-                                            <i class="far fa-trash-can" aria-hidden="true"></i>
+                                            <icon name="trash" aria-hidden="true" />
                                         </button>
                                     </div>
                                 </div>

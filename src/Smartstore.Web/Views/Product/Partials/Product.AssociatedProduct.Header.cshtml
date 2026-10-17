@@ -17,10 +17,11 @@
 
     var hasImageHeader = HasHeader(AssociatedProductHeader.Image);
     var hasSkuHeader = HasHeader(AssociatedProductHeader.Sku);
+    var hasGtinHeader = HasHeader(AssociatedProductHeader.Gtin);
     var hasDimensionsHeader = HasHeader(AssociatedProductHeader.Dimensions);
     var hasWeightHeader = HasHeader(AssociatedProductHeader.Weight);
     var hasPriceHeader = HasHeader(AssociatedProductHeader.Price);
-    var hasData = hasSkuHeader || hasDimensionsHeader || hasWeightHeader;
+    var hasData = hasSkuHeader || hasGtinHeader || hasDimensionsHeader || hasWeightHeader;
     var hasDataCol = hasData || hasPriceHeader;
 
     var dataLen = HeaderFields().Length;
@@ -78,9 +79,9 @@
 
     string GetFormattedDimensions(bool full)
     {
-        var w = Model.WidthValue;
-        var h = Model.HeightValue;
-        var l = Model.LengthValue;
+        var w = Model.Width.Value;
+        var h = Model.Height.Value;
+        var l = Model.Length.Value;
 
         if (w == 0 && h == 0 && l == 0)
             return string.Empty;
@@ -139,6 +140,9 @@
                 <div sm-if="@hasSkuHeader" class="col pd-assoc-attr text-start text-lg-center d-none d-sm-block" title="@Model.Sku">
                     @Model.Sku
                 </div>
+                <div sm-if="@hasGtinHeader" class="col pd-assoc-attr text-start text-lg-center d-none d-sm-block" title="@Model.Gtin">
+                    @Model.Gtin
+                </div>
                 <div sm-if="@hasDimensionsHeader" class="col pd-assoc-attr text-start text-lg-center d-none d-sm-block" title="@GetFormattedDimensions(true)">
                     @GetFormattedDimensions(false)
                 </div>
@@ -168,10 +172,10 @@
                         title="@addToCartLabel"
                         aria-label="@addToCartLabel - @Model.Name"
                         aria-describedby="sr-desc-empty">
-                        <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
+                        <icon name="cart-add"  aria-hidden="true" />
                 </button>
             </div>
-            <i class="fas fa-angle-up collapse-chevron m-0 ml-2" aria-hidden="true"></i>
+            <icon name="chevron-up" class="collapse-chevron m-0 ml-2" aria-hidden="true" />
         </div>
     </div>
 </div>

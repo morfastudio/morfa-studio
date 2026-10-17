@@ -21,48 +21,48 @@
         <sort by="CreatedOn" by-entity-member="CreatedOnUtc" descending="true" />
     </sorting>
     <toolbar>
-        @if (isOrderListPage)
-        {
-            <toolbar-group>
-                <button datagrid-action="DataGridToolAction.ToggleSearchPanel" type="button" class="btn btn-light btn-icon">
-                    <i class="fa fa-fw fa-filter"></i>
-                </button>
-            </toolbar-group>
+        <toolbar-group sm-if="isOrderListPage">
+            <button datagrid-action="DataGridToolAction.ToggleSearchPanel" type="button" class="btn btn-plain btn-icon">
+                <icon name="filter" />
+            </button>
+        </toolbar-group>
 
-            <toolbar-group class="dropdown">
-                <button type="button" class="btn btn-light btn-flat dropdown-toggle" data-toggle="dropdown" data-boundary="window">
+        <toolbar-group class="dropdown" sm-if="isOrderListPage">
+            <fragment>
+                <button type="button" class="btn btn-plain dropdown-toggle" data-toggle="dropdown" data-boundary="window">
                     @T("Admin.Common.Export.PDF")
                 </button>
                 <div class="dropdown-menu">
                     <a href="javascript:;" class="dropdown-item process-orders" v-bind:class="{ disabled: !grid.hasSelection }" data-url="@Url.Action("ExportPdf", "Order")">
-                        <i class="far fa-fw fa-file-pdf"></i>
+                        <icon name="file-pdf" class="icon-fw" />
                         <span class="order-process-title">@T("Admin.Common.ExportToPdf.Selected")</span>
                     </a>
                     <a href="javascript:;" class="dropdown-item process-orders all-allowed" data-url="@Url.Action("ExportPdf", "Order")" data-msg="@T("Admin.Common.AskToProceed")">
-                        <i class="far fa-fw fa-file-pdf"></i>
+                        <icon name="file-pdf" class="icon-fw" />
                         <span class="order-process-title">@T("Admin.Common.ExportToPdf.All")</span>
                     </a>
                 </div>
-            </toolbar-group>
-        }
+            </fragment>
+        </toolbar-group>
         <zone name="datagrid_toolbar_alpha"></zone>
         <toolbar-group class="omega"></toolbar-group>
         <zone name="datagrid_toolbar_omega"></zone>
         <toolbar-group class="dropdown">
-            <button datagrid-action="DataGridToolAction.ReactToSelection" class="btn btn-light btn-flat dropdown-toggle no-chevron" data-toggle="dropdown" data-boundary="window">
-                <i class="fa fa-fw fa-ellipsis-h"></i>
+            <button datagrid-action="DataGridToolAction.ReactToSelection" class="btn btn-plain dropdown-toggle no-chevron" data-toggle="dropdown" data-boundary="window">
+                <icon name="ellipsis" class="icon-fw" />
             </button>
-            <div class="dropdown-menu dropdown-menu-right">
-                @{ OrdersGridMenu(false); }
-            </div>
+            <fragment>
+                <div class="dropdown-menu dropdown-menu-right">
+                    @{
+                        await OrdersGridMenu(false);
+                    }
+                </div>
+            </fragment>
         </toolbar-group>
     </toolbar>
-    @if (isOrderListPage)
-    {
-        <search-panel>
-            <partial name="~/Areas/Admin/Views/Order/Grids/_Grid.Orders.Search.cshtml" model="parentModel" />
-        </search-panel>
-    }
+    <search-panel sm-if="isOrderListPage">
+        <partial name="~/Areas/Admin/Views/Order/Grids/_Grid.Orders.Search.cshtml" model="parentModel" />
+    </search-panel>
     <columns>
         <column for="Id" halign="center" visible="false" type="string" />
         <column for="OrderNumber" hideable="false" width="auto">
@@ -108,7 +108,7 @@
         <column for="OrderTotalString" entity-member="OrderTotal" halign="flex-end">
             <display-template>
                 <div class="dg-cell-value text-right">
-                    <div class="pr-2 text-truncate">
+                    <div class="d-flex align-items-center justify-content-end gap-1 text-truncate">
                         <big class="fwm">{{ item.row.OrderTotalString }}</big>
                         <i :class="item.row.PaymentStatusLabelClass" :title="item.row.PaymentStatusString"></i>
                     </div>
@@ -138,24 +138,28 @@
         </column>
     </columns>
     <row-commands>
-        @{ OrdersGridMenu(true); }
+        <fragment>
+            @{
+                await OrdersGridMenu(true);
+            }
+        </fragment>
     </row-commands>
 </datagrid>
 
 @functions
 {
-    void OrdersGridMenu(bool isRowCommand)
+    async Task OrdersGridMenu(bool isRowCommand)
     {
         var key = isRowCommand ? " :data-key='item.row.Id'" : string.Empty;
         <div class="dropdown-header h6 text-uppercase">
             @T("Admin.Orders.Fields.OrderStatus")
         </div>
         <a href="javascript:;" class="dropdown-item process-orders" data-url="@Url.Action("ProcessOrder", "Order", new { operation = "complete" })"@Html.Raw(key)>
-            <i class="fa fa-fw fa-check"></i>
+            <icon name="check" class="icon-fw" />
             <span class="order-process-title">@T("Enums.OrderStatus.Complete")</span>
         </a>
         <a href="javascript:;" class="dropdown-item process-orders" data-url="@Url.Action("ProcessOrder", "Order", new { operation = "cancel" })"@Html.Raw(key)>
-            <i class="fa fa-fw fa-times"></i>
+            <icon name="close" class="icon-fw" />
             <span class="order-process-title">@T("Admin.Orders.Fields.OrderStatus.Cancel")</span>
         </a>
         <div class="dropdown-divider"></div>
@@ -163,11 +167,11 @@
             @T("Admin.Orders.Fields.ShippingStatus")
         </div>
         <a href="javascript:;" class="dropdown-item process-orders" data-url="@Url.Action("ProcessOrder", "Order", new { operation = "ship" })"@Html.Raw(key)>
-            <i class="fa fa-fw fa-truck fa-flip-horizontal"></i>
+            <icon name="truck" class="icon-fw flip-h" />
             <span class="order-process-title">@T("Enums.ShippingStatus.Shipped")</span>
         </a>
         <a href="javascript:;" class="dropdown-item process-orders" data-url="@Url.Action("ProcessOrder", "Order", new { operation = "deliver" })"@Html.Raw(key)>
-            <i class="fa fa-fw"></i>
+            <span class="icon icon-fw" aria-hidden="true"></span>
             <span class="order-process-title">@T("Enums.ShippingStatus.Delivered")</span>
         </a>
         <div class="dropdown-divider"></div>
@@ -176,32 +180,32 @@
         </div>
         <a href="javascript:;" class="dropdown-item process-orders" data-url="@Url.Action("ProcessOrder", "Order", new { operation = "markpaid" })" 
            title="@T("Admin.Orders.Fields.MarkAsPaid.Hint")"@Html.Raw(key)>
-            <i class="fa fa-fw"></i>
+            <span class="icon icon-fw" aria-hidden="true"></span>
             <span class="order-process-title">@T("Admin.Orders.Fields.MarkAsPaid")</span>
         </a>
         <a href="javascript:;" class="dropdown-item process-orders" data-url="@Url.Action("ProcessOrder", "Order", new { operation = "capture" })" 
            title="@T("Admin.Orders.Fields.Capture.Hint")"@Html.Raw(key)>
-            <i class="fas fa-fw fa-euro-sign"></i>
+            <icon name="euro" class="icon-fw" />
             <span class="order-process-title">@T("Admin.Orders.Fields.Capture")</span>
         </a>
         <a href="javascript:;" class="dropdown-item process-orders" data-url="@Url.Action("ProcessOrder", "Order", new { operation = "refundoffline" })" 
            title="@T("Admin.Orders.Fields.RefundOffline.Hint")"@Html.Raw(key)>
-            <i class="fa fa-fw"></i>
+            <icon name="refund" class="icon-fw" />
             <span class="order-process-title">@T("Admin.Orders.Fields.RefundOffline")</span>
         </a>
         <a href="javascript:;" class="dropdown-item process-orders" data-url="@Url.Action("ProcessOrder", "Order", new { operation = "refund" })" 
            title="@T("Admin.Orders.Fields.Refund.Hint")"@Html.Raw(key)>
-            <i class="fas fa-fw fa-rotate-left"></i>
+            <icon name="refund" class="icon-fw" />
             <span class="order-process-title">@T("Admin.Orders.Fields.Refund")</span>
         </a>
         <a href="javascript:;" class="dropdown-item process-orders" data-url="@Url.Action("ProcessOrder", "Order", new { operation = "voidoffline" })" 
            title="@T("Admin.Orders.Fields.VoidOffline.Hint")"@Html.Raw(key)>
-            <i class="fa fa-fw"></i>
+            <span class="icon icon-fw" aria-hidden="true"></span>
             <span class="order-process-title">@T("Admin.Orders.Fields.VoidOffline")</span>
         </a>
         <a href="javascript:;" class="dropdown-item process-orders" data-url="@Url.Action("ProcessOrder", "Order", new { operation = "void" })" 
            title="@T("Admin.Orders.Fields.Void.Hint")"@Html.Raw(key)>
-            <i class="fa fa-fw fa-times"></i>
+            <icon name="close" class="icon-fw" />
             <span class="order-process-title">@T("Admin.Orders.Fields.Void")</span>
         </a>
     }

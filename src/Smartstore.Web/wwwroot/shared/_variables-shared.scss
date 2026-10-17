@@ -1,19 +1,23 @@
 /// <reference path="../lib/bootstrap/scss/bootstrap-reboot.scss" />
 
 //
+@use "sass:map";
+
 // General
 // --------------------------------------------------
 
 $alert-info-is-primary:		false !default;
 $enable-lightbtn-tweak:		false !default;
+$enable-alert-icons:        false !default;
 $enable-social-buttons:		true !default;
 $site-bg:                   #fff !default;
 
 
 //
-// Easings
+// Anim & Easing
 // -------------------------------------------------
 
+$collapse-offset:       -10px !default;
 $link-transition:       color 0.125s ease, opacity 0.125s ease !default;
 
 $ease-in-sine:          cubic-bezier(.47, 0, .745, .715) !default;
@@ -58,6 +62,8 @@ $font-size-xs:				    0.75rem !default;
 $font-weight-medium:            600 !default;
 $headings-lg-font-weight:       $font-weight-medium !default;
 $headings-sm-font-weight:       $font-weight-medium !default;
+$prose-font-size:               1rem !default;
+$prose-line-height:             1.55 !default;
 $prose-headings-lg-font-weight: $font-weight-medium !default;
 $prose-headings-sm-font-weight: $font-weight-medium !default;
 
@@ -87,12 +93,9 @@ $form-check-min-height:                         $font-size-base * $line-height-b
 $form-check-padding-start:                      $form-check-input-width + .6em !default;
 $form-check-margin-bottom:                      .125rem !default;
 
-$form-check-input-checked-bg-image:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>") !default;
-$form-check-radio-checked-bg-image:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#fff'/></svg>") !default;
 
 $form-check-input-indeterminate-bg-color:       $primary !default;
 $form-check-input-indeterminate-border-color:   $form-check-input-indeterminate-bg-color !default;
-$form-check-input-indeterminate-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>") !default;
 
 
 // Dropdowns
@@ -133,14 +136,14 @@ $box-shadow-xs:                 0 calc(1px * var(--shadow-yoffset, 1)) 8px -2px 
 $box-shadow-xl:                 0 calc(17px * var(--shadow-yoffset, 1)) 70px -7px rgba(var(--shadow-colorbase-rgb), calc(var(--shadow-intensity) * 0.14)), 
                                 0 calc(20px * var(--shadow-yoffset, 1)) 48px -12px rgba(var(--shadow-color-rgb), calc(var(--shadow-intensity) * 0.22)) !default;
 
-$utilities: map-merge(
+$utilities: map.merge(
     $utilities,
     (
-        "shadow": map-merge(
-            map-get($utilities, "shadow"),
+        "shadow": map.merge(
+            map.get($utilities, "shadow"),
             (
-                values: map-merge(
-                    map-get(map-get($utilities, "shadow"), "values"),
+                values: map.merge(
+                    map.get(map.get($utilities, "shadow"), "values"),
                     ( 
                         xs: $box-shadow-xs,
                         xl: $box-shadow-xl,
@@ -164,26 +167,12 @@ $box-scale-factor:              1.12 !default;
 // Icons
 // --------------------------------------------------
 
-$fa-use-pro:                    false !default;
 
 $fa-font-family-free:           'Font Awesome 7 Free' !default;
-$fa-font-family-pro:            'Font Awesome 7 Pro' !default;
-$fa-font-family-brands:         'Font Awesome 7 Brands' !default;
 
 //$icon-font-size-base:           16px !default; // for pixel perfection
 $icon-font-size-base:           inherit !default;
-$icon-font-variant-default:     regular !default;
 $icon-font-weight-default:      900 !default;
-
-$icon-font-variants: () !default;
-$icon-font-variants: map-merge(
-  (
-    "light":    300,
-    "regular":  400,
-    "solid":    900
-  ),
-  $icon-font-variants
-);
 
 $fa-free-regular-icons: (
 	"\f2b9": "address-book",

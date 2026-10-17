@@ -2,7 +2,7 @@
 # Creates a Docker image from an existing build artifact
 # -----------------------------------------------------------
 
-ARG ASPNET_TAG=10.0
+ARG ASPNET_TAG=10.0-noble
 
 FROM mcr.microsoft.com/dotnet/aspnet:${ASPNET_TAG}
 EXPOSE 80
@@ -11,7 +11,7 @@ ENV ASPNETCORE_URLS="http://+:80;https://+:443"
 
 # Copy
 ARG EDITION=Community
-ARG VERSION=6.3.0
+ARG VERSION=6.4.0
 ARG RUNTIME=linux-x64
 ARG SOURCE=build/artifacts/${EDITION}.${VERSION}.${RUNTIME}
 

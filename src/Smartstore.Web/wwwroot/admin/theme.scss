@@ -38,19 +38,19 @@
 @import "../lib/bootstrap/scss/vendor/rfs";
 @import "../lib/select2/scss/core";
 @import "../lib/aos/scss/aos";
-@import "../lib/colorpicker/scss/colorpicker";
 @import "../lib/datetimepicker/scss/tempusdominus";
 @import "../lib/editors/summernote/scss/summernote";
+@import "../skinning/summernote";
 
 
 //
 // Global / Shared
 // --------------------------------------------------
 
+@import '../shared/colorpicker';
 @import '../shared/spacing';
 @import '../shared/accessibility';
 @import '../shared/fa';
-@import '../shared/bootstrap-icons';
 @import '../shared/typo';
 @import '../shared/alert';
 @import '../shared/badge';
@@ -69,11 +69,14 @@
 @import "../shared/entity-picker";
 @import "../shared/tree";
 @import '../shared/choice';
+@import '../shared/swatch';
 //@import '/shared/switch'; // Deprecated
 @import '../shared/rangeslider';
 @import '../shared/bg';
 @import '../shared/custom-scrollbar';
+@import '../shared/scroll-fade';
 @import "../shared/utils";
+@import "../shared/icons";
 @import "../shared/media";
 @import "../shared/text-expander";
 @import "../shared/offcanvas";

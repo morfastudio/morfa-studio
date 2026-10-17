@@ -30,7 +30,7 @@ internal class Events : IConsumer
             await message.TabFactory.AppendAsync(builder => builder
                 .Text("GMC")
                 .Name("tab-gmc")
-                .Icon("google", "bi")
+                .Icon("google")
                 .LinkHtmlAttributes(new { data_tab_name = "GMC" })
                 .Action("ProductEditTab", "GoogleMerchantCenter", new { productId })
                 .Ajax());
@@ -40,7 +40,7 @@ internal class Events : IConsumer
     public async Task HandleEventAsync(ModelBoundEvent message,
         IPermissionService permissionService)
     {
-        if (!message.BoundModel.CustomProperties.TryGetValue("GMC", out object value) 
+        if (!message.BoundModel.CustomProperties.TryGetValue("GMC", out object value)
             || value is not GoogleProductModel model
             || !await permissionService.AuthorizeAsync(Permissions.Catalog.Product.Update))
         {

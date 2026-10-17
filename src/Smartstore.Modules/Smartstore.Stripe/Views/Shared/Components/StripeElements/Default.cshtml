@@ -12,6 +12,11 @@
             </div>
         </div>
     
+        @if (Model.PaymentPageButtonMethodsJson != "[]")
+        {
+            <div id="stripe-express-checkout-element" class="mt-3" style="visibility: hidden"></div>
+        }
+
         <div id="stripe-payment-element" class="mt-3" data-store-payment-selection-url="@Url.Action("StorePaymentMethodId", "Stripe")">
             <!--Stripe.js injects the Payment Element-->
         </div>
@@ -20,12 +25,12 @@
     <script>
         $(function () {
             if (typeof Stripe !== 'undefined') {
-                Smartstore.Stripe.initPaymentElement('@Model.PublicApiKey', '@StripeHelper.ApiVersion', @Model.Amount, '@Model.Currency', '@Model.CaptureMethod');
+                Smartstore.Stripe.initPaymentElement('@Model.PublicApiKey', '@StripeHelper.ApiVersion', @Model.Amount, '@Model.Currency', '@Model.CaptureMethod', @Html.Raw(Model.PaymentPageButtonMethodsJson));
             }
             else {
                 var script = document.getElementById("stripe-js");
                 script.onload = function () {
-                    Smartstore.Stripe.initPaymentElement('@Model.PublicApiKey', '@StripeHelper.ApiVersion', @Model.Amount, '@Model.Currency', '@Model.CaptureMethod');
+                    Smartstore.Stripe.initPaymentElement('@Model.PublicApiKey', '@StripeHelper.ApiVersion', @Model.Amount, '@Model.Currency', '@Model.CaptureMethod', @Html.Raw(Model.PaymentPageButtonMethodsJson));
                 };
             }
 
@@ -47,12 +52,12 @@ else
         $(function () {
             var paymentRequest = @Html.Raw(Model.PaymentRequest);
             if (typeof Stripe !== 'undefined') {
-                Smartstore.Stripe.initWalletButtonElement('@Model.PublicApiKey', paymentRequest, @Model.IsCartPage.ToString().ToLower(), '@StripeHelper.ApiVersion');
+                Smartstore.Stripe.initWalletButtonElement('@Model.PublicApiKey', paymentRequest, @Model.IsCartPage.ToString().ToLower(), '@StripeHelper.ApiVersion', @Model.CurrencyMinorUnitFactor);
             } 
             else {
                 var script = document.getElementById("stripe-js");
                 script.onload = function () {
-                    Smartstore.Stripe.initWalletButtonElement('@Model.PublicApiKey', paymentRequest, @Model.IsCartPage.ToString().ToLower(), '@StripeHelper.ApiVersion');
+                    Smartstore.Stripe.initWalletButtonElement('@Model.PublicApiKey', paymentRequest, @Model.IsCartPage.ToString().ToLower(), '@StripeHelper.ApiVersion', @Model.CurrencyMinorUnitFactor);
                 };
             }
         });

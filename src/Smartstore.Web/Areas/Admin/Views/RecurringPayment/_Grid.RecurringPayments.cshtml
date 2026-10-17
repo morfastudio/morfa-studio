@@ -16,8 +16,8 @@
     </sorting>
     <toolbar>
         <toolbar-group>
-            <button datagrid-action="DataGridToolAction.ToggleSearchPanel" type="button" class="btn btn-light btn-icon">
-                <i class="fa fa-fw fa-filter"></i>
+            <button datagrid-action="DataGridToolAction.ToggleSearchPanel" type="button" class="btn btn-plain btn-icon">
+                <icon name="filter" />
             </button>
         </toolbar-group>
         <zone name="datagrid_toolbar_omega"></zone>
@@ -59,7 +59,7 @@
     </columns>
     <row-commands>
         <a datarow-action="DataRowAction.Custom" :href="item.row.EditUrl">@T("Common.Edit")</a>
-        <div class="dropdown-divider"></div>
+        <fragment><div class="dropdown-divider"></div></fragment>
         <a datarow-action="DataRowAction.Custom" class="grid-process-next-payment" :data-key="item.row.Id" v-bind:class="{ disabled: !item.row.CanProcessNextPayment }">
             @T("Admin.RecurringPayments.History.ProcessNextPayment")
         </a>

@@ -1,77 +1,73 @@
-﻿using System.Reflection;
+﻿using System.Collections.Immutable;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Smartstore.Engine.Modularity;
 
-namespace Smartstore.Engine
+namespace Smartstore.Engine;
+
+/// <inheritdoc/>
+public class DefaultTypeScanner : ITypeScanner
 {
-    /// <inheritdoc/>
-    public class DefaultTypeScanner : ITypeScanner
+    public DefaultTypeScanner(params Assembly[] assemblies)
     {
-        private readonly HashSet<Assembly> _activeAssemblies = [];
+        // No edit allowed from now on
+        Assemblies = assemblies.ToImmutableArray();
+    }
 
-        public DefaultTypeScanner(params Assembly[] assemblies)
-        {
-            _activeAssemblies.AddRange(assemblies);
+    public DefaultTypeScanner(IEnumerable<Assembly> coreAssemblies, IModuleCatalog moduleCatalog, ILogger logger)
+    {
+        Guard.NotNull(coreAssemblies);
+        Guard.NotNull(moduleCatalog);
+        Guard.NotNull(logger);
 
-            // No edit allowed from now on
-            Assemblies = assemblies.AsReadOnly();
-        }
+        Logger = logger;
 
-        public DefaultTypeScanner(IEnumerable<Assembly> coreAssemblies, IModuleCatalog moduleCatalog, ILogger logger)
-        {
-            Guard.NotNull(coreAssemblies);
-            Guard.NotNull(moduleCatalog);
-            Guard.NotNull(logger);
-
-            Logger = logger;
-
-            var assemblies = new HashSet<Assembly>(coreAssemblies);
-
+        // No edit allowed from now on
+        Assemblies = coreAssemblies
             // Add all module assemblies to assemblies list
-            assemblies.AddRange(moduleCatalog.GetInstalledModules().Select(x => x.Module.Assembly));
+            .Concat(moduleCatalog.GetInstalledModules().Select(x => x.Module.Assembly))
+            // Remove dupes, Keep first occurrence = preserve order
+            .Distinct()
+            .ToImmutableArray();
+    }
 
-            // No edit allowed from now on
-            Assemblies = assemblies.AsReadOnly();
-        }
+    public ILogger Logger { get; set; } = NullLogger.Instance;
 
-        public ILogger Logger { get; set; } = NullLogger.Instance;
+    /// <inheritdoc/>
+    public IReadOnlyList<Assembly> Assemblies { get; private set; }
 
-        /// <inheritdoc/>
-        public IEnumerable<Assembly> Assemblies { get; private set; }
+    /// <inheritdoc/>
+    public IEnumerable<Type> FindTypes(Type baseType, bool concreteTypesOnly = true)
+    {
+        Guard.NotNull(baseType);
 
-        /// <inheritdoc/>
-        public IEnumerable<Type> FindTypes(Type baseType, bool concreteTypesOnly = true)
+        return FindTypes(baseType, Assemblies, concreteTypesOnly);
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<Type> FindTypes(Type baseType, IEnumerable<Assembly> assemblies, bool concreteTypesOnly = true)
+    {
+        Guard.NotNull(baseType);
+
+        var isOpenGeneric = baseType.IsGenericTypeDefinition;
+
+        foreach (var t in assemblies.SelectMany(x => x.GetLoadableTypes()))
         {
-            Guard.NotNull(baseType);
+            if (t.IsInterface)
+                continue;
 
-            return FindTypes(baseType, Assemblies, concreteTypesOnly);
-        }
+            // INFO (perf): scanning is 2x faster without these extra checks.
+            //if (t.IsInterface || t.IsCompilerGenerated() || t.IsRazorCompiledItem() || t.IsDelegate())
+            //    continue;
 
-        /// <inheritdoc/>
-        public IEnumerable<Type> FindTypes(Type baseType, IEnumerable<Assembly> assemblies, bool concreteTypesOnly = true)
-        {
-            Guard.NotNull(baseType);
+            var isCandidate = (!concreteTypesOnly || !t.IsAbstract) && (isOpenGeneric
+                ? t.IsClosedGenericTypeOf(baseType)
+                : baseType.IsAssignableFrom(t));
 
-            var isOpenGeneric = baseType.IsGenericTypeDefinition;
-
-            foreach (var t in assemblies.SelectMany(x => x.GetLoadableTypes()))
+            if (isCandidate)
             {
-                if (t.IsInterface)
-                    continue;
-
-                // INFO (perf): scanning is 2x faster without these extra checks.
-                //if (t.IsInterface || t.IsCompilerGenerated() || t.IsRazorCompiledItem() || t.IsDelegate())
-                //    continue;
-
-                var isCandidate = (!concreteTypesOnly || !t.IsAbstract) && (isOpenGeneric
-                    ? t.IsClosedGenericTypeOf(baseType)
-                    : baseType.IsAssignableFrom(t));
-
-                if (isCandidate)
-                {
-                    yield return t;
-                }
+                yield return t;
             }
         }
     }

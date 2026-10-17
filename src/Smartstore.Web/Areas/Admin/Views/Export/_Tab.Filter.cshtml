@@ -111,7 +111,7 @@
             <smart-label asp-for="Filter.ProductTagId" />
         </div>
         <div class="adminData">
-            <select asp-for="Filter.ProductTagId" asp-items="ViewBag.ProductTags" asp-placeholder="@allString"></select>
+            <select asp-for="Filter.ProductTagId" data-icon="tag" asp-items="ViewBag.ProductTags" asp-placeholder="@allString"></select>
             <span asp-validation-for="Filter.ProductTagId"></span>
         </div>
     </div>
@@ -363,6 +363,15 @@
         <div class="adminData">
             <select asp-for="Filter.ShippingStatusIds" asp-items="Html.GetLocalizedEnumSelectList(typeof(ShippingStatus))" multiple="multiple"></select>
             <span asp-validation-for="Filter.ShippingStatusIds"></span>
+        </div>
+    </div>
+    <div class="adminRow">
+        <div class="adminTitle">
+            <smart-label asp-for="Filter.CustomerRoleIds" />
+        </div>
+        <div class="adminData">
+            <editor asp-for="Filter.CustomerRoleIds" />
+            <span asp-validation-for="Filter.CustomerRoleIds"></span>
         </div>
     </div>
 </div>

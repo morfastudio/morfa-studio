@@ -1,9 +1,9 @@
 ﻿using Smartstore.Core.AI.Metadata;
 using Smartstore.Json.Converters;
 
-namespace Smartstore.Core.AI;
+namespace Smartstore.Core.AI.JsonConverters;
 
-internal sealed class AIResponseToolConverter : ArrayEnumFlagConverter<AIResponseTool>
+public sealed class AIResponseToolConverter : ArrayEnumFlagConverter<AIResponseTool>
 {
     protected override IReadOnlyDictionary<string, AIResponseTool> GetMapping()
     {

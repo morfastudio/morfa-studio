@@ -25,7 +25,7 @@
     <div class="dropdown">
         <a id="@(menuName)-opener" data-toggle="dropdown" aria-haspopup="listbox" aria-expanded="false" href="#" rel="nofollow" attrs="@item.GetCombinedAttributes().PrependCssClass("menubar-link")">
             <span sm-language-attributes-for="item">@root.GetItemText(T)</span>
-            <i class="fal fa-angle-down menubar-caret"></i>
+            <icon name="chevron-down" class="menubar-caret" />
         </a>
         @{ await CreateDropdown(root.Children); }
     </div>
@@ -74,15 +74,22 @@
                 <a href="@itemUrl" attrs="attrs" role="option">
                     @if (hasIcons)
                     {
-                        <i class="fa-fw@(item.Icon.HasValue() ? item.Icon.EnsureStartsWith(" ") : " fas")"></i>
+                        @if (item.Icon.HasValue())
+                        {
+                            <icon name="@item.Icon" class="icon-fw" attr-class='@(item.IconClass.HasValue(), item.IconClass)' />
+                        }
+                        else
+                        {
+                            <span class="icon icon-fw" aria-hidden="true"></span>
+                        }
                     }
                     else if (hasImages && item.ImageUrl.HasValue())
                     {
-                        <img class="sm-icon" src="@Url.Content(item.ImageUrl)" alt="@itemText" />
+                        <img class="icon" src="@Url.Content(item.ImageUrl)" alt="@itemText" />
                     }
                     else if (hasImages)
                     {
-                        <i class="fa-fw fas"></i>
+                        <span class="icon icon-fw" aria-hidden="true"></span>
                     }
                     <span sm-language-attributes-for="item">@itemText</span>
                 </a>

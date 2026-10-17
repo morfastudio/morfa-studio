@@ -1,0 +1,323 @@
+/// <reference path="references.scss" />
+
+//
+// Swatches
+// ------------------------------------------------------
+
+.swatch-group {
+    --swatch-size: 38px;
+    --swatch-gap: 12px;
+    --swatch-aspect-ratio: 1;
+    --swatch-multicolor-angle: 135deg;
+    --swatch-border-radius: var(--border-radius-md);
+    --swatch-border-color: transparent;
+    --swatch-border-color-selected: #fff;
+    --swatch-outline-width: 2px;
+    --swatch-outline-offset: 2px;
+    --swatch-outline-color: rgba(0, 0, 0, 0.125);
+    --swatch-outline-color-hover: rgba(0, 0, 0, 0.25);
+    --swatch-outline-color-selected: #{$focus-ring-color};
+    --swatch-strike-color-1: #000;
+    --swatch-strike-color-2: #fff;
+    --swatch-strike-width: 2px;
+
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--swatch-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.swatch-group-xs {
+    --swatch-size: 18px;
+    --swatch-gap: 8px;
+    --swatch-border-radius: var(--border-radius-sm);
+    --swatch-outline-width: 1px;
+}
+
+.swatch-group-sm {
+    --swatch-size: 28px;
+}
+
+.swatch-group-lg {
+    --swatch-size: 58px;
+}
+
+.swatch-group-xl {
+    --swatch-size: 84px;
+    --swatch-gap: 15px;
+    --swatch-outline-offset: 3px;
+}
+
+.swatch-group-xxl {
+    --swatch-size: 108px;
+    --swatch-gap: 18px;
+    --swatch-outline-offset: 4px;
+}
+
+.swatch-shape-rect {
+    --swatch-border-radius: 0 !important;
+}
+
+.swatch-shape-circle {
+    --swatch-border-radius: 50% !important;
+}
+
+.swatch-group-fixed {
+    .swatch,
+    .swatch-label,
+    .swatch-content,
+    .swatch-element {
+        width: var(--swatch-size);
+    }
+
+    .swatch {
+        flex: 0 0 var(--swatch-size);
+    }
+}
+
+.swatch-group-cards {
+    //--swatch-border-radius: var(--border-radius-sm);
+    align-items: stretch;
+
+    @include media-breakpoint-down(sm) {
+        // Make cards scrollable on small screens, but only on touch devices.
+        .touchevents & {
+            --scroll-fade-padding-x: calc(var(--swatch-outline-width) + var(--swatch-outline-offset));
+            --scroll-fade-padding-y: calc(var(--swatch-outline-width) + var(--swatch-outline-offset));
+
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+    }
+
+    .swatch {
+        display: flex;
+    }
+
+    .swatch-label,
+    .swatch-content,
+    .swatch-card {
+        display: flex;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+}
+
+.swatch {
+    position: relative;
+    display: block;
+    background-color: transparent;
+}
+
+.swatch-label {
+    margin: 0;
+}
+
+.swatch-content {
+    position: relative;
+    display: block;
+    cursor: pointer;
+}
+
+.swatch-element {
+    position: relative;
+    display: inline-block;
+    min-width: var(--swatch-size);
+    height: var(--swatch-size);
+    overflow: hidden;
+    border-radius: var(--swatch-border-radius);
+    box-shadow: 0 0 0 var(--swatch-outline-offset) var(--swatch-border-color);
+    outline: var(--swatch-outline-width) solid var(--swatch-outline-color);
+    outline-offset: var(--swatch-outline-offset);
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: cover;
+    background-clip: padding-box;
+    font-weight: $font-weight-medium;
+    line-height: var(--swatch-size);
+    text-align: center;
+    vertical-align: middle;
+    transition: outline-color 0.1s ease;
+
+    &:hover {
+        outline-color: var(--swatch-outline-color-hover);
+    }
+
+    &:not(.swatch-card) > .swatch-value {
+        padding-inline: 0.4rem;
+    }
+}
+
+.swatch-text {
+    background-color: #fff;
+}
+
+.swatch-color:before {
+    // Nice glossy effect for color swatches
+    position: absolute;
+    content: "";
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255, 0.16) 0%,
+            transparent 48%,
+            rgba(0,0,0, 0.055) 100%
+        );
+}
+
+.swatch.unavailable {
+    .swatch-element {
+        outline-color: var(--swatch-outline-color-hover);
+        outline-style: dotted;
+    }
+
+    .swatch-visual {
+        opacity: 0.6;
+        &:after {
+            position: absolute;
+            inset: 0;
+            content: "";
+            pointer-events: none;
+            clip-path: inset(10%);
+            opacity: 1;
+            --ssw: calc(var(--swatch-strike-width) / 2);
+            background: linear-gradient(
+                to bottom left,
+                transparent calc(50% - var(--ssw)),
+                var(--swatch-strike-color-2) calc(50% - var(--ssw)),
+                var(--swatch-strike-color-2) 50%,
+                var(--swatch-strike-color-1) 50%,
+                var(--swatch-strike-color-1) calc(50% + var(--ssw)),
+                transparent calc(50% + var(--ssw))
+            );
+        }
+    }
+
+    .swatch-color:before {
+        // No glossy effect for unavailable color swatches
+        display: none;
+    }
+
+    .swatch-details {
+        background-color: var(--gray-200);
+        opacity: 0.7;
+    }
+}
+
+.swatch.disabled {
+    .swatch-content {
+        cursor: not-allowed;
+    }
+
+    .swatch-element {
+        outline-width: 1px;
+        filter: grayscale(0.6);
+        opacity: 0.4;
+    }
+}
+
+.swatch-card {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    line-height: normal;
+}
+
+.swatch-media {
+    position: relative;
+    display: block;
+    flex: 0 0 auto;
+    width: var(--swatch-size);
+    height: calc(var(--swatch-size) * var(--swatch-aspect-ratio));
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: cover;
+    background-clip: padding-box;
+}
+
+.swatch-details {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 2px;
+    padding: 4px;
+    padding-top: 6px;
+    //border-top: 1px solid rgba($black, 0.125);
+    //background-color: #fff;
+    color: $body-color;
+    text-align: start;
+    line-height: 1.15;
+
+    > .swatch-value {
+        display: -webkit-box;
+        max-width: 100%;
+        overflow: hidden;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-semibold;
+        overflow-wrap: anywhere;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    > :is(.swatch-price, .swatch-compare-price, .swatch-base-price, .swatch-status) {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12px;
+        font-weight: $font-weight-normal;
+    }
+
+    > .swatch-base-price {
+        font-size: 11px;
+    }
+}
+
+.swatch-mediafile .swatch-content {
+    max-width: var(--swatch-size) !important;
+
+    .file-img {
+        max-width: 100%;
+        object-fit: cover;
+    }
+}
+
+.swatch-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.swatch-input:focus-visible + :is(.swatch-label, .swatch-content) {
+    .swatch-element {
+        box-shadow: $focus-ring-box-shadow !important;
+    }
+}
+
+.swatch-input:checked + :is(.swatch-label, .swatch-content) {
+    .swatch-element {
+        box-shadow: 0 0 0 var(--swatch-outline-offset) var(--swatch-border-color-selected);
+        outline-color: var(--swatch-outline-color-selected);
+        // TODO: Hmmm, not sure about this
+        //outline-width: calc(var(--swatch-outline-width) + 1px);
+    }
+}
+
+.swatch-input:checked + .swatch-label .swatch-content::after,
+.swatch-input:checked + .swatch-content::after {
+    opacity: 1;
+    transform: scale(1);
+}

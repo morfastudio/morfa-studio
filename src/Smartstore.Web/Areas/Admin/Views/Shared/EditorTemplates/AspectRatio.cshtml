@@ -1,0 +1,119 @@
+@model object
+
+@{
+    ViewData["tools"] = false;
+
+    var name = ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty);
+    var id = Html.GenerateIdFromName(name);
+    var isNullable = Nullable.GetUnderlyingType(ViewData.ModelMetadata.ModelType) != null;
+    var hasValue = Model != null;
+
+    // INFO: These values represent a practical compromise designed to avoid a "step" that is too fine.
+    // The deviation from the mathematically exact ratio remains below approximately 0.5%.
+    var presets = new[]
+    {
+        (Value: 0.5m, Label: "2:1"),
+        (Value: 0.56m, Label: "16:9"),
+        (Value: 0.67m, Label: "3:2"),
+        (Value: 0.75m, Label: "4:3"),
+        (Value: 0m, Label: string.Empty),
+        (Value: 1m, Label: "1:1"),
+        (Value: 0m, Label: string.Empty),
+        (Value: 1.33m, Label: "3:4"),
+        (Value: 1.5m, Label: "2:3"),
+        (Value: 1.78m, Label: "9:16"),
+        (Value: 2m, Label: "1:2"),
+        (Value: 3m, Label: "1:3")
+    };
+}
+
+<div id="aspect-ratio-@id" class="row xs-gutters aspect-ratio-editor">
+    <div class="col">
+        <partial name="~/Views/Shared/EditorTemplates/Range.cshtml" model="@Model" view-data="ViewData" />
+    </div>
+    <div class="col-auto">
+        <div class="d-flex align-items-start">
+            <div style="width: 20px; height: 60px;">
+                <div class="aspect-ratio-preview" style="width: 20px; background-color: var(--gray-600); transition: height 0.08s linear;"></div>
+            </div>
+            <div class="dropdown ml-1">
+                <button type="button"
+                        class="btn btn-sm btn-light btn-flat btn-no-border btn-icon dropdown-toggle no-chevron"
+                        data-toggle="dropdown"
+                        title="@ViewData.ModelMetadata.GetDisplayName()">
+                    <icon name="aspect-ratio" />
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    @foreach (var preset in presets)
+                    {
+                        if (preset.Value == 0m)
+                        {
+                            <div class="dropdown-divider"></div>
+                        }
+                        else
+                        {
+                            <button type="button" class="dropdown-item aspect-ratio-preset" data-value="@preset.Value.ToStringInvariant()">
+                                @preset.Label
+                            </button>
+                        }
+                    }
+                    @if (isNullable)
+                    {
+                        <div class="dropdown-divider"></div>
+                        <button type="button"
+                                class="dropdown-item range-reset"
+                                title="@T("Admin.Common.ResetToDefault")"
+                                attr-disabled='(!hasValue, "disabled")'>
+                            @T("Admin.Common.Clear")
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script sm-target-zone="scripts" data-origin="aspect-ratio-template">
+    $(function() {
+        const $container = $('#aspect-ratio-@id');
+        const $rangeContainer = $container.find('[data-editor="range"]');
+        const $range = $container.find('.form-control-range');
+        const $preview = $container.find('.aspect-ratio-preview');
+        const $presets = $container.find('.aspect-ratio-preset');
+        const $resetBtn = $container.find('.range-reset');
+
+        $rangeContainer.rangeSlider();
+        const rangeSlider = $rangeContainer.data('rangeSlider');
+
+        function updatePreview(e, value) {
+            let val = parseFloat(value ?? $range.val());
+            if (isNaN(val) || val <= 0) {
+                val = 1;
+            }
+
+            $resetBtn.prop('disabled', rangeSlider.isUnspecified());
+
+            const previewWidth = parseFloat($preview.css('width'));
+            $preview.css('height', (previewWidth * val) + 'px');
+
+            $presets.each((_, element) => {
+                const $preset = $(element);
+                const isActive = Math.abs(parseFloat($preset.data('value')) - val) < 0.00005;
+                $preset.toggleClass('active', isActive);
+            });
+        }
+
+        $rangeContainer.on('rangeslider:change', updatePreview);
+
+        $presets.on('click', (e) => {
+            rangeSlider.setValue($(e.currentTarget).data('value'));
+        });
+
+        $resetBtn.on('click', (e) => {
+            e.preventDefault();
+            rangeSlider.reset();
+        });
+
+        updatePreview();
+    });
+</script>

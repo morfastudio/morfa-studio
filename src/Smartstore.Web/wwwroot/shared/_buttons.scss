@@ -1,5 +1,7 @@
 /// <reference path="references.scss" />
 
+@use "sass:color";
+
 $btn-wide-padding-x: 1.8rem;
 $btn-wide-padding-x-lg: 2.5rem;
 $btn-wide-padding-x-sm: 1.2rem;
@@ -18,15 +20,6 @@ button:where(.reset) {
     margin: 0;
     border: none;
     color: inherit;
-}
-
-
-// Make icon font-size 14px in small buttons
-// (looks ugly otherwise)
-// -----------------------------------------------------
-
-.btn-sm > .fa {
-    font-size: 14px;
 }
 
 
@@ -57,13 +50,13 @@ button:where(.reset) {
     gap: 0.5em;
     min-height: var(--btn-height);
 
-    > :is(i, svg) {
+    > :where(.icon, .icon-stack) {
         color: var(--btn-icon-color);
         transition: var(--btn-icon-transition);
     }
 
     &:hover {
-        > :is(i, svg) {
+        > :where(.icon, .icon-stack) {
             color: var(--btn-icon-hover-color);
         }
     }
@@ -71,7 +64,7 @@ button:where(.reset) {
     &.disabled,
     &:disabled,
     fieldset:disabled & {
-        > :is(i, svg) {
+        > :where(.icon, .icon-stack) {
             color: var(--btn-icon-color);
         }
     }
@@ -79,7 +72,7 @@ button:where(.reset) {
     &:active,
     &.active,
     .show > &.dropdown-toggle {
-        > :is(i, svg) {
+        > :where(.icon, .icon-stack) {
             color: var(--btn-icon-active-color);
         }
     }
@@ -140,29 +133,24 @@ button:where(.reset) {
     > span {
         //display: none;
     }
-    // Move caret to bottom right corner
-    &.dropdown-toggle:after {
-        position: absolute;
-        inset-inline-end: 3px;
-        bottom: 0.5em;
+    &.dropdown-toggle:not(.no-chevron):not(.dropdown-toggle-split) {
+        padding-inline-end: 8px;
+
+        &::after {
+            position: absolute;
+            inset-inline-end: 3px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            margin: 0;
+        }
     }
 
     &.btn-sm {
         --inline-icon-size: #{$input-height-sm};
         --inline-icon-font-size: #{$font-size-sm};
     }
-}
-
-
-// Toggle button with animated chevron
-// --------------------------------------------------
-
-.btn[data-toggle="button"] > .fa-chevron-up {
-    transition: transform 0.35s ease;
-}
-
-.btn.active[data-toggle="button"] > .fa-chevron-up {
-    transform: rotate(180deg);
 }
 
 
@@ -282,7 +270,7 @@ button:where(.reset) {
     --btn-disabled-bg: var(--btn-bg);
     --btn-disabled-border-color: var(--btn-border-color);
     --btn-hover-color: #{darken($yiq-text-dark, 8%)};
-    --btn-hover-bg: #{rgba(#000, 0.06)};
+    --btn-hover-bg: #{rgba(#000, 0.05)};
     --btn-hover-border-color: #{rgba(#000, 0.1)};
     --btn-active-color: var(--btn-hover-color);
     --btn-active-bg: #{rgba(#000, 0.08)};
@@ -370,7 +358,7 @@ button:where(.reset) {
         transition: transform 0.2s ease-out;
         transform: translate(0, 0);
 
-        > :is(i, svg) {
+        > :is(.icon, .icon-stack) {
             position: absolute;
             display: inline-block;
             vertical-align: middle;
@@ -397,7 +385,7 @@ button:where(.reset) {
 
     &:hover > span {
         transform: translateX(var(--btn-animate-offset));
-        > :is(i, svg) {
+        > :is(.icon, .icon-stack) {
             opacity: 1;
         }
     }
@@ -433,15 +421,20 @@ button:where(.reset) {
 // btn-to-[danger|primary]
 // --------------------------------------------------
 
+// .btn-destructive: destructive actions keep their base style and turn red
+// only on hover, focus and active. .btn-to-danger is kept as a legacy alias.
+
+.btn-destructive,
 .btn-to-danger,
 .btn-to-primary {
     --btn-transition: none;
 
-    > :is(i, svg) {
+    > :is(.icon, .icon-stack) {
         opacity: 1;
     }
 }
 
+.btn-destructive,
 .btn-to-danger {
     @include button-active-variant($danger, rgba($gray-700, 0.15));
 }
@@ -481,7 +474,7 @@ button:where(.reset) {
     .btn-3d.btn-#{$color},
     .btn-3d.btn-outline-#{$color} {
         @if $color != "secondary" and $color != "light" {
-            $c: mix($value, $black, 50%);
+            $c: color.mix($value, $black, 50%);
             --shadow-color-rgb: #{to-rgb($c)};
             --shadow-intensity: 1.8;
         }
@@ -599,11 +592,10 @@ button:where(.reset) {
     }
 
     .btn.has-caret:after {
-        @include fontawesome("\f0d7");
+        @include icon-mask(var(--icon-mask-chevron-down), 1rem);
         position: absolute;
         display: block;
         inset-inline-end: $input-btn-padding-x;
-        line-height: 1;
         top: 50%;
         transform: translate3d(50%, -50%, 0);
     }

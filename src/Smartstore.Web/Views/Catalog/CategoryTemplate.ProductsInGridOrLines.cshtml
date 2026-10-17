@@ -19,7 +19,9 @@
 
     async Task SubCategoryList()
     {
-        <div class="artlist artlist-grid artlist-4-cols artlist-boxed artlist-sub-categories@(Model.SubCategoryDisplayType == SubCategoryDisplayType.AboveProductList ? " hide-on-active-filter" : "")" role="list">
+        <div class="artlist artlist-grid artlist-4-cols artlist-boxed artlist-sub-categories" 
+             attr-class='(Model.SubCategoryDisplayType == SubCategoryDisplayType.AboveProductList, "hide-on-active-filter")'
+             role="list">
             @foreach (var item in Model.SubCategories)
             {
                 var image = item.Image;
@@ -100,10 +102,11 @@
         @* Product list *@
         <zone name="categorydetails_before_product_list" />
 
-        <div class="product-list-container">
+        <div id="main-product-list" class="product-list-container">
             @if (Model.Products != null)
             {
                 <partial name="Product.List" model="Model.Products" />
+                Assets.JsonLd.BuildProductItemList(Request, Model.Products.Items, categoryName, Model.CanonicalUrl);
             }
         </div>
 

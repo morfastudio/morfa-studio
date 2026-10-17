@@ -67,7 +67,6 @@
 // Global / Shared
 // --------------------------------------------------
 
-@import '/shared/mixins';
 @import '/shared/spacing';
 @import '/shared/accessibility';
 @import '/shared/typo';
@@ -89,12 +88,15 @@
 @import "/shared/star-rating";
 @import "/shared/sortable-grip";
 @import '/shared/choice';
+@import '/shared/swatch';
 @import "/shared/offcanvas";
 @import "/shared/sections";
 @import "/shared/bg";
 @import '/shared/custom-scrollbar';
+@import '/shared/scroll-fade';
 @import "/shared/box";
 @import "/shared/utils";
+@import "/shared/icons";
 //@import '/shared/switch'; // Deprecated
 @import '/shared/media';
 @import "/shared/text-expander";

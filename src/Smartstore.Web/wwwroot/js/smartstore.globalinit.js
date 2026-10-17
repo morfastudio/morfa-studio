@@ -6,6 +6,17 @@ jQuery(function () {
 
     // Adjust PNotify global defaults
     if (typeof PNotify !== 'undefined') {
+        // Status icons use the shared alert masks; button icons use our own classes.
+        PNotify.styling.smartstore = $.extend({}, PNotify.styling.bootstrap3, {
+            notice_icon: "",
+            info_icon: "",
+            success_icon: "",
+            error_icon: "",
+            closer: "pnotify-icon-close",
+            pin_up: "pnotify-icon-pin",
+            pin_down: "pnotify-icon-unpin"
+        });
+
         var stack = {
             dir1: "up",
             dir2: rtl ? "right" : "left",
@@ -17,7 +28,7 @@ jQuery(function () {
             context: $("body")
         };
         PNotify.prototype.options = $.extend(PNotify.prototype.options, {
-            styling: "fontawesome",
+            styling: "smartstore",
             stack: stack,
             addclass: 'stack-bottom' + (rtl ? 'left' : 'right'),
             width: "500px",
@@ -340,9 +351,15 @@ jQuery(function () {
         });
     })();
 
-    // HTML text collapser
-    if ($.fn.moreLess) {
-        $('.more-less').moreLess();
+    // Text expander
+    if ($.fn.textExpander) {
+        // TODO: Remove `.more-less` after stored HtmlEditor content has been migrated.
+        $('.text-expander, .more-less').textExpander();
+    }
+
+    // Observable scroll edge fades
+    if ($.fn.scrollFade) {
+        $('.scroll-fade-observable').scrollFade();
     }
 
     // Toggle grouped buttons

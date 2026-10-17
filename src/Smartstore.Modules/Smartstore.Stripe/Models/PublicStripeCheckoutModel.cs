@@ -28,6 +28,11 @@ public class PublicStripeElementsModel : ModelBase
     public int Amount { get; set; }
 
     /// <summary>
+    /// Factor used to convert a major currency amount to Stripe's integer minor unit.
+    /// </summary>
+    public int CurrencyMinorUnitFactor { get; set; }
+
+    /// <summary>
     /// Influences available payment methods.
     /// </summary>
     public string CaptureMethod { get; set; }
@@ -36,6 +41,11 @@ public class PublicStripeElementsModel : ModelBase
     /// Defines whether the component is rendered on payment selection page.
     /// </summary>
     public bool IsPaymentSelectionPage { get; set; }
+
+    /// <summary>
+    /// JSON array of payment methods selected for Express Checkout buttons.
+    /// </summary>
+    public string PaymentPageButtonMethodsJson { get; set; } = "[]";
 
     /// <summary>
     /// Defines whether the component is rendered on cart page.

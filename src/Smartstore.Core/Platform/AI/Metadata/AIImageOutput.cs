@@ -1,6 +1,10 @@
 ﻿#nullable enable
 
+using System.ComponentModel;
+using System.Runtime.Serialization;
+using System.Text.Json;
 using Smartstore.Imaging;
+using Smartstore.Json;
 
 namespace Smartstore.Core.AI.Metadata;
 
@@ -11,57 +15,65 @@ namespace Smartstore.Core.AI.Metadata;
 /// properties to specify supported aspect ratios, resolutions, and formats, as well as methods to determine the
 /// best match for a given attempted configuration. A default configuration is available via the <see
 /// cref="Default"/> property.</remarks>
-public record AIImageOutput
+public record AIImageOutput : IDefaultable
 {
     /// <summary>
     /// Gets the default configuration for AI image output.
     /// </summary>
-    public static AIImageOutput Default => new() 
-    { 
-        AspectRatios = ["1:1"], 
-        Resolutions = ["1K"], 
-        Qualities = ["auto"], 
-        Formats = ["jpeg"] 
+    public static readonly AIImageOutput Default = new()
+    {
+        AspectRatios = ["1:1"],
+        Resolutions = ["1K"],
+        Qualities = ["auto"],
+        Formats = ["jpeg"]
     };
 
     /// <summary>
     /// Gets an array of supported aspect ratios. Default: 1:1.
     /// </summary>
+    [DefaultValue("[]")]
     public string[]? AspectRatios { get; set; }
 
     /// <summary>
     /// Gets an array of supported resolutions. Default: 1K.
     /// </summary>
+    [DefaultValue("[]")]
     public string[]? Resolutions { get; set; }
 
     /// <summary>
     /// Gets an array of supported image rendering qualities. Default: auto.
     /// </summary>
+    [DefaultValue("[]")]
     public string[]? Qualities { get; set; }
 
     /// <summary>
     /// Gets an array of supported image formats. Default: png.
     /// </summary>
+    [DefaultValue("[]")]
     public string[]? Formats { get; set; }
 
     /// <summary>
     /// Gets the default aspect ratio for this model instance.
     /// </summary>
+    [DefaultValue("")]
     public string? DefaultAspectRatio { get; set; }
 
     /// <summary>
     /// Gets the default resolution for this model instance.
     /// </summary>
+    [DefaultValue("")]
     public string? DefaultResolution { get; set; }
 
     /// <summary>
     /// Gets the default image rendering quality for this model instance.
     /// </summary>
+    [DefaultValue("")]
     public string? DefaultQuality { get; set; }
 
     /// <summary>
     /// Gets the default image format for this model instance.
     /// </summary>
+    [DefaultValue("")]
     public string? DefaultFormat { get; set; }
 
     /// <summary>
@@ -69,9 +81,26 @@ public record AIImageOutput
     /// </summary>
     public bool OmitDefault { get; set; }
 
+    /// <summary>
+    /// Gets a value indicating whether the current instance is in its default state, meaning all properties are either null or empty.
+    /// </summary>
+    [IgnoreDataMember]
+    public bool IsDefaultState
+    {
+        get => AspectRatios.IsNullOrEmpty()
+            && Resolutions.IsNullOrEmpty()
+            && Qualities.IsNullOrEmpty()
+            && Formats.IsNullOrEmpty()
+            && DefaultAspectRatio.IsEmpty()
+            && DefaultResolution.IsEmpty()
+            && DefaultQuality.IsEmpty()
+            && DefaultFormat.IsEmpty()
+            && !OmitDefault;
+    }
+
     public ImageAspectRatio FindSupportedAspectRatio(
-        ImageAspectRatio? attemptedRatio, 
-        ImageOrientation defaultOrientation, 
+        ImageAspectRatio? attemptedRatio,
+        ImageOrientation defaultOrientation,
         out bool isDefault)
     {
         isDefault = false;
@@ -147,7 +176,7 @@ public record AIImageOutput
     /// resolution if the attempted resolution is not supported.
     /// </summary>
     /// <remarks>If the <paramref name="attemptedResolution"/> is not <see langword="null"/> and is 
-    /// included in the list of supported resolutions, it will be returned. Otherwise, the  method returns the last
+    /// included in the list of supported resolutions, it will be returned. Otherwise, the  method returns the first
     /// resolution in the list of supported resolutions.</remarks>
     /// <param name="attemptedResolution">The resolution to attempt, or <see langword="null"/> to use the default resolution.</param>
     /// <returns>The supported resolution that matches the attempted resolution, if found;  otherwise, the default
@@ -191,4 +220,20 @@ public record AIImageOutput
 
         return (AIImageQuality)defaultQuality!;
     }
+
+    #region Serialization
+
+    /// <summary>
+    /// Serializes this instance to a JSON string.
+    /// </summary>
+    public virtual string? ToJson()
+        => IsDefaultState ? null : JsonSerializer.Serialize(this, SmartJsonOptions.CamelCasedIgnoreDefaults);
+
+    /// <summary>
+    /// Deserializes an <see cref="AIImageOutput"/> instance from a JSON string.
+    /// </summary>
+    public static AIImageOutput? FromJson(string json)
+        => json.HasValue() ? JsonSerializer.Deserialize<AIImageOutput>(json, SmartJsonOptions.CamelCasedIgnoreDefaults) : null;
+
+    #endregion
 }

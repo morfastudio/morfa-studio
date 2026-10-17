@@ -1,49 +1,107 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Smartstore.ComponentModel;
 using Smartstore.Core.Security;
+using Smartstore.IconKit;
 using Smartstore.DevTools.Models;
 using Smartstore.Web.Controllers;
 using Smartstore.Web.Modelling.Settings;
 
-namespace Smartstore.DevTools.Controllers
-{
-    [Area("Admin")]
-    //[Route("module/[area]/[action]/{id?}", Name = "Smartstore.DevTools")]
-    public class DevToolsController : ModuleController
-    {
-        [AuthorizeAdmin, Permission(DevToolsPermissions.Read)]
-        [LoadSetting]
-        public IActionResult Configure(ProfilerSettings settings)
-        {
-            var model = MiniMapper.Map<ProfilerSettings, ConfigurationModel>(settings);
-            return View(model);
-        }
+namespace Smartstore.DevTools.Controllers;
 
-        [AuthorizeAdmin, Permission(DevToolsPermissions.Update)]
-        [HttpPost, SaveSetting]
-        public IActionResult Configure(ConfigurationModel model, ProfilerSettings settings)
+[Area("Admin")]
+//[Route("module/[area]/[action]/{id?}", Name = "Smartstore.DevTools")]
+public class DevToolsController(IIconCache iconCache, IIconKitService iconKits, IIconService icons, IOptions<IconKitOptions> iconOptions) : ModuleController
+{
+    [AuthorizeAdmin, Permission(DevToolsPermissions.Read)]
+    [LoadSetting]
+    public async Task<IActionResult> Configure(ProfilerSettings settings)
+    {
+        var model = MiniMapper.Map<ProfilerSettings, ConfigurationModel>(settings);
+        var kitFiles = new List<IconKitFileModel>();
+        var kitDirectory = Path.Combine(iconOptions.Value.CachePath, "kits");
+        foreach (var kit in iconKits.Kits.OrderBy(x => x.Name, StringComparer.Ordinal))
         {
-            if (!ModelState.IsValid)
+            var url = iconKits.GetUrl(kit.Name);
+            if (url == null)
             {
-                return Configure(settings);
+                continue;
             }
 
-            ModelState.Clear();
-            MiniMapper.Map(model, settings);
-
-            return RedirectToAction(nameof(Configure));
-        }
-
-        [AuthorizeAdmin]
-        public IActionResult ProductEditTab(int productId)
-        {
-            var model = new BackendExtensionModel
+            // Inspect only the current revision; never generate sprites for diagnostics.
+            var fileName = Uri.UnescapeDataString(Path.GetFileName(url));
+            var file = new FileInfo(Path.Combine(kitDirectory, fileName));
+            if (file.Exists)
             {
-                Welcome = "Hello world!"
-            };
-
-            ViewData.TemplateInfo.HtmlFieldPrefix = "CustomProperties[DevTools]";
-            return View(model);
+                kitFiles.Add(new IconKitFileModel(kit.DisplayName ?? kit.Name, fileName, file.Length));
+            }
         }
+        model.KitFiles = kitFiles;
+
+        var kitAddresses = iconKits.GetSourceAddresses();
+        var logoAddresses = new HashSet<string>(StringComparer.Ordinal);
+        var libraries = await icons.GetLibrariesAsync();
+        var logos = libraries.SelectMany(library => library.Variants.Values
+            .Select(variant => variant.Icon ?? library.Icon).Append(library.Icon))
+            .Where(address => address.HasValue()).Distinct(StringComparer.Ordinal);
+        foreach (var logo in logos)
+        {
+            // Resolve metadata only: library aliases and variant fallbacks must match
+            // the canonical cache identity without loading or caching any drawing.
+            var icon = await icons.GetIconAsync(IconExpression.Parse(logo).Address);
+            if (icon != null)
+            {
+                logoAddresses.Add(icon.Address);
+            }
+        }
+
+        var cachedIcons = new Dictionary<string, IconSvg>(StringComparer.Ordinal);
+        await foreach (var entry in iconCache.GetEntriesAsync())
+        {
+            var address = entry.Address.ToString();
+            if (kitAddresses.Contains(address) || logoAddresses.Contains(address) || cachedIcons.ContainsKey(address))
+            {
+                continue;
+            }
+
+            // Entries can expire between enumeration and lookup. Read the cached payload
+            // directly so this diagnostic view does not populate or refresh the icon cache.
+            var svg = await iconCache.GetAsync(entry.Key);
+            if (svg != null)
+            {
+                cachedIcons.TryAdd(svg.Address, svg);
+            }
+        }
+
+        model.CachedIcons = cachedIcons.Values.OrderBy(x => x.Address, StringComparer.Ordinal).ToArray();
+        return View(model);
+    }
+
+    [AuthorizeAdmin, Permission(DevToolsPermissions.Update)]
+    [HttpPost, SaveSetting]
+    public async Task<IActionResult> Configure(ConfigurationModel model, ProfilerSettings settings)
+    {
+        if (!ModelState.IsValid)
+        {
+            return await Configure(settings);
+        }
+
+        ModelState.Clear();
+        MiniMapper.Map(model, settings);
+
+        return RedirectToAction(nameof(Configure));
+    }
+
+    [AuthorizeAdmin]
+    public IActionResult ProductEditTab(int productId)
+    {
+        var model = new BackendExtensionModel
+        {
+            Welcome = "Hello world!"
+        };
+
+        ViewData.TemplateInfo.HtmlFieldPrefix = "CustomProperties[DevTools]";
+        return View(model);
     }
 }

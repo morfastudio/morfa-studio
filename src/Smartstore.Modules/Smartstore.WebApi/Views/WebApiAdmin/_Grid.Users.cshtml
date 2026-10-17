@@ -18,8 +18,8 @@
     <sorting enabled="true" allow-unsort="true" allow-multisort="false"></sorting>
     <toolbar>
         <toolbar-group>
-            <button datagrid-action="DataGridToolAction.ToggleSearchPanel" class="btn btn-light btn-icon">
-                <i class="fa fa-fw fa-filter"></i>
+            <button datagrid-action="DataGridToolAction.ToggleSearchPanel" class="btn btn-plain btn-icon">
+                <icon name="filter" />
             </button>
         </toolbar-group>
         <zone name="datagrid_toolbar_alpha"></zone>
@@ -38,10 +38,7 @@
                 </a>
             </display-template>
         </column>
-        @if (ViewBag.UsernamesEnabled)
-        {
-            <column for="Username" />
-        }
+        <column for="Username" sm-if="ViewBag.UsernamesEnabled == true" />
         <column for="FullName" />
         <column for="Active" halign="center" />
         <column for="AdminComment" />
@@ -82,7 +79,7 @@
             @T("Plugins.Api.WebApi.Deactivate")
         </a>
 
-        <div class="dropdown-divider"></div>
+        <fragment><div class="dropdown-divider"></div></fragment>
 
         <a datarow-action="DataRowAction.Custom" href="javascript:;" class="apiuser-grid-cmd create-keys" title="@T("Plugins.Api.WebApi.CreateKeys.Hint")"
            :data-key="item.row.Id"

@@ -24,7 +24,7 @@ public class JsonLdBuilder
     private readonly Dictionary<string, JsonLdFragment> _fragments = new(StringComparer.OrdinalIgnoreCase);
 
     /// <inheritdoc cref="Fragment(string)" />
-    public JsonLdFragment this[string type] 
+    public JsonLdFragment this[string type]
         => Fragment(type);
 
     /// <summary>
@@ -46,36 +46,54 @@ public class JsonLdBuilder
     }
 
     /// <summary>Gets or creates the <c>Product</c> fragment.</summary>
-    public JsonLdFragment Product 
+    public JsonLdFragment Product
         => this["Product"];
 
-    /// <summary>Gets or creates the <c>BreadcrumbList</c> fragment.</summary>
-    public JsonLdFragment BreadcrumbList 
+    /// <summary>Gets or creates the <c>CollectionPage</c> fragment.</summary>
+    public JsonLdFragment CollectionPage
+        => this["CollectionPage"];
+
+    /// <summary>
+    /// Gets or creates the <c>BreadcrumbList</c> fragment.
+    /// </summary>
+    public JsonLdFragment BreadcrumbList
         => this["BreadcrumbList"];
 
-    /// <summary>Gets or creates the <c>BlogPosting</c> fragment.</summary>
-    public JsonLdFragment BlogPosting 
+    /// <summary>
+    /// Gets or creates the <c>BlogPosting</c> fragment.
+    /// </summary>
+    public JsonLdFragment BlogPosting
         => this["BlogPosting"];
 
-    /// <summary>Gets or creates the <c>Organization</c> fragment.</summary>
-    public JsonLdFragment Organization 
+    /// <summary>
+    /// Gets or creates the <c>NewsArticle</c> fragment.
+    /// </summary>
+    public JsonLdFragment NewsArticle
+        => this["NewsArticle"];
+
+    /// <summary>
+    /// Gets or creates the <c>Organization</c> fragment.
+    /// </summary>
+    public JsonLdFragment Organization
         => this["Organization"];
 
-    /// <summary>Gets or creates the <c>WebSite</c> fragment.</summary>
+    /// <summary>
+    /// Gets or creates the <c>WebSite</c> fragment.
+    /// </summary>
     public JsonLdFragment WebSite
         => this["WebSite"];
 
     /// <summary>
     /// Gets a value indicating whether any JSON-LD fragments have been registered.
     /// </summary>
-    public bool HasFragments 
+    public bool HasFragments
         => _fragments.Count > 0;
 
     /// <summary>
     /// Gets all currently registered fragments as a read-only sequence.
     /// Does not create new fragments. Useful for inspection, testing, or conditional logic.
     /// </summary>
-    public IReadOnlyCollection<JsonLdFragment> Fragments 
+    public IReadOnlyCollection<JsonLdFragment> Fragments
         => _fragments.Values;
 
     /// <summary>
@@ -104,7 +122,7 @@ public class JsonLdBuilder
         foreach (var fragment in _fragments.Values)
         {
             var data = fragment.AsJsonObject();
-            
+
             sb.Append($"<script type=\"application/ld+json\" fragment-type=\"{fragment.Type}\">");
             if (CommonHelper.IsDevEnvironment)
             {

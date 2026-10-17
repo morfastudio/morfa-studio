@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
-using Smartstore.Json.Polymorphy;
 using System.Text.Json.Serialization;
+using Smartstore.Json.Polymorphy;
 
 namespace Smartstore.Core.AI;
 
@@ -11,6 +11,7 @@ internal sealed class AIChatJsonConverter : JsonConverter<AIChat>
         IReadOnlyList<AIChatMessage> messages = null;
         var topic = AIChatTopic.Text;
         string modelName = null;
+        string reasoningEffort = null;
 
         IDictionary<string, object> metadata = null;
         var initialUserMessageHash = 0;
@@ -43,6 +44,10 @@ internal sealed class AIChatJsonConverter : JsonConverter<AIChat>
             {
                 modelName = reader.GetString();
             }
+            else if (string.Equals(propertyName, nameof(AIChat.ReasoningEffort), StringComparison.OrdinalIgnoreCase))
+            {
+                reasoningEffort = reader.GetString();
+            }
             else if (string.Equals(propertyName, nameof(AIChat.Messages), StringComparison.OrdinalIgnoreCase))
             {
                 messages = JsonSerializer.Deserialize<IReadOnlyList<AIChatMessage>>(ref reader, options);
@@ -65,6 +70,7 @@ internal sealed class AIChatJsonConverter : JsonConverter<AIChat>
         var chat = (AIChat)Activator.CreateInstance(typeToConvert, topic);
         chat.UseModel(modelName)
             .AddMessages([.. messages]);
+        chat.ReasoningEffort = reasoningEffort;
 
         if (metadata != null && metadata.Count > 0)
         {
@@ -87,8 +93,12 @@ internal sealed class AIChatJsonConverter : JsonConverter<AIChat>
             JsonSerializer.Serialize(writer, value.Topic, options);
 
             writer.WriteString(
-                nameof(AIChat.ModelName), 
+                nameof(AIChat.ModelName),
                 value.ModelName);
+
+            writer.WriteString(
+                nameof(AIChat.ReasoningEffort),
+                value.ReasoningEffort);
 
             writer.WritePropertyName(nameof(AIChat.Messages));
             JsonSerializer.Serialize(writer, value.Messages, options);

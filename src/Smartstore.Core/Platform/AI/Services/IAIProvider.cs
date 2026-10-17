@@ -1,87 +1,112 @@
 ﻿#nullable enable
 
+using System.Text.Json;
 using Smartstore.Core.AI.Metadata;
 using Smartstore.Core.AI.Prompting;
 using Smartstore.Core.Content.Media;
 using Smartstore.Engine.Modularity;
 
-namespace Smartstore.Core.AI
+namespace Smartstore.Core.AI;
+
+/// <summary>
+/// Represents an AI provider like ChatGPT.
+/// </summary>
+public partial interface IAIProvider : IProvider, IDisposable, IAsyncDisposable
 {
     /// <summary>
-    /// Represents an AI provider like ChatGPT.
+    /// Gets a value indicating whether the provider is active.
     /// </summary>
-    public partial interface IAIProvider : IProvider
-    {
-        /// <summary>
-        /// Gets a value indicating whether the provider is active.
-        /// </summary>
-        /// <returns><c>true</c> if the provider is active, otherwise <c>false</c>.</returns>
-        bool IsActive();
+    /// <returns><c>true</c> if the provider is active, otherwise <c>false</c>.</returns>
+    bool IsActive();
 
-        /// <summary>
-        /// Gets the metadata associated with the current AI provider, mapped from metadata.json.
-        /// </summary>
-        AIMetadata Metadata { get; }
+    /// <summary>
+    /// Gets the metadata associated with the current AI provider, mapped from metadata.json.
+    /// </summary>
+    AIMetadata Metadata { get; }
 
-        /// <summary>
-        /// Gets the local AI models available for the specified topic.
-        /// </summary>
-        AIModelCollection GetModels(AIChatTopic topic);
+    /// <summary>
+    /// Waits for asynchronous metadata post-processing to complete, if still in progress.
+    /// </summary>
+    /// <param name="timeout">The maximum time to wait for the metadata post-processing to complete.</param>
+    /// <param name="cancelToken">A token to cancel the wait operation.</param>
+    Task WaitForMetadataAsync(TimeSpan? timeout = null, CancellationToken cancelToken = default);
 
-        /// <summary>
-        /// Retrieves a collection of live AI models that are currently available for use.
-        /// </summary>
-        Task<AIModelCollection> GetLiveModelsAsync(CancellationToken cancelToken = default);
+    /// <summary>
+    /// Gets the local AI models available for the specified topic.
+    /// </summary>
+    AIModelCollection GetModels(AIChatTopic topic);
 
-        /// <summary>
-        /// Starts or continues an AI conversation.
-        /// Adds the latest answer to the chat if the chat is not of type <see cref="AIChatTopic.Image"/>.
-        /// </summary>
-        /// <remarks>
-        /// For <see cref="AIChatTopic.Image"/>, context information can be passed via the metadata with the key <see cref="KnownAIChatMetadataKeys.ImageChatContext"/>.
-        /// </remarks>
-        /// <param name="chat">The AI chat.</param>
-        /// <returns>
-        /// The latest answer or the path of a temporary image file if the chat is of type <see cref="AIChatTopic.Image"/>.
-        /// </returns>
-        /// <exception cref="AIException">Thrown when an error occurs during the AI conversation.</exception>
-        Task<string?> ChatAsync(AIChat chat, CancellationToken cancelToken = default);
+    /// <summary>
+    /// Retrieves a collection of live AI models that are currently available for use.
+    /// </summary>
+    Task<AIModelCollection> GetLiveModelsAsync(CancellationToken cancelToken = default);
 
-        /// <summary>
-        /// Starts or continues an AI conversation.
-        /// Adds the latest answer to the chat.
-        /// </summary>
-        /// <param name="chat">The AI chat.</param>
-        /// <param name="numAnswers">The number of AI answers to return. 1 by default.</param>
-        /// <returns>The answer and its index. The index is greater than or equal to 0 and less than numAnswers.</returns>
-        /// <exception cref="AIException">Thrown when an error occurs during the AI conversation.</exception>
-        IAsyncEnumerable<AIChatCompletionResponse> ChatAsStreamAsync(
-            AIChat chat,
-            int numAnswers = 1,
-            CancellationToken cancelToken = default);
+    /// <summary>
+    /// Starts or continues an AI conversation.
+    /// Adds the latest answer to the chat if the chat is not of type <see cref="AIChatTopic.Image"/>.
+    /// </summary>
+    /// <remarks>
+    /// For <see cref="AIChatTopic.Image"/>, context information can be passed via the metadata with the key <see cref="KnownAIChatMetadataKeys.ImageChatContext"/>.
+    /// </remarks>
+    /// <param name="chat">The AI chat.</param>
+    /// <returns>
+    /// The latest answer or the path of a temporary image file if the chat is of type <see cref="AIChatTopic.Image"/>.
+    /// </returns>
+    /// <exception cref="AIException">Thrown when an error occurs during the AI conversation.</exception>
+    Task<string?> ChatAsync(AIChat chat, CancellationToken cancelToken = default);
 
-        /// <summary>
-        /// Gets the image creation or editing options.
-        /// </summary>
-        /// <param name="modelName">The name of the AI model.</param>
-        AIImageOptions GetImageOptions(string modelName);
+    /// <summary>
+    /// Sends the chat to the AI provider, requests a response that conforms to the given <paramref name="schema"/>,
+    /// and deserializes the returned JSON to a strongly typed object of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The reference type to deserialize the JSON response into.</typeparam>
+    /// <param name="chat">The AI chat containing the messages and topic.</param>
+    /// <param name="schema">The response schema the AI must adhere to.</param>
+    /// <param name="jsonOptions">Optional <see cref="JsonSerializerOptions"/> used to deserialize the provider response.</param>
+    /// <returns>
+    /// The deserialized AI response, or <c>null</c> when the provider returns an empty response.
+    /// </returns>
+    /// <exception cref="AIException">Thrown when an error occurs during the AI conversation or when the response cannot be deserialized to <typeparamref name="T"/>.</exception>
+    Task<T?> GetTypedResponseAsync<T>(
+        AIChat chat,
+        AIResponseSchema schema,
+        JsonSerializerOptions? jsonOptions = null,
+        CancellationToken cancelToken = default) where T : class;
 
-        /// <summary>
-        /// Get the URL(s) of AI generated image(s).
-        /// </summary>
-        /// <param name="model">The AI image model.</param>
-        /// <param name="numImages">The number of images to be generated. 1 by default.</param>
-        /// <returns>An array of paths of temporary image files.</returns>
-        /// <exception cref="AIException">Thrown when an error occurs during image generation.</exception>
-        Task<string[]?> CreateImagesAsync(IAIImageModel model, int numImages = 1, CancellationToken cancelToken = default);
+    /// <summary>
+    /// Starts or continues an AI conversation.
+    /// Adds the latest answer to the chat.
+    /// </summary>
+    /// <param name="chat">The AI chat.</param>
+    /// <param name="numAnswers">The number of AI answers to return. 1 by default.</param>
+    /// <returns>The answer and its index. The index is greater than or equal to 0 and less than numAnswers.</returns>
+    /// <exception cref="AIException">Thrown when an error occurs during the AI conversation.</exception>
+    IAsyncEnumerable<AIChatCompletionResponse> ChatAsStreamAsync(
+        AIChat chat,
+        int numAnswers = 1,
+        CancellationToken cancelToken = default);
 
-        /// <summary>
-        /// Analyzes an image based on an AI prompt.
-        /// </summary>
-        /// <param name="file">Image to analyze.</param>
-        /// <param name="chat">The AI chat.</param>
-        /// <returns>The analysis result.</returns>
-        /// <exception cref="AIException">Thrown when an error occurs during image analysis.</exception>
-        Task<string?> AnalyzeImageAsync(MediaFile file, AIChat chat, CancellationToken cancelToken = default);
-    }
+    /// <summary>
+    /// Gets the image creation or editing options.
+    /// </summary>
+    /// <param name="modelName">The name of the AI model.</param>
+    AIImageOptions GetImageOptions(string modelName);
+
+    /// <summary>
+    /// Get the URL(s) of AI generated image(s).
+    /// </summary>
+    /// <param name="model">The AI image model.</param>
+    /// <param name="numImages">The number of images to be generated. 1 by default.</param>
+    /// <returns>An array of paths of temporary image files.</returns>
+    /// <exception cref="AIException">Thrown when an error occurs during image generation.</exception>
+    Task<string[]?> CreateImagesAsync(IAIImageModel model, int numImages = 1, CancellationToken cancelToken = default);
+
+    /// <summary>
+    /// Analyzes an image based on an AI prompt.
+    /// </summary>
+    /// <param name="file">Image to analyze.</param>
+    /// <param name="chat">The AI chat.</param>
+    /// <returns>The analysis result.</returns>
+    /// <exception cref="AIException">Thrown when an error occurs during image analysis.</exception>
+    Task<string?> AnalyzeImageAsync(MediaFile file, AIChat chat, CancellationToken cancelToken = default);
 }

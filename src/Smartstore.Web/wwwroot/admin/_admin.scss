@@ -57,18 +57,6 @@ b, strong {
 
 
 //
-// Buttons
-// -----------------------------------------------------
-
-// Light button icons lighter (looks nice).
-.btn-secondary:not(.btn-flat-light),
-.btn-light:not(.btn-flat-light) {
-    --btn-icon-color: #{lighten($body-color, 16%)};
-    --btn-icon-hover-color: inherit;
-}
-
-
-//
 // Layout
 // -----------------------------------------------------
 
@@ -213,9 +201,9 @@ body {
         flex-grow: 1;
         max-width: 100%;
 
-        > i {
+        > :is(.icon, .icon-stack) {
             display: none; // Turn off for now, seems to look nicer
-            font-size: 28px;
+            --icon-size: 28px;
             vertical-align: text-top;
             margin-inline-end: 0.5rem;
             color: $text-muted;
@@ -356,6 +344,11 @@ body {
 #navbar {
     padding: 0 var(--content-padding-x);
 
+    #navbar-menu {
+        --dropdown-icon-item-padding-x: 1rem;
+        --dropdown-icon-item-gap: 10px;
+    }
+
     .dropdown-toggle:after {
         display: none;
     }
@@ -382,10 +375,16 @@ body {
       --dropdown-item-padding-x: 1rem;
       --dropdown-item-padding-y: 0.5rem;
       --dropdown-divider-margin-y: 0.5rem;
-      --dropdown-border-radius: 8px;
+      --dropdown-border-radius: var(--border-radius-lg);
       --shadow-intensity: 0.7;
       --dropdown-box-shadow: #{$box-shadow-lg};
         margin-top: -2px;
+    }
+
+    .navbar-icon.icon {
+        --icon-size: 24px;
+        width: var(--icon-size);
+        height: var(--icon-size);
     }
 
     #navbar-menu .nav-item > .dropdown-menu {
@@ -519,17 +518,13 @@ body {
         > .list-group-item-icon {
             margin-inline-end: 1rem;
 
-             > .bi {
-                vertical-align: -3px;
-            }
-
-            > i {
+            > :is(.icon, .icon-stack) {
                 max-width: 16px;
             }
         }
 
         &:active:not(.active) {
-            .bi-circle {
+            .menu-color-dot {
                 fill: transparent;
             }
         }
@@ -582,9 +577,6 @@ legend {
             color: $gray-700;
         }
 
-        > i {
-            font-size: 1rem;
-        }
     }
 
     &:hover > .hint {
@@ -598,9 +590,6 @@ legend {
         padding-top: calc(#{$input-padding-y-sm} + #{$input-border-width});
         padding-bottom: calc(#{$input-padding-y-sm} + #{$input-border-width});
 
-        > i {
-            font-size: inherit;
-        }
     }
 }
 
@@ -740,6 +729,43 @@ legend {
 // Apply grid layout to editor tables (.adminContent)
 // --------------------------------------------------
 
+.adminContent {
+    --adminRow-width: 1000px;
+    --adminTitle-width: 0.4;
+    --adminContent-width: 0.6;
+    --adminRow-margin-y: 0.8rem;
+
+    display: block;
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 0;
+    border-collapse: initial;
+
+    &.adminContent-boxed {
+        --adminContent-padding: 1rem;
+        padding-inline: 1rem;
+    }
+}
+
+.adminRow {
+    display: flex;
+    flex-wrap: wrap;
+    margin-block: var(--adminRow-margin-y, 0.8rem);
+    margin-inline: 0 !important;
+}
+
+.adminTitle,
+.adminData {
+    position: relative;
+    display: block;
+    @include make-col-ready();
+    padding-inline: 0;
+}
+
+.adminTitle {
+    margin-bottom: 0;
+}
+
 .adminData {
     select,
     input,
@@ -751,122 +777,60 @@ legend {
     }
 }
 
-.adminContent {
-    --adminRow-width: 1000px;
-    --adminTitle-width: 0.4;
-    --adminContent-width: 0.6;
-    --adminRow-margin-y: 0.8rem;
+.adminRow:not(.wide) {
+    @include media-breakpoint-up(md) {
+        flex-wrap: nowrap;
 
-    display: block;
-    width: 100%;
-    margin-right: auto;
-    margin-left: auto;
-    padding-left: 0;
-    padding-right: 0;
-    border-collapse: initial;
+        > .adminTitle {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+            padding-inline-end: 0 !important;
 
-    > tbody {
-        display: flex;
-        flex-flow: column;
-        border-collapse: initial;
-    }
-
-    > tbody > tr,
-    > tr,
-    .adminRow {
-        display: flex;
-        flex-wrap: wrap;
-        margin-block: 0.4rem;
-        margin-inline: 0 !important;
-    }
-
-    div.adminRow {
-        // DIV type rows do margin collapse, fix it.
-        margin-block: var(--adminRow-margin-y, 0.8rem);
-    }
-
-    .adminTitle,
-    .adminData {
-        position: relative;
-        display: block;
-        @include make-col-ready();
-        padding-inline: 0;
-    }
-
-    .adminTitle {
-        margin-bottom: 0;
-    }
-
-    > tbody > tr > td:only-child:not(.adminData):not(.adminTitle),
-    > tr > td:only-child:not(.adminData):not(.adminTitle) {
-        flex-grow: 1;
-        max-width: 100%;
-    }
-
-    &:not(.adminContent-vertical) > tbody > tr:not(.wide),
-    &:not(.adminContent-vertical) > tr:not(.wide),
-    &:not(.adminContent-vertical) .adminRow:not(.wide) {
-        @include media-breakpoint-up(md) {
-            flex-wrap: nowrap;
-
-            > .adminTitle {
-                flex: 0 0 33.333333%;
-                max-width: 33.333333%;
-                //text-align: right;
-                padding-right: 0 !important;
-
-                .ctl-label > label,
-                .ctl-label > .hint {
-                    // actually is '.col-form-label', @extend is not possible here.
-                    font-size: inherit;
-                    line-height: $input-line-height;
-                    padding-top: calc(#{$input-padding-y} + #{$input-border-width});
-                    padding-bottom: calc(#{$input-padding-y} + #{$input-border-width});
-                    margin-bottom: 0;
-                }
-            }
-
-            > .adminData {
-                flex: 0 0 66.666667%;
-                max-width: 66.666667%;
-                padding-left: 0 !important;
-
-                &:not(.wide) {
-                    padding-right: 0 !important;
-                }
+            .ctl-label > :is(label, .hint) {
+                // actually is '.col-form-label', @extend is not possible here.
+                font-size: inherit;
+                line-height: $input-line-height;
+                padding-top: calc(#{$input-padding-y} + #{$input-border-width});
+                padding-bottom: calc(#{$input-padding-y} + #{$input-border-width});
+                margin-bottom: 0;
             }
         }
 
-        @include media-breakpoint-up(lg) {
-            > .adminTitle {
-                flex-basis: calc(calc(var(--adminRow-width) * var(--adminTitle-width)) - var(--adminContent-padding, 0px));
-                max-width: calc(var(--adminTitle-width) * 100%);
+        > .adminData {
+            flex: 0 0 66.666667%;
+            max-width: 66.666667%;
+            padding-inline-start: 0 !important;
+
+            &:not(.wide) {
+                padding-inline-end: 0 !important;
             }
+        }
+    }
 
-            > .adminData {
-                --w: calc(var(--adminRow-width) * var(--adminContent-width));
-                flex-basis: var(--w);
-                width: var(--w);
-                max-width: calc(var(--adminContent-width) * 100%);
+    @include media-breakpoint-up(lg) {
+        > .adminTitle {
+            flex-basis: calc(calc(var(--adminRow-width) * var(--adminTitle-width)) - var(--adminContent-padding, 0px));
+            max-width: calc(var(--adminTitle-width) * 100%);
+        }
 
-                &.wide {
-                    flex-grow: 1;
-                    flex-basis: 0;
-                    max-width: 100%;
-                }
-            }
+        > .adminData {
+            --w: calc(var(--adminRow-width) * var(--adminContent-width));
+            flex-basis: var(--w);
+            width: var(--w);
+            max-width: calc(var(--adminContent-width) * 100%);
 
-            .adminContainer {
-                flex-basis: var(--adminRow-width);
-                width: var(--adminRow-width);
+            &.wide {
+                flex-grow: 1;
+                flex-basis: 0;
                 max-width: 100%;
             }
         }
-    }
 
-    &.adminContent-boxed {
-        --adminContent-padding: 1rem;
-        padding-inline: 1rem;
+        .adminContainer {
+            flex-basis: var(--adminRow-width);
+            width: var(--adminRow-width);
+            max-width: 100%;
+        }
     }
 }
 
@@ -878,6 +842,7 @@ legend {
 .adminSeparator {
     width: 100%;
 }
+
 
 //
 // Tables
@@ -1044,12 +1009,12 @@ legend {
         }
 
         .nav-link {
-            > img { opacity: 0.8; }
+            > img.icon { opacity: 0.8; }
 
             &:hover,
             &.active {
                 color: inherit;
-                > img { opacity: 1; }
+                > img.icon { opacity: 1; }
             }
         }
     }
@@ -1172,16 +1137,14 @@ legend {
     cursor: pointer;
 
     &:after {
-        @include fontawesome-font("\f078", regular); // chevron-down
+        @include icon-mask(var(--icon-mask-chevron-down), 1rem);
         display: block;
         position: absolute;
-        font-size: 0.85rem;
-        line-height: 1;
         color: $body-color;
         inset-inline-end: 0;
         top: 50%;
-        margin-top: -7px;
-        transition: transform 0.25s ease-in-out;
+        translate: 0 -50%;
+        transition: transform var(--collapse-duration, .2s) var(--collapse-easing, ease-out);
     }
 
     &.collapsed:after {
@@ -1194,9 +1157,22 @@ legend {
 // Themes
 // --------------------------------------------------
 
-#theme-list {
+.theme-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(cssmin(100%, 300px), 1fr));
+    gap: 1.5rem;
+
+    .theme-item {
+        min-width: 0;
+
+        &.active {
+            background-color: rgba(var(--primary-rgb), 0.04);
+            border-color: var(--primary);
+        }
+    }
+
     .theme-thumbnail {
-        height: 220px;
+        aspect-ratio: 4 / 3;
         background-size: cover;
         background-repeat: no-repeat;
         border-bottom: 1px solid rgba(#000, 0.1);
@@ -1291,12 +1267,30 @@ legend {
     }
 
     .btn.activate-provider {
-        > svg {
+        > .icon {
             margin-inline-end: 0.2rem;
         }
         > span {
             padding: 0 !important;
         }
+    }
+}
+
+// Shared presentation for module/provider SVG icons and legacy image logos.
+.module-icon-display {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--module-icon-size, 32px);
+    height: var(--module-icon-size, 32px);
+    vertical-align: middle;
+    line-height: 1;
+
+    > :is(.icon, .icon-stack) {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
 }
 
@@ -1307,8 +1301,10 @@ legend {
     justify-content: center;
     flex: 0 0 auto;
     max-width: none;
+    --icon-size: 48px;
+    --module-icon-size: 48px;
 
-    > .icon, > i {
+    > :is(.icon, .icon-stack) {
         max-width: 48px;
     }
 }
@@ -1391,6 +1387,11 @@ a.editable {
     display: none;
 }
 
+.alert-branding {
+    max-height: 50px;
+    width: auto;
+}
+
 .plugin-configuration {
     display: flex;
     flex-wrap: nowrap;
@@ -1423,8 +1424,8 @@ a.editable {
     color: $green;
     text-shadow: 0 -1px 0 #fff;
 
-    &::before {
-        content: '\f00c';
+    &:not(.icon)::before {
+        @include icon-mask(var(--icon-mask-check), 1rem);
     }
 }
 
@@ -1432,8 +1433,8 @@ a.editable {
     color: $gray-400;
     text-shadow: 0 -1px 0 #fff;
 
-    &::before {
-        content: '\f068';
+    &:not(.icon)::before {
+        @include icon-mask("minus", 1rem);
     }
 }
 
@@ -1748,3 +1749,130 @@ a.editable {
 .st-param-name      { color: var(--st-param-name-color); }
 .st-file            { color: var(--st-file-color); }
 .st-line            { color: var(--st-line-color); font-weight: 600 !important; }
+
+
+// Shared icon option editors (Icon Browser and editor popovers).
+.icon-tool-size-menu {
+    width: min(30rem, calc(100vw - 1rem));
+    z-index: $zindex-popover + 1;
+
+    .range-slider {
+        isolation: isolate;
+    }
+}
+
+.icon-tool-color-menu {
+    z-index: $zindex-popover + 1;
+}
+
+.icon-tool-color-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, .15);
+}
+
+.icon-tool-animation-menu {
+    &.show {
+        display: grid;
+    }
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: min(17rem, calc(100vw - 1rem));
+    max-height: calc(100vh - 1rem);
+    overflow-y: auto;
+    gap: 0.125rem;
+    z-index: $zindex-popover + 1;
+
+    > .btn {
+        min-height: 3.75rem;
+    }
+
+    .icon {
+        --icon-size: 24px;
+        --icon-size-factor: 1;
+    }
+}
+
+// Icon browser
+// --------------------------------------------------------------
+
+.icon-browser-selection {
+    min-width: 0;
+    container-type: inline-size;
+}
+
+.icon-browser-selection-with-tools {
+    .select2-selection__rendered {
+        overflow: visible;
+    }
+
+    .select2-option,
+    .select2-selection__placeholder {
+        flex: 1 1 0;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.icon-browser-toolbar {
+    gap: 2px;
+
+    > .btn {
+        --btn-height: 26px;
+        --btn-font-size: 0.875rem;
+        --btn-color: var(--gray-650);
+        --btn-box-shadow: none;
+        --btn-hover-shadow: none;
+        --btn-active-shadow: none;
+        --btn-focus-box-shadow: none;
+    }
+
+    [data-more] {
+        display: none;
+    }
+}
+
+@container (max-width: 360px) {
+    .icon-browser-toolbar {
+        [data-overflow] { display: none; }
+        [data-more] { display: inline-flex; }
+    }
+}
+
+.icon-browser-source-menu {
+    max-height: min(36rem, 75vh);
+}
+
+.icon-grid,
+.icon-browser-dropdown .select2-results > .select2-results__options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(72px, 100%), 1fr));
+    gap: 0.25rem;
+}
+
+// Only dropdown results use the grid; the selection uses the standard Select2 styles.
+.icon-browser-dropdown {
+    .select2-results > .select2-results__options {
+        max-height: min(24rem, 60vh);
+    }
+
+    .select2-results__option {
+        min-width: 0;
+
+        &[aria-selected] {
+            min-height: 64px;
+            padding: 0.5rem 0.25rem;
+        }
+
+        // Search feedback and the infinite-scroll sentinel must span the whole grid.
+        &:not([aria-selected]) {
+            grid-column: 1 / -1;
+        }
+    }
+
+    .icon-browser-choice > .icon {
+        --icon-size: var(--icon-browser-size, 24px);
+    }
+}

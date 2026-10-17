@@ -1,5 +1,6 @@
 ﻿@using Smartstore.Web.Models.Catalog
 @using Smartstore.Core.Catalog.Products
+@using Microsoft.AspNetCore.Http.Extensions
 
 @model ProductDetailsModel
 
@@ -13,6 +14,7 @@
         Assets.AppendCanonicalUrlParts(Model.CanonicalUrl);
     }
 
+    var url = Model.CanonicalUrl ?? Request.GetDisplayUrl();
     // INFO: Not "showing" this data in the UI does not mean it's not useful for bots. We can add it to the JSON-LD anyway.
     Assets.JsonLd.Product.Merge(new
     {
@@ -20,17 +22,18 @@
         sku = Model.Sku,
         gtin = Model.Gtin,
         mpn = Model.ManufacturerPartNumber,
-        url = Model.CanonicalUrl.NullEmpty(),
-        weight = Model.Weight.NullEmpty(),
-        width = Model.Width.NullEmpty(),
-        depth = Model.Length.NullEmpty(),
-        height = Model.Height.NullEmpty()
+        url = url
     });
+
+    Assets.JsonLd.Product.Quantity("weight", Model.Weight);
+    Assets.JsonLd.Product.Quantity("width", Model.Width);
+    Assets.JsonLd.Product.Quantity("depth", Model.Length);
+    Assets.JsonLd.Product.Quantity("height", Model.Height);
 }
 
 <partial name="MetaProperties" model="Model.MetaProperties" />
 
-<div class="page product-details-page" itemscope itemtype="http://schema.org/Product">
+<div class="page product-details-page">
     <zone name="productdetails_top" />
     
     <article class="pd page-body">
@@ -104,7 +107,7 @@
                                 class="btn btn-secondary rounded-pill btn-sm"
                                 target="admin-product"
                                 rel="nofollow">
-                                <i class="fa fa-cog" aria-hidden="true"></i>
+                                <icon name="gear"  aria-hidden="true" />
                                 <span>@T("Common.Catalog.EditProduct")</span>
                             </a>
                         </div>

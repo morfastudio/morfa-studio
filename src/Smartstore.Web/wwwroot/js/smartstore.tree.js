@@ -26,12 +26,12 @@
         showStateInfo: false,   // true: show number of 'on'(green) descendents for 'on-off' stateType.
         showNumChildren: true,
         showNumChildrenDeep: false,
-        defaultCollapsedIconClass: null,
-        defaultExpandededIconClass: null,
+        defaultCollapsedIcon: null,
+        defaultExpandedIcon: null,
         defaultCollapsedIconUrl: null,
         defaultExpandededIconUrl: null,
-        expandedClass: 'fas fa-chevron-down',
-        collapsedClass: 'fas fa-chevron-right',
+        expandedIcon: null,
+        collapsedIcon: 'chevron-right',
         leafClass: 'tree-leaf',
         stateTitles: ['', '', '', ''],
         stateInfoTitles: ['', '', ''],
@@ -262,8 +262,12 @@
             var title = nodeData?.Title ? window.htmlEncode(nodeData.Title) : li.data('title');
             var nodeUrl = nodeData?.Url || li.data('url');
             var badgeText = nodeData?.BadgeText || li.data('badge-text');
-            var iconClass = nodeData?.IconClass || li.data('icon-class') || opt.defaultCollapsedIconClass;
-            var iconUrl = nodeData?.IconUrl || li.data('icon-url') || opt.defaultCollapsedIconUrl;
+            var customIcon = nodeData?.Icon || li.data('icon');
+            var customIconUrl = nodeData?.IconUrl || li.data('icon-url');
+            var icon = customIcon || (customIconUrl ? null : opt.defaultCollapsedIcon);
+            var iconUrl = customIconUrl || opt.defaultCollapsedIconUrl;
+            var iconArea = customIcon ? nodeData?.IconArea || li.data('icon-area') : null;
+            var defaultIconClass = customIcon || customIconUrl ? '' : ' tree-icon-default';
             var dimmed = nodeData ? nodeData.Dimmed : toBool(li.data('dimmed'), false);
             var enabled = nodeData ? nodeData.Enabled : toBool(li.data('enabled'), true);
             var textClass = numChildren == 0 ? 'tree-text tree-leaf-text' : 'tree-text tree-noleaf-text';
@@ -301,7 +305,7 @@
             }
 
             if (numChildren > 0) {
-                html += `<span class="tree-expander-container tree-expander"><i class="${opt.collapsedClass}"></i></span>`;
+                html += `<span class="tree-expander-container tree-expander">${renderExpanderIcon(opt)}</span>`;
             }
             else {
                 html += '<span class="tree-expander-container"></span>';
@@ -309,11 +313,11 @@
 
             html += `<label class="tree-label"${!enabled && opt.disabledTitle ? ` title="${opt.disabledTitle}"` : ''}><span class="${contentClass}">`;
 
-            if (iconClass) {
-                html += `<span class="tree-icon"><i class="${iconClass}"></i></span>`;
+            if (icon) {
+                html += `<span class="tree-icon${defaultIconClass}"><sm-icon name="${window.htmlEncode(icon)}"${iconArea ? ` area="${window.htmlEncode(iconArea)}"` : ''} fw aria-hidden="true"></sm-icon></span>`;
             }
             else if (iconUrl) {
-                html += `<span class="tree-icon"><img src="${iconUrl}" alt="${name}" /></span>`;
+                html += `<span class="tree-icon${defaultIconClass}"><img src="${iconUrl}" alt="${name}" /></span>`;
             }
 
             html += `<span class="${textClass}">${labelHtml}</span>`;
@@ -402,18 +406,25 @@
         opt.expanded = expand;
     }
 
-    function expandNode(node, expand, opt, slide) {
+    function expandNode(node, expand, opt, animate) {
         var childNodes = node.children('ul');
+
+        if (!childNodes.length || childNodes.hasClass('collapsing')) {
+            return;
+        }
+
+        childNodes.addClass('collapse');
+        var stateChanged = childNodes.hasClass('show') !== expand;
 
         if (expand) {
             // Expand.
             node.removeClass('tree-collapsed').addClass('tree-expanded');
 
-            if (slide) {
-                childNodes.hide().slideDown(200);
+            if (animate && stateChanged) {
+                childNodes.collapse('show');
             }
             else {
-                childNodes.show();
+                childNodes.toggleClass('show', true).css('height', '');
             }
 
             finalizeExpanding('tree.expanded');
@@ -422,14 +433,14 @@
             // Collapse.
             node.removeClass('tree-expanded').addClass('tree-collapsed');
 
-            if (slide) {
-                childNodes.slideUp(200, function () {
-                    childNodes.hide();
+            if (animate && stateChanged) {
+                childNodes.one('hidden.bs.collapse.tree', function () {
                     finalizeExpanding('tree.collapsed');
                 });
+                childNodes.collapse('hide');
             }
             else {
-                childNodes.hide();
+                childNodes.toggleClass('show', false).css('height', '');
                 finalizeExpanding('tree.collapsed');
             }
         }
@@ -438,15 +449,18 @@
             var nodeInner = node.find('.tree-inner').first();
 
             // Toggle node icon.
-            if (opt.defaultCollapsedIconClass && opt.defaultExpandededIconClass) {
-                nodeInner.find('.tree-icon i').attr('class', expand ? opt.defaultExpandededIconClass : opt.defaultCollapsedIconClass);
+            if (opt.defaultCollapsedIcon && opt.defaultExpandedIcon) {
+                nodeInner.find('.tree-icon-default sm-icon').attr('name', expand ? opt.defaultExpandedIcon : opt.defaultCollapsedIcon);
             }
             else if (opt.defaultCollapsedIconUrl && opt.defaultExpandededIconUrl) {
-                nodeInner.find('.tree-icon img').attr('src', expand ? opt.defaultExpandededIconUrl : opt.defaultCollapsedIconUrl);
+                nodeInner.find('.tree-icon-default img').attr('src', expand ? opt.defaultExpandededIconUrl : opt.defaultCollapsedIconUrl);
             }
 
-            // Toggle expander icon.
-            nodeInner.find('.tree-expander').html(`<i class="${expand ? opt.expandedClass : opt.collapsedClass}"></i>`);
+            // Toggle custom expander icons. The default chevron keeps the same element and class
+            // so its transform can transition continuously.
+            if (opt.expandedIcon && opt.expandedIcon !== opt.collapsedIcon) {
+                nodeInner.find('.tree-expander > sm-icon').attr('name', expand ? opt.expandedIcon : opt.collapsedIcon);
+            }
 
             EventBroker.publishSync(eventName, { node });
         }
@@ -456,9 +470,14 @@
         var container = node.find('.tree-inner').first().find('.tree-expander-container');
 
         if (!container.hasClass('tree-expander')) {
-            container.addClass('tree-expander').html(`<i class="${opt.collapsedClass}"></i>`);
+            container.addClass('tree-expander').html(renderExpanderIcon(opt));
             node.addClass('tree-collapsed tree-noleaf').removeClass('tree-leaf');
         }
+    }
+
+    function renderExpanderIcon(opt) {
+        const cssClass = !opt.expandedIcon || opt.expandedIcon === opt.collapsedIcon ? 'tree-chevron' : '';
+        return `<sm-icon name="${window.htmlEncode(opt.collapsedIcon)}" class="${cssClass}" aria-hidden="true"></sm-icon>`;
     }
 
     function setInheritedState(node, inheritedState, opt) {
@@ -572,8 +591,9 @@
             data: { parentId: parentId },
             beforeSend: function () {
                 if (expander) {
-                    expander.find('i').hide();
-                    expander.prepend(window.createCircularSpinner(12, true));
+                    expander
+                        .addClass('loading')
+                        .prepend(window.createCircularSpinner(12, true));
                 }
 
                 EventBroker.publishSync('tree.loading', { node });
@@ -584,18 +604,22 @@
 
                 (node ?? root).append(`<ul class="tree-list">${items}</ul>`);
 
+                resetExpander();
                 callback(data);
                 EventBroker.publishSync('tree.loaded', { node });
             },
             complete: function () {
-                if (expander) {
-                    expander.find('.spinner').remove();
-                    expander.find('i').show();
-                }
+                resetExpander();
             }
         });
 
         return true;
+
+        function resetExpander() {
+            if (expander) {
+                expander.removeClass('loading').find('.spinner').remove();
+            }
+        }
     }
 
     function initializeDragAndDrop(root, opt) {

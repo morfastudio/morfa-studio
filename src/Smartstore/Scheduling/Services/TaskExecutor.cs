@@ -61,7 +61,7 @@ public class TaskExecutor : ITaskExecutor
         bool faulted = false;
         bool canceled = false;
         string lastError = null;
-        string stateName = null; 
+        string stateName = null;
         string normalizedTypeName = null;
 
         var executionInfo = _taskStore.CreateExecutionInfo(task);
@@ -95,7 +95,7 @@ public class TaskExecutor : ITaskExecutor
 
             // Create execution context
             var ctx = new TaskExecutionContext(_taskStore, _asyncState, httpContext, _componentContext, executionInfo, taskParameters);
-            
+
             // Create & set a composite CancellationTokenSource which also contains the global app shoutdown token.
             var cts = CancellationTokenSource.CreateLinkedTokenSource(_asyncRunner.AppShutdownCancellationToken, cancelToken);
             await _asyncState.CreateAsync(ctx.ExecutionInfo.Task, stateName, neverExpires: false, cancelTokenSource: cts);
@@ -167,7 +167,16 @@ public class TaskExecutor : ITaskExecutor
                 updateTask = true;
             }
 
+            // Primary update via change tracker.
             await _taskStore.UpdateExecutionInfoAsync(executionInfo);
+
+            // Fallback: verify the critical IsRunning flag was actually persisted.
+            // Uses a direct SQL UPDATE that is immune to any prior EF tracking corruption.
+            // This guarantees the entry is never left in a zombie "IsRunning = true" state.
+            if (executionInfo.Id > 0)
+            {
+                await _taskStore.FinalizeExecutionInfoAsync(executionInfo);
+            }
 
             if (updateTask)
             {

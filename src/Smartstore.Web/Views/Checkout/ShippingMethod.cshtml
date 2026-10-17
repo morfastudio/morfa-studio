@@ -1,4 +1,5 @@
 ﻿@using Smartstore.Web.Models.Checkout
+@using Smartstore.Core.Checkout.Orders
 
 @model CheckoutShippingMethodModel
 
@@ -39,10 +40,35 @@
 
 <script sm-target-zone="scripts" data-origin="shipping-method">
     $(function () {
-        $('.checkout-data .opt-radio').on('change', function (e) {
+        let shippingRequest;
+
+        $('.checkout-data .opt-radio').on('change', (e) => {
+            const $el = $(e.currentTarget);
             $('.checkout-data .opt-list-item').removeClass('active');
-            var item = $(this).closest('.opt-list-item');
-            item.addClass("active");
+            $el.closest('.opt-list-item').addClass('active');
+
+            const shippingOption = $el.closest('form').find('input[name="shippingoption"]:checked').val();
+            const orderTotalPart = @((int)CheckoutPartial.OrderTotals);
+
+            shippingRequest?.abort();
+            shippingRequest = $.ajax({
+                type: 'POST',
+                cache: false,
+                url: '@Url.Action("Refresh")',
+                data: { 
+                    shippingOption,
+                    actionName: '@CheckoutActionNames.ShippingMethod',
+                    parts: orderTotalPart
+                }
+            })
+            .done((response) => {
+                $('#order-totals').html(response.contents[orderTotalPart]);
+            })
+            .fail((xhr, status) => {
+                if (status !== 'abort') {
+                    location.reload();
+                }
+            });
         });
 
         $('.shipping-method-next-step-button').on('click', function () {

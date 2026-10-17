@@ -1,44 +1,41 @@
 ﻿using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.FileProviders;
 
-namespace Smartstore.Web.Bundling
+namespace Smartstore.Web.Bundling;
+
+public class BundlingOptions
 {
-    public class BundlingOptions
-    {
-        public bool? EnableBundling { get; set; }
+    public bool? EnableBundling { get; set; }
 
-        public bool? EnableClientCache { get; set; }
+    public bool? EnableClientCache { get; set; }
 
-        public bool? EnableDiskCache { get; set; }
+    public bool? EnableDiskCache { get; set; }
 
-        public bool? EnableMinification { get; set; }
+    public bool? EnableMinification { get; set; }
 
-        public bool? EnableAutoprefixer { get; set; }
+    /// <summary>Enables browser-targeted CSS transpilation independently of minification.</summary>
+    public bool? EnableCssTranspilation { get; set; }
 
-        public AutoprefixerOptions Autoprefixer { get; set; } = new AutoprefixerOptions();
+    /// <summary>Options for transpiling style bundles.</summary>
+    public CssTranspilerOptions CssTranspiler { get; set; } = new();
 
-        public IFileProvider FileProvider { get; set; }
+    public IFileProvider FileProvider { get; set; }
 
-        /// <summary>
-        /// Indicates if files should be compressed for HTTPS requests when the Response Compression middleware is available.
-        /// The default value is <see cref="HttpsCompressionMode.Compress"/>.
-        /// </summary>
-        /// <remarks>
-        /// Enabling compression on HTTPS requests for remotely manipulable content may expose security problems.
-        /// </remarks>
-        public HttpsCompressionMode HttpsCompression { get; set; } = HttpsCompressionMode.Default;
-    }
+    /// <summary>
+    /// Indicates if files should be compressed for HTTPS requests when the Response Compression middleware is available.
+    /// The default value is <see cref="HttpsCompressionMode.Compress"/>.
+    /// </summary>
+    /// <remarks>
+    /// Enabling compression on HTTPS requests for remotely manipulable content may expose security problems.
+    /// </remarks>
+    public HttpsCompressionMode HttpsCompression { get; set; } = HttpsCompressionMode.Default;
+}
 
-    public class AutoprefixerOptions
-    {
-        public bool AlwaysDisableInDevMode { get; set; } = true;
-        public IList<string> Browsers { get; set; }
-        public bool Cascade { get; set; }
-        public bool Add { get; set; } = true;
-        public bool Remove { get; set; } = true;
-        public bool Supports { get; set; } = true;
-        public bool IgnoreUnknownVersions { get; set; }
-        public bool Flexbox { get; set; }
-        public bool Grid { get; set; }
-    }
+public class CssTranspilerOptions
+{
+    /// <summary>Disables CSS transpilation by default in development unless explicitly enabled.</summary>
+    public bool AlwaysDisableInDevMode { get; set; } = true;
+
+    /// <summary>Browserslist query that determines which CSS compatibility transforms are needed.</summary>
+    public string Targets { get; set; } = string.Empty;
 }

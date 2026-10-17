@@ -29,6 +29,7 @@ public class StripeElementsProvider : PaymentMethodBase, IConfigurable
     private readonly IStoreContext _storeContext;
     private readonly ISettingFactory _settingFactory;
     private readonly ICheckoutStateAccessor _checkoutStateAccessor;
+    private readonly ICurrencyService _currencyService;
     private readonly IRoundingHelper _roundingHelper;
     private readonly ICacheManager _cache;
     private readonly StripeSettings _settings;
@@ -38,6 +39,7 @@ public class StripeElementsProvider : PaymentMethodBase, IConfigurable
         IStoreContext storeContext,
         ISettingFactory settingFactory,
         ICheckoutStateAccessor checkoutStateAccessor,
+        ICurrencyService currencyService,
         IRoundingHelper roundingHelper,
         ICacheManager cache,
         StripeSettings settings)
@@ -46,6 +48,7 @@ public class StripeElementsProvider : PaymentMethodBase, IConfigurable
         _storeContext = storeContext;
         _settingFactory = settingFactory;
         _checkoutStateAccessor = checkoutStateAccessor;
+        _currencyService = currencyService;
         _roundingHelper = roundingHelper;
         _cache = cache;
         _settings = settings;
@@ -103,7 +106,8 @@ public class StripeElementsProvider : PaymentMethodBase, IConfigurable
             throw new Exception($"{nameof(processPaymentRequest.OrderGuid)} is missing.");
         }
 
-        var result = new ProcessPaymentResult { 
+        var result = new ProcessPaymentResult
+        {
             NewPaymentStatus = PaymentStatus.Pending
         };
 
@@ -131,7 +135,12 @@ public class StripeElementsProvider : PaymentMethodBase, IConfigurable
 
         if (request.IsPartialRefund)
         {
-            options.Amount = _roundingHelper.ToSmallestCurrencyUnit(request.AmountToRefund);
+            var amountToRefund = _currencyService.ConvertToExchangeRate(
+                request.AmountToRefund.Amount,
+                request.Order.CurrencyRate,
+                request.Order.CustomerCurrencyCode);
+
+            options.Amount = _roundingHelper.ToSmallestCurrencyUnit(amountToRefund);
         }
 
         var service = new RefundService();

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Smartstore.Utilities;
 
 namespace Smartstore.Scheduling;
 
@@ -20,7 +21,7 @@ public class TaskSchedulerMiddleware
     public async Task Invoke(
         HttpContext context,
         ITaskScheduler scheduler,
-        ITaskStore taskStore, 
+        ITaskStore taskStore,
         ITaskExecutor executor)
     {
         if (_stopping.IsCancellationRequested)
@@ -28,7 +29,7 @@ public class TaskSchedulerMiddleware
             context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
             return;
         }
-        
+
         var urlSegments = context.Request.Path.Value.Trim('/').SplitSafe('/').ToArray();
         var action = urlSegments.Length > 1 ? urlSegments[1] : string.Empty;
 
@@ -107,6 +108,12 @@ public class TaskSchedulerMiddleware
                 numExecuted++;
             }
         }
+
+        // After executing tasks, add normalization as a throttled background check
+        await Throttle.CheckAsync(
+            "Normalize stale schedule task history entries",
+            TimeSpan.FromHours(1),
+            async () => await taskStore.NormalizeStaleExecutionInfosAsync() > 0);
 
         context.Response.StatusCode = StatusCodes.Status200OK;
         await context.Response.WriteAsync($"{numExecuted} of {numTasks} pending tasks executed.");
