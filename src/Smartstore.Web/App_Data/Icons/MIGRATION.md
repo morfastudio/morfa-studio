@@ -6,6 +6,41 @@ The current system default is HugeIcons (`hi`), variant `stroke-rounded` (`sr`).
 These tables contain names and mappings only; they do not depend on a diagnostic
 Razor view, generated SVG output or temporary import reports.
 
+## Bundled Page Builder story templates
+
+The shipped `.story` archives use the current `Icon` and `ButtonIcon` models.
+These bundled archives were updated offline; the runtime converter remains unchanged.
+Active icons retain their size, color and display settings. Inactive legacy icon
+selections and empty FontAwesome models are removed; picture content is preserved.
+
+| Legacy FA name | Template concept | Hugeicons source |
+| --- | --- | --- |
+| percent | discount | badge-percent |
+| headphones | headphones | headphones |
+| signal | wifi | wifi-02 |
+| envelope-open | mail-open | mail-open-01 |
+| camera | camera | camera-01 |
+| internet-explorer | globe | globe-02 |
+| hdd | hard-drive | hard-drive |
+| clock | clock | clock-04 |
+| headset | headset | headset |
+| bolt | bolt | zap |
+| question-circle | question-circle | circle-question-mark |
+| certificate | certificate | certificate-01 |
+| star | star | star |
+| credit-card | creditcard | credit-card |
+
+The Internet tile now uses a generic globe instead of a browser brand; the Wi-Fi
+tile uses a WLAN symbol instead of signal bars. These are intentional semantic
+replacements. Concepts resolve through the Public kit without a fixed variant.
+Inactive `500px`/`fa-500px`, `mobile-alt`, `sun` and button `globe` values are removed.
+
+User templates and uploaded story archives additionally migrate legacy HTML-block icon
+data on temporary extracted copies before the import writes any records. Nested stories
+are included. Bundled templates skip this step. Existing converters preserve FA SVG
+sources and styles for user content; they do not apply the curated mappings above.
+Source archives remain unchanged, and conversion errors identify the story and block.
+
 ## Typed resolution and presentation
 
 - `Html.IconAsync` accepts an `IconExpression` or its string representation, plus optional
@@ -54,9 +89,7 @@ Shopware import progress and SupportAgent collapse/copy controls.
 
 Use `check` for legacy `circle-check`, `alert-danger` for `exclamation-circle` or
 `circle-exclamation`, `eye-off` for `eye-slash`, and `chevron-*` for `angle-*`.
-These state icons are available in the applicable public/admin kits. The legacy
-PageBuilder IconChooser, the cheatsheet and the independent `confirm2` CSS-class
-contract are excluded from this migration.
+These state icons are available in the applicable public/admin kits. The cheatsheet is excluded from this migration.
 
 ## Select option icons
 
@@ -66,7 +99,7 @@ same contract, including initial loading and lazy selections (`init.icon`).
 For example, use `data-icon="mail"` or `data-icon='["mail", "lock"]'`.
 Icons render through `sm-icon` in both results and selections; prefer kit concepts
 to avoid individual SVG requests. Icons count as rich content on touch devices.
-Custom formatters, including the legacy FontAwesome chooser, retain their own contracts.
+Custom formatters retain their own contracts.
 
 Export deployment icons use `folder-open`, `mail`, `hi:cloud-server!/sr` (HTTP POST),
 `database-export` (FTP), and `hi:folder-upload!/sr` (public folder).
@@ -92,7 +125,7 @@ kit sprite, or its concrete source with modifiers, even across areas.
 ## System library icons
 
 The system library has no separate kit. `not-found`, `smartstore` and
-`stars-tricolor` belong to collection `shared`, each pinned to `sys:<name>!/default`.
+`stars-tricolor` belong to collection `shared`, pinned to their concrete `outline` or `fill` variant.
 Missing icons continue to use an external area-kit sprite symbol in danger color.
 
 ## Legacy Bootstrap assets removed
@@ -110,7 +143,7 @@ BI addresses. The menu-specific `bi-circle` class is independent and remains.
 The shared collection provides `-outline` and `-fill` concepts for `bubble-round`,
 `bubble-square`, `circle`, `diamond`, `hexagon`, `polygon`, `rect`, `seal`,
 `square`, `star` and `triangle`. Each concept pins its source to
-`sys:<concept>!/default`, independently of the configured default library.
+`sys:<shape>!/outline` or `sys:<shape>!/fill` (without the concept suffix), independently of the configured default library.
 The SVG files live in the system library, but these 22 concepts belong only to
 the shared collection. Existing unsuffixed concepts remain unchanged.
 Use, for example, `<icon name="star-outline" />` or `<icon name="star-fill" />`.
@@ -119,7 +152,7 @@ AI and Shopware import stop buttons use `square-fill`. Admin review headings use
 `star-fill`; ProductSpecificationTable uses `star-fill` for earned stars and
 `star-outline` for remaining stars. Legacy PageBuilder icon choices remain unchanged.
 
-The shared collection's `star-half` concept pins `sys:star-half!/default`: the same star geometry
+The shared collection's `star-half` concept pins `sys:star-half!/fill`: the same star geometry
 as `star-outline` and `star-fill`, with a complete outline and the fill clipped to
 the left half of the viewBox. It replaces the former admin-kit membership.
 
@@ -296,7 +329,7 @@ See [README.md](README.md#resolve-missing-icons) for the configuration and prece
 | Source FA icon classes | Target | Concept |
 | --- | --- | --- |
 | `fal fa-address-book` | `address-book` | `address-book` |
-| `fa fa-exclamation-circle`, `fa-circle-exclamation` | `alert-danger` | `sys:alert-danger!/default` |
+| `fa fa-exclamation-circle`, `fa-circle-exclamation` | `alert-danger` | `sys:alert-danger!/outline` |
 | `fa fa-arrow-down` | `arrow-down-02` | `arrow-down` |
 | `far fa-circle-down` | `circle-arrow-down-02` | `arrow-down-circle` |
 | `fa fa-arrow-left` | `arrow-left-02` | `arrow-left` |
@@ -833,10 +866,13 @@ PNotify uses the custom smartstore styling preset: status icons reuse alert mask
 close uses the close mask, and pin/unpin retain the pause/play motifs as SVG masks.
 The HP theme inherits this preset. Vendor scripts remain unchanged.
 
-Legacy Font Awesome styles now always use the bundled Free webfonts. The Pro theme
-switch, hosted CSS kit loading, unused thin shim and group/overlay styles were removed.
-Light/regular fallbacks and the legacy chooser's duotone shim remain until their
-callers are migrated. Pro SVG libraries use library replacement independently.
+Font Awesome webfonts, their CSS/Sass packages, stylesheet includes and font preloads
+have been removed. The shared `_icons.scss` deliberately retains the legacy base
+selectors `.fa`, `.fas`, `.far`, `.fal`, `.fab` and `.fad`: they render the red
+`sys:not-found!/outline` SVG mask to expose unmigrated markup in external projects.
+This is a migration indicator, not a webfont compatibility layer. Replace affected
+markup with icon concepts or explicit SVG addresses. The Font Awesome SVG library
+and legacy import conversion remain available independently.
 
 ## MediaManager kit icons
 
@@ -1138,7 +1174,9 @@ Smartstore still renders SVG icons and does not import this font.
 - ConfirmTagHelper and ConfirmModel use Icon addresses instead of IconClass. The
   dialog renders server-side SVGs with existing theme colors and size utilities.
   Defaults are alert-circle and trash; Campaign and PersonalPromo use question-circle
-  and rotate-right. The independent client-side confirm2 API remains unchanged.
+  and rotate-right. Client-side confirm2, alert2 and prompt2 render sm-icon with
+  concept/address names instead of Font Awesome CSS classes. Custom icon names follow
+  the same contract; type colors, size and spacing remain unchanged.
 
 - TreeItem.Icon and data-icon replace IconClass/data-icon-class. The tree renders
   sm-icon and accepts defaultCollapsedIcon/defaultExpandedIcon and

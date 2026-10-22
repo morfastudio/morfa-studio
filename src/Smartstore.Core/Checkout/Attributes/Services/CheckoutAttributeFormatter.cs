@@ -4,7 +4,6 @@ using Smartstore.Core.Catalog.Attributes;
 using Smartstore.Core.Checkout.Tax;
 using Smartstore.Core.Common.Services;
 using Smartstore.Core.Data;
-using Smartstore.Core.Identity;
 using Smartstore.Core.Localization;
 using Smartstore.Core.Web;
 using Smartstore.Utilities;
@@ -14,7 +13,6 @@ namespace Smartstore.Core.Checkout.Attributes;
 
 public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
 {
-    private readonly ICheckoutAttributeMaterializer _checkoutAttributeMaterializer;
     private readonly ICurrencyService _currencyService;
     private readonly ITaxService _taxService;
     private readonly IWorkContext _workContext;
@@ -23,7 +21,6 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
     private readonly SmartDbContext _db;
 
     public CheckoutAttributeFormatter(
-        ICheckoutAttributeMaterializer attributeMaterializer,
         ICurrencyService currencyService,
         IWorkContext workContext,
         ITaxService taxService,
@@ -31,7 +28,6 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
         IWebHelper webHelper,
         SmartDbContext db)
     {
-        _checkoutAttributeMaterializer = attributeMaterializer;
         _currencyService = currencyService;
         _workContext = workContext;
         _taxService = taxService;
@@ -40,38 +36,33 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
         _db = db;
     }
 
-    public async Task<string> FormatAttributesAsync(
-        CheckoutAttributeSelection selection,
-        Customer customer = null,
-        string serapator = "<br />",
-        bool htmlEncode = true,
-        bool renderPrices = true,
-        bool allowHyperlinks = true)
+    public async Task<string> FormatAttributesAsync(MaterializedCheckoutAttributes attributes, CheckoutAttributeFormatOptions options = null)
     {
-        Guard.NotNull(selection);
-
-        customer ??= _workContext.CurrentCustomer;
-
-        using var psb = StringBuilderPool.Instance.Get(out var sb);
-        var attributesList = await _checkoutAttributeMaterializer.MaterializeCheckoutAttributesAsync(selection);
+        var attributesList = Guard.NotNull(attributes).Attributes;
         if (attributesList.IsNullOrEmpty())
         {
             return null;
         }
 
-        var attributeValues = attributesList
-            .Where(x => x.IsListTypeAttribute)
-            .SelectMany(x => x.CheckoutAttributeValues);
+        options ??= CheckoutAttributeFormatOptions.Default;
+
+        using var psb = StringBuilderPool.Instance.Get(out var sb);
 
         var language = _workContext.WorkingLanguage;
+        var attributeValues = attributes.SelectedValues;
+
         for (var i = 0; i < attributesList.Count; i++)
         {
             var currentAttribute = attributesList[i];
-            var currentAttributeValues = selection.GetAttributeValues(currentAttribute.Id).ToList();
-
-            for (var j = 0; j < currentAttributeValues.Count; j++)
+            var currentValues = attributes.Selection.GetAttributeValues(currentAttribute.Id)?.ToList();
+            if (currentValues.IsNullOrEmpty())
             {
-                var currentValue = currentAttributeValues[j].ToString();
+                continue;
+            }
+
+            for (var j = 0; j < currentValues.Count; j++)
+            {
+                var currentValue = currentValues[j].ToString();
                 var attributeStr = string.Empty;
                 if (!currentAttribute.IsListTypeAttribute)
                 {
@@ -79,7 +70,7 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
                     {
                         // Multiline textbox input gets never encoded
                         var attributeName = currentAttribute.GetLocalized(a => a.Name, language).ToString();
-                        if (htmlEncode)
+                        if (options.HtmlEncode)
                         {
                             attributeName = HttpUtility.HtmlEncode(attributeName);
                         }
@@ -101,12 +92,12 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
                             //var genratedUrl = _mediaService.GenerateFileDownloadUrl(download.MediaFileId, 0);
                             var attributeText = string.Empty;
                             var fileName = download.MediaFile.Name;
-                            if (htmlEncode)
+                            if (options.HtmlEncode)
                             {
                                 fileName = HttpUtility.HtmlEncode(fileName);
                             }
 
-                            if (allowHyperlinks)
+                            if (options.IncludeHyperlinks)
                             {
                                 var downloadLink = $"{_webHelper.GetStoreLocation()}download/getfileupload/?downloadId={download.DownloadGuid}";
                                 attributeText = $"<a href='{downloadLink}' class='fileuploadattribute'>{fileName}</a>";
@@ -117,7 +108,7 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
                             }
 
                             var attributeName = currentAttribute.GetLocalized(a => a.Name, language).ToString();
-                            if (htmlEncode)
+                            if (options.HtmlEncode)
                             {
                                 attributeName = HttpUtility.HtmlEncode(attributeName);
                             }
@@ -136,7 +127,7 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
 
                         attributeStr = $"{currentAttribute.GetLocalized(a => a.Name, language)}: {currentValue}";
 
-                        if (htmlEncode)
+                        if (options.HtmlEncode)
                         {
                             attributeStr = HttpUtility.HtmlEncode(attributeStr);
                         }
@@ -151,9 +142,9 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
                         {
                             attributeStr = $"{currentAttribute.GetLocalized(x => x.Name, language)}: {attributeValue.GetLocalized(x => x.Name, language)}";
 
-                            if (renderPrices)
+                            if (options.IncludePrices)
                             {
-                                var adjustment = await _taxCalculator.CalculateCheckoutAttributeTaxAsync(attributeValue, customer: customer);
+                                var adjustment = await _taxCalculator.CalculateCheckoutAttributeTaxAsync(attributeValue, customer: attributes.Customer);
                                 if (adjustment.Price != 0m)
                                 {
                                     var convertedAdjustment = _currencyService.ConvertToWorkingCurrency(adjustment.Price);
@@ -163,7 +154,7 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
                             }
                         }
 
-                        if (htmlEncode)
+                        if (options.HtmlEncode)
                         {
                             attributeStr = HttpUtility.HtmlEncode(attributeStr);
                         }
@@ -172,9 +163,9 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
 
                 if (attributeStr.HasValue())
                 {
-                    if (i != 0 || j != 0)
+                    if (sb.Length > 0)
                     {
-                        sb.Append(serapator);
+                        sb.Append(options.ItemSeparator);
                     }
 
                     sb.Append(attributeStr);

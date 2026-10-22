@@ -24,6 +24,7 @@
   - #1571 The message templates of returns have been extended to provide shipping information (placeholder `ReturnCase.Shipping.xyz`).
   - #1571 Display shipping and delivery dates in the withdrawal and returns grid and on the edit page, along with whether the associated order has been canceled.
 - #1564 MegaSearch: Added a setting to determine the relevance of a search hit using the best matching field.
+- #1580 Allow checkout attributes to be conditionally displayed using cart rules.
 - Dimension Pricing plugin (commercial module)
 	- Calculates product and shipping prices based on customer-entered dimensions and weight.
 	- Supports formulas, packing rules, girth and volumetric limits, rate tiers and surcharges.
@@ -39,6 +40,11 @@
     - **Riso:** Risograph-inspired cobalt, fluorescent pink and sunflower yellow on white, with DIN-style headings.
     - **Porcelain:** White and soft gray surfaces, graphite typography and precise blue accents with a compact, light header.
   - `.scroll-fade`: reusable responsive edge fades for horizontal and vertical scroll containers.
+- **PageBuilder**
+  - Added three new section dividers (SVG masks that can be selected per block):
+    - **Torn:** A torn paper edge with irregular notches.
+    - **Drip:** Hanging drops with a slight overhang.
+    - **Scallop:** A row of semicircular arcs.
 - #1530 If a product is subsequently added to an order, update all price input controls with the price of the selected attribute combination.
 - Automated tax and total calculations now ensure that gross and net prices, as well as line and order totals, update instantly when editing orders or order items.
 - Enforce `MaxDownloadFileSize` in `DownloadManager` via the global `appsettings.json` setting (default: 50 MB).
@@ -113,7 +119,10 @@
   - #1550 Clearly distinguish between the terms "withdrawal" and "return", and do not use "withdrawal" when referring to returns.
   - Fixed missing order number in JSON deserialization of `WithdrawalRequest`.
   - "Challenge" instead of "Forbid" for a customer who has already logged in but has not been authorized.
-- Weight adjustments for preselected products attributes were not taken into account on the product detail page.
+- Corrected an incorrect regular bundle price when bundle items are discounted.
+- **Product Details**:
+  - Weight adjustments for preselected products attributes were not taken into account.
+  - The images of linked products displayed for variants were too small and distorted.
 - Negative price adjustments for checkout attributes were not taken into account on the checkout confirm page.  
 - #1575 Newsletter reward points are not awarded during customer registration.
 - MegaSearch: A single letter in the search term may incorrectly result in 0 search results if "Hits contain all searched terms" is enabled.

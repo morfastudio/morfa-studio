@@ -27,6 +27,10 @@
     --_icon-shift-x: initial;
     --_icon-shift-y: initial;
     --_icon-color: initial;
+    // Opacity composites the host once. Never inherit its variable onto nested layers.
+    --_icon-opacity: initial;
+    --icon-opacity: initial;
+    opacity: var(--icon-opacity, var(--_icon-opacity, 1));
     --_icon-animation-duration: initial;
     --_icon-animation-direction: initial;
     --_icon-rotate: initial;
@@ -402,6 +406,19 @@ $icon-animations: (
 // Specific overrides
 .btn-lg .icon-hi {
     --icon-min-size: 20px;
+}
+
+// Flag legacy webfont markup in projects that have not migrated to SVG icons.
+:is(.fa, .fas, .far, .fal, .fab, .fad) {
+    display: inline-block;
+    font-style: normal;
+    line-height: 1;
+
+    &::before {
+        @include icon-mask("sys:not-found!/outline");
+        background-color: var(--danger, #dc3545) !important;
+        vertical-align: -0.125em;
+    }
 }
 
 // Missing-icon color remains independent of caller presentation.

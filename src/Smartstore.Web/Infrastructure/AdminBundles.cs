@@ -27,7 +27,6 @@ internal class AdminBundles : IBundleProvider
         /* Admin Common CSS --> /bundle/css/admin-common.css
         -----------------------------------------------------*/
         bundles.Add(new StyleBundle("/bundle/css/admin-common.css").Include(
-            lib + "fa7/css/all.css",
             lib + "pnotify/css/pnotify.css",
             lib + "pnotify/css/pnotify.mobile.css",
             lib + "pnotify/css/pnotify.buttons.css"));
@@ -50,7 +49,6 @@ internal class AdminBundles : IBundleProvider
             lib + "sortable/sortable.js",
             lib + "sortable/jquery-sortable.js",
             lib + "moment/moment.js",
-            lib + "datetimepicker/js/tempusdominus-bootstrap-4.js",
             lib + "select2/js/select2.js",
             lib + "pnotify/js/pnotify.js",
             lib + "pnotify/js/pnotify.mobile.js",
@@ -71,6 +69,7 @@ internal class AdminBundles : IBundleProvider
             js + "smartstore.ajax.js",
             js + "smartstore.eventbroker.js",
             js + "smartstore.common.js",
+            js + "smartstore.datetimepicker.js",
             js + "smartstore.globalinit.js",
             js + "smartstore.tabs.js",
             js + "smartstore.dialogs.js",
@@ -158,13 +157,13 @@ internal class AdminBundles : IBundleProvider
             cm + "mode/htmlmixed/htmlmixed.min.js",
             cm + "mode/liquid/liquid.js"));
         // CSS
-        bundles.Add(new StyleBundle("/bundle/css/codemirror.css").Include(
+        bundles.Add(new StyleBundle("/bundle/css/codemirror.css") { IconArea = "admin" }.Include(
             cm + "codemirror.min.css",
             cm + "codemirror.custom.css",
             cm + "addon/hint/show-hint.min.css",
             cm + "addon/display/fullscreen.css",
             cm + "theme/eclipse.min.css",
-            cm + "mode/liquid/liquid.css"));
+            cm + "mode/liquid/liquid.scss"));
 
 
         /* Roxy File Manager--> /bundle/js/filemanager.js
@@ -172,6 +171,7 @@ internal class AdminBundles : IBundleProvider
         var roxy = "/lib/roxyfm/js/";
         // Script
         bundles.Add(new ScriptBundle("/bundle/js/roxyfm.js").Include(
+            js + "smartstore.icons.js",
             roxy + "jquery-2.1.1.min.js",
             roxy + "jquery-ui-1.10.4.custom.min.js",
             roxy + "filetypes.js",

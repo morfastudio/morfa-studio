@@ -10,6 +10,8 @@ using Smartstore.Core.Catalog.Products.Utilities;
 using Smartstore.Core.Checkout.Tax;
 using Smartstore.Core.Common;
 using Smartstore.Core.Content.Media;
+using Smartstore.Core.Identity;
+using Smartstore.Core.Rules;
 using Smartstore.Core.Installation.Seeding;
 using Smartstore.Core.Seo;
 using Smartstore.Json;
@@ -33,7 +35,9 @@ public partial class InstallationDataSeeder
         public Dictionary<string, MediaFile> SeparateMedia { get; } = new(StringComparer.OrdinalIgnoreCase);
         public List<(Product Product, JsonObject Picture)> SharedPictures { get; } = [];
         public List<(Product Product, string Path)> SampleDownloads { get; } = [];
+        public List<(Product Product, JsonNode Download)> Downloads { get; } = [];
         public List<(Product Product, string ParentSku)> GroupedParents { get; } = [];
+        public List<(Product Product, JsonArray Skus)> RequiredProducts { get; } = [];
         public List<(Product Product, JsonArray Items, string Source)> BundleItems { get; } = [];
         public List<(Product Product, JsonArray Attributes, string Source)> VariantAttributes { get; } = [];
         public List<(Product Product, JsonArray Combinations, string Source)> Combinations { get; } = [];
@@ -53,6 +57,22 @@ public partial class InstallationDataSeeder
         {
             var products = CreateFromSeed(ProductDescriptor(state));
             await SaveRangeAsync(products);
+
+            // Downloads that customers receive after buying. A string is the media path, an object
+            // can also set the file version: { "file": "download/x.zip", "fileVersion": "1.0" }.
+            foreach (var (product, node) in state.Downloads)
+            {
+                var file = node is JsonObject obj ? obj["file"].GetValue<string>() : node.GetValue<string>();
+                Context.Downloads.Add(new Download
+                {
+                    EntityId = product.Id,
+                    EntityName = nameof(Product),
+                    DownloadGuid = Guid.NewGuid(),
+                    MediaFile = CreateSampleMedia(file, null),
+                    FileVersion = (node as JsonObject)?["fileVersion"]?.GetValue<string>(),
+                    UpdatedOnUtc = DateTime.UtcNow
+                });
+            }
 
             // Sample downloads.
             foreach (var (product, path) in state.SampleDownloads)
@@ -75,6 +95,13 @@ public partial class InstallationDataSeeder
             foreach (var (product, parentSku) in state.GroupedParents)
             {
                 product.ParentGroupedProductId = _seedResolver.GetId<Product>(parentSku);
+            }
+
+            // Required products. RequireOtherProducts is derived from the list.
+            foreach (var (product, skus) in state.RequiredProducts)
+            {
+                product.RequiredProductIds = string.Join(',', skus.Select(x => _seedResolver.GetId<Product>(x.GetValue<string>())));
+                product.RequireOtherProducts = true;
             }
 
             foreach (var (product, picture) in state.SharedPictures)
@@ -118,20 +145,30 @@ public partial class InstallationDataSeeder
         await PopulateAsync("PopulateProductVariantAttributes", async () =>
         {
             var attributes = new List<ProductVariantAttribute>();
+            var visibilityRules = new List<(Product Product, ProductVariantAttribute Attribute, JsonObject Conditions)>();
             foreach (var (product, records, source) in state.VariantAttributes)
             {
                 var values = new SeedEntityDescriptor<ProductVariantAttributeValue>("alias")
-                    .Bind("mediaFile", (value, node, _) => value.MediaFileId = ResolveProductMedia(product, node, state).Id);
+                    .Bind("mediaFile", (value, node, _) => value.MediaFileId = ResolveProductMedia(product, node, state).Id)
+                    .Bind("additionalColors", (value, node, _) => value.AdditionalColors = node.Deserialize<string[]>())
+                    .Reference<Product>("linkedProduct", (value, linkedProduct) => value.LinkedProductId = linkedProduct.Id);
 
                 var descriptor = new SeedEntityDescriptor<ProductVariantAttribute>("productAttribute")
                     .Reference<ProductAttribute>("productAttribute", (pva, attribute) => pva.ProductAttribute = attribute)
                     .Child("values", x => x.ProductVariantAttributeValues, values)
+                    .Bind("visibleWhen", (pva, node, _) => visibilityRules.Add((product, pva, node.AsObject())))
                     .OnCreated((pva, _) => pva.Product = product);
 
                 attributes.AddRange(records.Select(x => _seedFactory.Create(ChildRecord(product, x, "productAttribute", source), descriptor)));
             }
 
             await SaveRangeAsync(attributes);
+
+            if (visibilityRules.Count > 0)
+            {
+                Context.RuleSets.AddRange(visibilityRules.Select(x => CreateVisibilityRuleSet(x.Product, x.Attribute, x.Conditions)));
+                await Context.SaveChangesAsync();
+            }
         });
 
         await PopulateAsync("ProductVariantAttributeCombinations", async () =>
@@ -140,6 +177,7 @@ public partial class InstallationDataSeeder
             foreach (var (product, records, source) in state.Combinations)
             {
                 var descriptor = new SeedEntityDescriptor<ProductVariantAttributeCombination>("sku")
+                    .Reference<DeliveryTime>("deliveryTime", (combination, deliveryTime) => combination.DeliveryTimeId = deliveryTime.Id)
                     .Bind("attributes", (combination, node, _) => combination.RawAttributes = CreateAttributeSelection(product, node))
                     .Bind("pictures", (combination, node, _) => combination.AssignedMediaFileIds = string.Join(",",
                         node.AsArray().Select(x => ResolveProductMedia(product, x, state).Id)))
@@ -150,7 +188,48 @@ public partial class InstallationDataSeeder
             }
 
             await SaveRangeAsync(combinations);
+
+            // Derived product property, maintained by a hook at runtime that does not run during installation.
+            foreach (var group in combinations.Where(x => x.IsActive && x.Price.HasValue).GroupBy(x => x.Product, ReferenceEqualityComparer.Instance))
+            {
+                ((Product)group.Key).LowestAttributeCombinationPrice = group.Min(x => x.Price);
+            }
+
+            await Context.SaveChangesAsync();
         });
+    }
+
+    /// <summary>
+    /// Creates the rule set that only shows an attribute if other attributes of the product have certain values,
+    /// e.g. <c>"visibleWhen": { "print": [ "print-text" ] }</c>. The rules are evaluated by the AttributeRules module
+    /// and follow its naming ("Variant{ProductAttributeId}"). Without the module they have no effect.
+    /// </summary>
+    private RuleSetEntity CreateVisibilityRuleSet(Product product, ProductVariantAttribute attribute, JsonObject conditions)
+    {
+        var ruleSet = new RuleSetEntity
+        {
+            Scope = RuleScope.ProductAttribute,
+            IsActive = true,
+            LogicalOperator = LogicalRuleOperator.And,
+            ProductVariantAttributeId = attribute.Id
+        };
+
+        var displayOrder = 0;
+        foreach (var (attributeKey, valueKeys) in conditions)
+        {
+            var valueIds = valueKeys.AsArray()
+                .Select(x => _seedResolver.GetId<ProductVariantAttributeValue>($"{product.Sku}/{attributeKey}/{x.GetValue<string>()}"));
+
+            ruleSet.Rules.Add(new RuleEntity
+            {
+                RuleType = $"Variant{_seedResolver.GetId<ProductAttribute>(attributeKey)}",
+                Operator = RuleOperator.In.Operator,
+                Value = string.Join(',', valueIds),
+                DisplayOrder = displayOrder++
+            });
+        }
+
+        return ruleSet;
     }
 
     private SeedEntityDescriptor<Product> ProductDescriptor(ProductSeedState state)
@@ -163,6 +242,8 @@ public partial class InstallationDataSeeder
             .Reference<ProductTemplate>("productTemplate", (product, template) => product.ProductTemplateId = template.Id)
             .Reference<TaxCategory>("taxCategory", (product, taxCategory) => product.TaxCategoryId = taxCategory.Id)
             .Reference<DeliveryTime>("deliveryTime", (product, deliveryTime) => product.DeliveryTimeId = deliveryTime.Id)
+            .Reference<QuantityUnit>("quantityUnit", (product, unit) => product.QuantityUnitId = unit.Id)
+            .Reference<PriceLabel>("comparePriceLabel", (product, label) => product.ComparePriceLabelId = label.Id)
             .Bind("categories", (product, node, _) => ForEachAssignment(node, "category", (key, assignment) =>
                 product.ProductCategories.Add(new ProductCategory
                 {
@@ -186,12 +267,33 @@ public partial class InstallationDataSeeder
             // Keyless list: an overlay replaces the specifications of a product as a whole.
             .ChildList("specifications", x => x.ProductSpecificationAttributes, new SeedEntityDescriptor<ProductSpecificationAttribute>("specificationAttributeOption")
                 .Reference<SpecificationAttributeOption>("specificationAttributeOption", (psa, option) => psa.SpecificationAttributeOptionId = option.Id))
+            .ChildList("reviews", x => x.ProductReviews, new SeedEntityDescriptor<ProductReview>("title")
+                .Reference<Customer>("customer", (review, customer) => review.CustomerId = customer.Id))
             .Child("tierPrices", x => x.TierPrices, new SeedEntityDescriptor<TierPrice>("quantity"))
-            .Bind("sampleDownload", (product, node, _) => state.SampleDownloads.Add((product, node.GetValue<string>())))
+            .Bind("download", (product, node, _) =>
+            {
+                product.IsDownload = true;
+                state.Downloads.Add((product, node));
+            })
+            .Bind("sampleDownload", (product, node, _) =>
+            {
+                product.HasSampleDownload = true;
+                state.SampleDownloads.Add((product, node.GetValue<string>()));
+            })
             .Bind("parentGroupedProduct", (product, node, _) => state.GroupedParents.Add((product, node.GetValue<string>())))
+            .Bind("requiredProducts", (product, node, _) => state.RequiredProducts.Add((product, node.AsArray())))
             .Bind("bundleItems", (product, node, context) => state.BundleItems.Add((product, node.AsArray(), context.Source)))
             .Bind("variantAttributes", (product, node, context) => state.VariantAttributes.Add((product, node.AsArray(), context.Source)))
-            .Bind("combinations", (product, node, context) => state.Combinations.Add((product, node.AsArray(), context.Source)));
+            .Bind("combinations", (product, node, context) => state.Combinations.Add((product, node.AsArray(), context.Source)))
+            // Derived product properties are maintained by hooks at runtime, which do not run during installation.
+            .OnCreated((product, _) =>
+            {
+                var approved = product.ProductReviews.Where(x => x.IsApproved).ToList();
+                product.ApprovedTotalReviews = approved.Count;
+                product.ApprovedRatingSum = approved.Sum(x => x.Rating);
+                product.HasTierPrices = product.TierPrices.Count > 0;
+                product.HasDiscountsApplied = product.AppliedDiscounts.Count > 0;
+            });
 
         // Child collections created after the products: declared for merging only.
         // Combinations are not keyed (SKUs are not unique); an overlay replaces them as a whole.

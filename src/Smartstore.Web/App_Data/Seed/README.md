@@ -30,6 +30,10 @@ It lists only values that differ from the defaults of the settings class. Values
 the ID of a seed record are written as `"$ref:{EntityType}:{key}"`, e.g. `"$ref:Currency:EUR"`.
 Its overlay has the same shape and is merged field by field.
 
+Settings that do not belong to a settings class, e.g. because their key contains an entity ID, go into the
+special object `"SettingKeys"`. Placeholders `{$ref:{EntityType}:{key}}` in a key are replaced by the ID:
+`{ "SettingKeys": { "ShippingRateComputationMethod.FixedRate.Rate.ShippingMethodId{$ref:ShippingMethod:by-ground}": 4.90 } }`.
+
 - **Base files** are JSON **arrays** of records.
 - **Overlay files** are JSON **objects** and live under the same relative path as their
   base file, e.g. `base/core/currencies.json` ↔ `cultures/de-DE/core/currencies.json`.
@@ -108,6 +112,26 @@ Example — Germany gets German tax categories, but products keep referring to `
 }
 ```
 
+## Sample overlays of core files
+
+Core data and settings apply to every installation, and the defaults of settings are defined in code.
+Changes that are only wanted in the demo shop therefore never go into `base/core/` itself, but into a
+sample overlay that is only applied when sample data is installed:
+
+```
+base/samples/core/{file}                 e.g. base/samples/core/settings.json
+cultures/{culture}/samples/core/{file}   e.g. cultures/de-DE/samples/core/tax-categories.json
+```
+
+They have the same format as culture overlays. Order, lowest first:
+
+```
+base/core  →  base/samples/core  →  cultures/{culture}/core  →  cultures/{culture}/samples/core
+```
+
+Examples: the demo shop's catalog settings and price display, shipping as default shipping method with a
+shipping rate, and the tax categories of the demo catalog.
+
 ## Long texts (`@file`)
 
 A **top-level** string field with the value `"@file"` is replaced by the content of
@@ -125,6 +149,8 @@ base/samples/catalog/products/sports/P-7004.fullDescription.html
 - `@file` in nested fields is an error.
 
 Rule of thumb: HTML longer than one line or about 200 characters goes into its own file.
+Format these files so that people can edit them: every block element (`<p>`, `<ul>`, `<li>`, ...) on its own line,
+content indented by two spaces, one sentence per line. No one-line HTML.
 
 ## Locale resources
 
@@ -177,6 +203,7 @@ seeded yet; the installer guarantees the order.
 | `bundleItems` | Keyed by `product` (SKU). Created after all products. |
 | `parentGroupedProduct`, `sampleDownload` | SKU of the grouped product; media path of the sample download. |
 | `groupedProductConfiguration` | Object, e.g. `{ "collapsible": true, "headerFields": [ "image", "sku", "price" ] }`. |
+| `reviews` | List without keys: `customer` (key of a sample customer), `rating` (1-5), `title`, `reviewText`, `isApproved`, optional `isVerifiedPurchase` and `createdOnUtc` (e.g. `@now-12d`). The rating counters of the product are calculated from the approved reviews. An overlay replaces the whole list. |
 
 ## Languages
 
@@ -236,6 +263,7 @@ In installation order. `core/` is always installed, `samples/` only with sample 
 | Activity log types, templates, scheduled tasks | `core/activity-log-types.json`, `core/product-templates.json`, `core/category-templates.json`, `core/manufacturer-templates.json`, `core/tasks.json` |
 | Menus (`@resource` titles, `publishedWhen`) | `core/menus.json` |
 | Specification and product attributes, option sets | `samples/catalog/specification-attributes.json`, `product-attributes.json`, `product-attribute-option-sets.json` |
+| Sample customers (authors of the sample reviews; registered, no password) | `samples/customers.json` |
 | Campaign, rule sets, discounts | `samples/campaigns.json`, `samples/rule-sets.json`, `samples/discounts.json` |
 | Categories and manufacturers (with pictures and slugs) | `samples/catalog/categories.json`, `samples/catalog/manufacturers.json` |
 | Product tags and products (pictures, specifications, tier prices, downloads, grouped and bundle products, variants, combinations) | `samples/catalog/product-tags.json`, `samples/catalog/products/*.json`, `cultures/{culture}/samples/catalog/attribute-value-names.json` |

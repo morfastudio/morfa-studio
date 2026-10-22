@@ -24,6 +24,14 @@
     "Value": "true"
   },
   {
+    "$key": "RuleSetEntity:Warenkorb-Zwischensumme ab 50|CartSubtotal",
+    "DisplayOrder": 0,
+    "Operator": ">=",
+    "RuleSetId": "RuleSetEntity:Warenkorb-Zwischensumme ab 50",
+    "RuleType": "CartSubtotal",
+    "Value": "50"
+  },
+  {
     "$key": "RuleSetEntity:Wichtige Kunden|CartOrderCount",
     "DisplayOrder": 0,
     "Operator": ">=",
@@ -46,5 +54,13 @@
     "RuleSetId": "RuleSetEntity:Wochenenden",
     "RuleType": "Weekday",
     "Value": "0,6"
+  },
+  {
+    "$key": "RuleSetEntity:|Variant32",
+    "DisplayOrder": 0,
+    "Operator": "In",
+    "RuleSetId": "RuleSetEntity:",
+    "RuleType": "Variant32",
+    "Value": "37"
   }
 ]

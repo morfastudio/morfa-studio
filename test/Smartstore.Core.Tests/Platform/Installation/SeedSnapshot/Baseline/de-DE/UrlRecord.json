@@ -1,11 +1,27 @@
 [
   {
+    "$key": "Category|Category:Apparel|0|mode-2",
+    "EntityId": "Category:Apparel",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "mode-2"
+  },
+  {
     "$key": "Category|Category:Apple|0|apple",
     "EntityId": "Category:Apple",
     "EntityName": "Category",
     "IsActive": true,
     "LanguageId": 0,
     "Slug": "apple"
+  },
+  {
+    "$key": "Category|Category:Armchairs|0|sessel-2",
+    "EntityId": "Category:Armchairs",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "sessel-2"
   },
   {
     "$key": "Category|Category:Basketball|0|basketball",
@@ -32,12 +48,28 @@
     "Slug": "sessel"
   },
   {
+    "$key": "Category|Category:Coffee and Tea|0|kaffee-tee",
+    "EntityId": "Category:Coffee and Tea",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "kaffee-tee"
+  },
+  {
     "$key": "Category|Category:Cook and enjoy|0|kochen-und-geniessen",
     "EntityId": "Category:Cook and enjoy",
     "EntityName": "Category",
     "IsActive": true,
     "LanguageId": 0,
     "Slug": "kochen-und-geniessen"
+  },
+  {
+    "$key": "Category|Category:Delicacies|0|food-delikatessen",
+    "EntityId": "Category:Delicacies",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "food-delikatessen"
   },
   {
     "$key": "Category|Category:Digital Products|0|digitale-produkte",
@@ -48,12 +80,44 @@
     "Slug": "digitale-produkte"
   },
   {
+    "$key": "Category|Category:Digital|0|digital",
+    "EntityId": "Category:Digital",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "digital"
+  },
+  {
+    "$key": "Category|Category:E-Books|0|e-books",
+    "EntityId": "Category:E-Books",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "e-books"
+  },
+  {
     "$key": "Category|Category:Fashion|0|mode",
     "EntityId": "Category:Fashion",
     "EntityName": "Category",
     "IsActive": true,
     "LanguageId": 0,
     "Slug": "mode"
+  },
+  {
+    "$key": "Category|Category:Footwear|0|schuhe-2",
+    "EntityId": "Category:Footwear",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "schuhe-2"
+  },
+  {
+    "$key": "Category|Category:Furniture and Design|0|moebel-design",
+    "EntityId": "Category:Furniture and Design",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "moebel-design"
   },
   {
     "$key": "Category|Category:Furniture|0|moebel",
@@ -96,6 +160,30 @@
     "Slug": "geschenkgutscheine"
   },
   {
+    "$key": "Category|Category:Golf Accessories|0|golfzubehoer",
+    "EntityId": "Category:Golf Accessories",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "golfzubehoer"
+  },
+  {
+    "$key": "Category|Category:Golf Balls|0|golfbaelle",
+    "EntityId": "Category:Golf Balls",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "golfbaelle"
+  },
+  {
+    "$key": "Category|Category:Golf and Sports|0|golf-sport",
+    "EntityId": "Category:Golf and Sports",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "golf-sport"
+  },
+  {
     "$key": "Category|Category:Golf|0|golf",
     "EntityId": "Category:Golf",
     "EntityName": "Category",
@@ -104,12 +192,44 @@
     "Slug": "golf"
   },
   {
+    "$key": "Category|Category:Jackets and Coats|0|jacken-maentel",
+    "EntityId": "Category:Jackets and Coats",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "jacken-maentel"
+  },
+  {
     "$key": "Category|Category:Jackets|0|jacken",
     "EntityId": "Category:Jackets",
     "EntityName": "Category",
     "IsActive": true,
     "LanguageId": 0,
     "Slug": "jacken"
+  },
+  {
+    "$key": "Category|Category:Lighting|0|leuchten",
+    "EntityId": "Category:Lighting",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "leuchten"
+  },
+  {
+    "$key": "Category|Category:Music|0|musik",
+    "EntityId": "Category:Music",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "musik"
+  },
+  {
+    "$key": "Category|Category:Oil and Vinegar|0|oel-essig",
+    "EntityId": "Category:Oil and Vinegar",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "oel-essig"
   },
   {
     "$key": "Category|Category:SPIEGEL-Bestseller|0|spiegel-bestseller",
@@ -152,6 +272,14 @@
     "Slug": "sofas"
   },
   {
+    "$key": "Category|Category:Software|0|software",
+    "EntityId": "Category:Software",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "software"
+  },
+  {
     "$key": "Category|Category:Sports|0|sport",
     "EntityId": "Category:Sports",
     "EntityName": "Category",
@@ -182,6 +310,14 @@
     "IsActive": true,
     "LanguageId": 0,
     "Slug": "hosen"
+  },
+  {
+    "$key": "Category|Category:Vouchers|0|gutscheine",
+    "EntityId": "Category:Vouchers",
+    "EntityName": "Category",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "gutscheine"
   },
   {
     "$key": "Category|Category:Watches|0|uhren",
@@ -216,6 +352,14 @@
     "Slug": "breitling"
   },
   {
+    "$key": "Manufacturer|Manufacturer:Casa Vireluna|0|casa-vireluna",
+    "EntityId": "Manufacturer:Casa Vireluna",
+    "EntityName": "Manufacturer",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "casa-vireluna"
+  },
+  {
     "$key": "Manufacturer|Manufacturer:Certina|0|certina",
     "EntityId": "Manufacturer:Certina",
     "EntityName": "Manufacturer",
@@ -230,6 +374,14 @@
     "IsActive": true,
     "LanguageId": 0,
     "Slug": "ea-sports"
+  },
+  {
+    "$key": "Manufacturer|Manufacturer:Fairway Vennix|0|fairway-vennix",
+    "EntityId": "Manufacturer:Fairway Vennix",
+    "EntityName": "Manufacturer",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "fairway-vennix"
   },
   {
     "$key": "Manufacturer|Manufacturer:Festina|0|festina",
@@ -248,6 +400,14 @@
     "Slug": "jack-wolfskin"
   },
   {
+    "$key": "Manufacturer|Manufacturer:Lindavero|0|lindavero",
+    "EntityId": "Manufacturer:Lindavero",
+    "EntityName": "Manufacturer",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "lindavero"
+  },
+  {
     "$key": "Manufacturer|Manufacturer:Microsoft|0|microsoft",
     "EntityId": "Manufacturer:Microsoft",
     "EntityName": "Manufacturer",
@@ -264,12 +424,28 @@
     "Slug": "nike"
   },
   {
+    "$key": "Manufacturer|Manufacturer:Norlumera|0|norlumera",
+    "EntityId": "Manufacturer:Norlumera",
+    "EntityName": "Manufacturer",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "norlumera"
+  },
+  {
     "$key": "Manufacturer|Manufacturer:Oakley|0|oakley",
     "EntityId": "Manufacturer:Oakley",
     "EntityName": "Manufacturer",
     "IsActive": true,
     "LanguageId": 0,
     "Slug": "oakley"
+  },
+  {
+    "$key": "Manufacturer|Manufacturer:Pixelmoor|0|pixelmoor",
+    "EntityId": "Manufacturer:Pixelmoor",
+    "EntityName": "Manufacturer",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "pixelmoor"
   },
   {
     "$key": "Manufacturer|Manufacturer:Puma|0|puma",
@@ -344,6 +520,190 @@
     "Slug": "superstar-schuh"
   },
   {
+    "$key": "Product|Product:DG-1001|0|der-stille-hafen-e-book-",
+    "EntityId": "Product:DG-1001",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "der-stille-hafen-e-book-"
+  },
+  {
+    "$key": "Product|Product:DG-1002|0|late-night-sessions-album-",
+    "EntityId": "Product:DG-1002",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "late-night-sessions-album-"
+  },
+  {
+    "$key": "Product|Product:DG-1003|0|pixelmoor-photo-studio",
+    "EntityId": "Product:DG-1003",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "pixelmoor-photo-studio"
+  },
+  {
+    "$key": "Product|Product:FD-1001|0|natives-olivenoel-extra-500-ml",
+    "EntityId": "Product:FD-1001",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "natives-olivenoel-extra-500-ml"
+  },
+  {
+    "$key": "Product|Product:FD-1002|0|roestkaffee",
+    "EntityId": "Product:FD-1002",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "roestkaffee"
+  },
+  {
+    "$key": "Product|Product:FD-1003|0|kaffee-abo",
+    "EntityId": "Product:FD-1003",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "kaffee-abo"
+  },
+  {
+    "$key": "Product|Product:FD-1004|0|mediterrane-kraeutermischung-100-g",
+    "EntityId": "Product:FD-1004",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "mediterrane-kraeutermischung-100-g"
+  },
+  {
+    "$key": "Product|Product:FD-1005|0|genuss-geschenkbox",
+    "EntityId": "Product:FD-1005",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "genuss-geschenkbox"
+  },
+  {
+    "$key": "Product|Product:FD-1006|0|meersalzmuehle",
+    "EntityId": "Product:FD-1006",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "meersalzmuehle"
+  },
+  {
+    "$key": "Product|Product:FD-1007|0|weihnachtliche-gewuerzkekse",
+    "EntityId": "Product:FD-1007",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "weihnachtliche-gewuerzkekse"
+  },
+  {
+    "$key": "Product|Product:FN-1001|0|loungesessel-lund",
+    "EntityId": "Product:FN-1001",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "loungesessel-lund"
+  },
+  {
+    "$key": "Product|Product:FN-1002|0|bogenleuchte-arc",
+    "EntityId": "Product:FN-1002",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "bogenleuchte-arc"
+  },
+  {
+    "$key": "Product|Product:FN-1003|0|wohnzimmer-serie-oslo",
+    "EntityId": "Product:FN-1003",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "wohnzimmer-serie-oslo"
+  },
+  {
+    "$key": "Product|Product:FN-1004|0|beistelltisch-oslo",
+    "EntityId": "Product:FN-1004",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "beistelltisch-oslo"
+  },
+  {
+    "$key": "Product|Product:FN-1005|0|regal-oslo",
+    "EntityId": "Product:FN-1005",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "regal-oslo"
+  },
+  {
+    "$key": "Product|Product:FN-1006|0|hocker-oslo",
+    "EntityId": "Product:FN-1006",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "hocker-oslo"
+  },
+  {
+    "$key": "Product|Product:FN-1007|0|led-leuchtmittel-e27-dimmbar",
+    "EntityId": "Product:FN-1007",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "led-leuchtmittel-e27-dimmbar"
+  },
+  {
+    "$key": "Product|Product:FS-1001|0|regenjacke-fjord",
+    "EntityId": "Product:FS-1001",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "regenjacke-fjord"
+  },
+  {
+    "$key": "Product|Product:FS-1002|0|rippstrick-pullover",
+    "EntityId": "Product:FS-1002",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "rippstrick-pullover"
+  },
+  {
+    "$key": "Product|Product:FS-1003|0|leder-sneaker-urban",
+    "EntityId": "Product:FS-1003",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "leder-sneaker-urban"
+  },
+  {
+    "$key": "Product|Product:FS-1004|0|merino-muetze",
+    "EntityId": "Product:FS-1004",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "merino-muetze"
+  },
+  {
+    "$key": "Product|Product:FS-1005|0|wollschal",
+    "EntityId": "Product:FS-1005",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "wollschal"
+  },
+  {
+    "$key": "Product|Product:FS-1006|0|bio-t-shirt-mit-wunschaufdruck",
+    "EntityId": "Product:FS-1006",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "bio-t-shirt-mit-wunschaufdruck"
+  },
+  {
     "$key": "Product|Product:Fashion-112355|0|converse-all-star",
     "EntityId": "Product:Fashion-112355",
     "EntityName": "Product",
@@ -406,6 +766,86 @@
     "IsActive": true,
     "LanguageId": 0,
     "Slug": "charles-eames-lounge-sessel-1956-"
+  },
+  {
+    "$key": "Product|Product:GC-1001|0|geschenkgutschein",
+    "EntityId": "Product:GC-1001",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "geschenkgutschein"
+  },
+  {
+    "$key": "Product|Product:GC-1002|0|geschenkgutschein-mit-wunschbetrag",
+    "EntityId": "Product:GC-1002",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "geschenkgutschein-mit-wunschbetrag"
+  },
+  {
+    "$key": "Product|Product:GC-1003|0|spende-pflanz-einen-baum",
+    "EntityId": "Product:GC-1003",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "spende-pflanz-einen-baum"
+  },
+  {
+    "$key": "Product|Product:GF-1001|0|tour-distance-golfbaelle",
+    "EntityId": "Product:GF-1001",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "tour-distance-golfbaelle"
+  },
+  {
+    "$key": "Product|Product:GF-1002|0|golf-tees-50-stueck",
+    "EntityId": "Product:GF-1002",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "golf-tees-50-stueck"
+  },
+  {
+    "$key": "Product|Product:GF-1003|0|golfhandschuh-aus-leder",
+    "EntityId": "Product:GF-1003",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "golfhandschuh-aus-leder"
+  },
+  {
+    "$key": "Product|Product:GF-1004|0|laser-entfernungsmesser-600",
+    "EntityId": "Product:GF-1004",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "laser-entfernungsmesser-600"
+  },
+  {
+    "$key": "Product|Product:GF-1005|0|golf-starter-set",
+    "EntityId": "Product:GF-1005",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "golf-starter-set"
+  },
+  {
+    "$key": "Product|Product:GF-1006|0|leichter-standbag",
+    "EntityId": "Product:GF-1006",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "leichter-standbag"
+  },
+  {
+    "$key": "Product|Product:GF-1007|0|pitchgabel",
+    "EntityId": "Product:GF-1007",
+    "EntityName": "Product",
+    "IsActive": true,
+    "LanguageId": 0,
+    "Slug": "pitchgabel"
   },
   {
     "$key": "Product|Product:Gaming-Lego-001|0|lego-worlds-playstation-4",

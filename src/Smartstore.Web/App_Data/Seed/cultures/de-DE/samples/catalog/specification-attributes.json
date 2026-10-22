@@ -103,6 +103,12 @@
       },
       "polyester": {
         "name": "Polyester"
+      },
+      "wool": {
+        "name": "Wolle"
+      },
+      "merino-wool": {
+        "name": "Merinowolle"
       }
     }
   },
@@ -341,5 +347,202 @@
         "name": "Saphir"
       }
     }
+  },
+  "origin": {
+    "name": "Herkunft",
+    "options": {
+      "italy": { "name": "Italien" },
+      "greece": { "name": "Griechenland" },
+      "spain": { "name": "Spanien" },
+      "colombia": { "name": "Kolumbien" },
+      "ethiopia": { "name": "Äthiopien" }
+    }
+  },
+  "roast": {
+    "name": "Röstung",
+    "options": {
+      "light": { "name": "Hell" },
+      "medium": { "name": "Mittel" },
+      "dark": { "name": "Dunkel" }
+    }
+  },
+  "dietary": {
+    "name": "Ernährung",
+    "options": {
+      "vegan": { "name": "Vegan" },
+      "gluten-free": { "name": "Glutenfrei" },
+      "organic": { "name": "Bio" }
+    }
+  },
+  "bean": {
+    "name": "Bohne",
+    "options": {
+      "arabica": { "name": "100 % Arabica" },
+      "blend": { "name": "Arabica-Robusta-Mischung" },
+      "robusta": { "name": "100 % Robusta" }
+    }
+  },
+  "intensity": {
+    "name": "Intensität",
+    "options": {
+      "mild": { "name": "Mild" },
+      "medium": { "name": "Mittel" },
+      "strong": { "name": "Kräftig" },
+      "extra-strong": { "name": "Extra kräftig" }
+    }
+  },
+  "coffee-type": {
+    "name": "Kaffeeart",
+    "options": {
+      "filter": { "name": "Filterkaffee" },
+      "espresso": { "name": "Espresso" },
+      "organic": { "name": "Bio-Kaffee" },
+      "rarity": { "name": "Rarität" }
+    }
+  },
+  "decaffeinated": {
+    "name": "Entkoffeiniert",
+    "options": {
+      "yes": { "name": "Ja" },
+      "no": { "name": "Nein" }
+    }
+  },
+  "olive-variety": {
+    "name": "Olivensorte"
+  },
+  "flavour": {
+    "name": "Geschmack",
+    "options": {
+      "mild": { "name": "Mild" },
+      "fruity": { "name": "Fruchtig" },
+      "savoury": { "name": "Würzig-herzhaft" },
+      "sweet": { "name": "Süß" },
+      "spicy": { "name": "Gewürzt" }
+    }
+  },
+  "occasion": {
+    "name": "Anlass",
+    "options": {
+      "everyday": { "name": "Alltag" },
+      "gift": { "name": "Geschenk" },
+      "christmas": { "name": "Weihnachten" }
+    }
+  },
+  "hardness": {
+    "name": "Härte",
+    "options": {
+      "soft": { "name": "Weich" },
+      "medium": { "name": "Mittel" },
+      "hard": { "name": "Hart" }
+    }
+  },
+  "layers": {
+    "name": "Schichten",
+    "options": {
+      "2-piece": { "name": "2-teilig" },
+      "3-piece": { "name": "3-teilig" },
+      "4-piece": { "name": "4-teilig" }
+    }
+  },
+  "level": {
+    "name": "Spielstärke",
+    "options": {
+      "beginner": { "name": "Einsteiger" },
+      "advanced": { "name": "Fortgeschritten" },
+      "pro": { "name": "Profi" }
+    }
+  },
+  "target-group": {
+    "name": "Zielgruppe",
+    "options": {
+      "men": { "name": "Herren" },
+      "women": { "name": "Damen" },
+      "kids": { "name": "Kinder" },
+      "unisex": { "name": "Unisex" }
+    }
+  },
+  "tee-length": {
+    "name": "Tee-Länge"
+  },
+  "measuring-range": {
+    "name": "Messbereich",
+    "options": {
+      "400m": { "name": "bis 400 m" },
+      "600m": { "name": "bis 600 m" },
+      "1000m": { "name": "bis 1000 m" }
+    }
+  },
+  "slope-function": {
+    "name": "Neigungsfunktion",
+    "options": {
+      "yes": { "name": "Ja" },
+      "no": { "name": "Nein" }
+    }
+  },
+  "bag-type": {
+    "name": "Taschenart",
+    "options": {
+      "stand-bag": { "name": "Standbag" },
+      "cart-bag": { "name": "Cartbag" }
+    }
+  },
+  "fit": {
+    "name": "Passform",
+    "options": {
+      "slim": { "name": "Schmal" },
+      "regular": { "name": "Normal" },
+      "oversized": { "name": "Weit" }
+    }
+  },
+  "season": {
+    "name": "Saison",
+    "options": {
+      "spring-summer": { "name": "Frühjahr/Sommer" },
+      "autumn-winter": { "name": "Herbst/Winter" },
+      "all-year": { "name": "Ganzjährig" }
+    }
+  },
+  "care": {
+    "name": "Pflege",
+    "options": {
+      "machine-30": { "name": "Maschinenwäsche 30 °C" },
+      "machine-40": { "name": "Maschinenwäsche 40 °C" },
+      "hand-wash": { "name": "Handwäsche" }
+    }
+  },
+  "water-resistance": {
+    "name": "Wetterschutz",
+    "options": {
+      "water-repellent": { "name": "Wasserabweisend" },
+      "waterproof": { "name": "Wasserdicht" }
+    }
+  },
+  "style": {
+    "name": "Stil",
+    "options": {
+      "scandinavian": { "name": "Skandinavisch" },
+      "modern": { "name": "Modern" },
+      "classic": { "name": "Klassisch" }
+    }
+  },
+  "assembly": {
+    "name": "Montage",
+    "options": {
+      "assembled": { "name": "Fertig montiert" },
+      "easy": { "name": "Einfacher Selbstaufbau" }
+    }
+  },
+  "dimmable": {
+    "name": "Dimmbar",
+    "options": {
+      "yes": { "name": "Ja" },
+      "no": { "name": "Nein" }
+    }
+  },
+  "file-format": {
+    "name": "Dateiformat"
+  },
+  "platform": {
+    "name": "Plattform"
   }
 }

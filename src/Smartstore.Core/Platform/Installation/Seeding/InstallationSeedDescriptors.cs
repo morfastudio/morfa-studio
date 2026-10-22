@@ -133,6 +133,27 @@ internal static class InstallationSeedDescriptors
             });
 
     /// <summary>
+    /// Sample customers who write the sample product reviews. They are registered customers without a password,
+    /// so nobody can sign in with them. The names are collected here and stored as customer attributes later.
+    /// </summary>
+    public static SeedEntityDescriptor<Customer> SampleCustomers(IDictionary<Customer, string> firstNames, IDictionary<Customer, string> lastNames)
+    {
+        Guard.NotNull(firstNames);
+        Guard.NotNull(lastNames);
+
+        return new SeedEntityDescriptor<Customer>("key")
+            .FromFiles("samples/customers.json")
+            .Bind("firstName", (customer, node, _) => firstNames[customer] = node.GetValue<string>())
+            .Bind("lastName", (customer, node, _) => lastNames[customer] = node.GetValue<string>())
+            .OnCreated((customer, _) =>
+            {
+                customer.CustomerGuid = Guid.NewGuid();
+                customer.CreatedOnUtc = DateTime.UtcNow;
+                customer.LastActivityDateUtc = DateTime.UtcNow;
+            });
+    }
+
+    /// <summary>
     /// Address of the admin user.
     /// </summary>
     public static SeedEntityDescriptor<Address> AdminAddress()
@@ -220,7 +241,9 @@ internal static class InstallationSeedDescriptors
             .Reference<Category>("parent", (category, parent) => category.Parent = parent)
             .Bind("mediaFile", (category, node, _) => category.MediaFile = media(node))
             .References<RuleSetEntity>("ruleSets", (category, ruleSets) => ruleSets.Each(category.RuleSets.Add))
-            .References<Discount>("discounts", (category, discounts) => discounts.Each(category.AppliedDiscounts.Add));
+            .References<Discount>("discounts", (category, discounts) => discounts.Each(category.AppliedDiscounts.Add))
+            // Derived property, maintained by the discount service at runtime.
+            .OnCreated((category, _) => category.HasDiscountsApplied = category.AppliedDiscounts.Count > 0);
     }
 
     /// <summary>
@@ -234,7 +257,9 @@ internal static class InstallationSeedDescriptors
         return new SeedEntityDescriptor<Manufacturer>("key")
             .FromFiles("samples/catalog/manufacturers.json")
             .Bind("mediaFile", (manufacturer, node, _) => manufacturer.MediaFile = media(node))
-            .References<Discount>("discounts", (manufacturer, discounts) => discounts.Each(manufacturer.AppliedDiscounts.Add));
+            .References<Discount>("discounts", (manufacturer, discounts) => discounts.Each(manufacturer.AppliedDiscounts.Add))
+            // Derived property, maintained by the discount service at runtime.
+            .OnCreated((manufacturer, _) => manufacturer.HasDiscountsApplied = manufacturer.AppliedDiscounts.Count > 0);
     }
 
     public static SeedEntityDescriptor<ProductTag> ProductTags()

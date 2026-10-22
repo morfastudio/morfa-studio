@@ -80,6 +80,36 @@
     "SpecificationAttributeId": "SpecificationAttribute:Angebot"
   },
   {
+    "$key": "SpecificationAttribute:Anlass|Alltag",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Alltag",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Anlass"
+  },
+  {
+    "$key": "SpecificationAttribute:Anlass|Geschenk",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Geschenk",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Anlass"
+  },
+  {
+    "$key": "SpecificationAttribute:Anlass|Weihnachten",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Weihnachten",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Anlass"
+  },
+  {
     "$key": "SpecificationAttribute:Anschluss|DVI",
     "Alias": null,
     "Color": null,
@@ -310,6 +340,36 @@
     "SpecificationAttributeId": "SpecificationAttribute:Betriebssystem"
   },
   {
+    "$key": "SpecificationAttribute:Bohne|100 % Arabica",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "100 % Arabica",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Bohne"
+  },
+  {
+    "$key": "SpecificationAttribute:Bohne|100 % Robusta",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "100 % Robusta",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Bohne"
+  },
+  {
+    "$key": "SpecificationAttribute:Bohne|Arabica-Robusta-Mischung",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Arabica-Robusta-Mischung",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Bohne"
+  },
+  {
     "$key": "SpecificationAttribute:CPU-Hersteller|AMD",
     "Alias": null,
     "Color": null,
@@ -400,6 +460,66 @@
     "SpecificationAttributeId": "SpecificationAttribute:Computer-Typ"
   },
   {
+    "$key": "SpecificationAttribute:Dateiformat|EPUB",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "EPUB",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Dateiformat"
+  },
+  {
+    "$key": "SpecificationAttribute:Dateiformat|MP3",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "MP3",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Dateiformat"
+  },
+  {
+    "$key": "SpecificationAttribute:Dateiformat|PDF",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "PDF",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Dateiformat"
+  },
+  {
+    "$key": "SpecificationAttribute:Dateiformat|ZIP",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 4,
+    "MediaFileId": 0,
+    "Name": "ZIP",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Dateiformat"
+  },
+  {
+    "$key": "SpecificationAttribute:Dimmbar|Ja",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Ja",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Dimmbar"
+  },
+  {
+    "$key": "SpecificationAttribute:Dimmbar|Nein",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Nein",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Dimmbar"
+  },
+  {
     "$key": "SpecificationAttribute:Durchmesser|38mm",
     "Alias": null,
     "Color": null,
@@ -428,6 +548,56 @@
     "Name": "44mm",
     "NumberValue": 0.0,
     "SpecificationAttributeId": "SpecificationAttribute:Durchmesser"
+  },
+  {
+    "$key": "SpecificationAttribute:Entkoffeiniert|Ja",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Ja",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Entkoffeiniert"
+  },
+  {
+    "$key": "SpecificationAttribute:Entkoffeiniert|Nein",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Nein",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Entkoffeiniert"
+  },
+  {
+    "$key": "SpecificationAttribute:Ernährung|Bio",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Bio",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Ernährung"
+  },
+  {
+    "$key": "SpecificationAttribute:Ernährung|Glutenfrei",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Glutenfrei",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Ernährung"
+  },
+  {
+    "$key": "SpecificationAttribute:Ernährung|Vegan",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Vegan",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Ernährung"
   },
   {
     "$key": "SpecificationAttribute:Farbe|Beige",
@@ -800,6 +970,56 @@
     "SpecificationAttributeId": "SpecificationAttribute:Geschlecht"
   },
   {
+    "$key": "SpecificationAttribute:Geschmack|Fruchtig",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Fruchtig",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Geschmack"
+  },
+  {
+    "$key": "SpecificationAttribute:Geschmack|Gewürzt",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 5,
+    "MediaFileId": 0,
+    "Name": "Gewürzt",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Geschmack"
+  },
+  {
+    "$key": "SpecificationAttribute:Geschmack|Mild",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Mild",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Geschmack"
+  },
+  {
+    "$key": "SpecificationAttribute:Geschmack|Süß",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 4,
+    "MediaFileId": 0,
+    "Name": "Süß",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Geschmack"
+  },
+  {
+    "$key": "SpecificationAttribute:Geschmack|Würzig-herzhaft",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Würzig-herzhaft",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Geschmack"
+  },
+  {
     "$key": "SpecificationAttribute:Glas|Mineral",
     "Alias": null,
     "Color": null,
@@ -898,6 +1118,56 @@
     "Name": "XXL",
     "NumberValue": 0.0,
     "SpecificationAttributeId": "SpecificationAttribute:Größe"
+  },
+  {
+    "$key": "SpecificationAttribute:Herkunft|Griechenland",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Griechenland",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Herkunft"
+  },
+  {
+    "$key": "SpecificationAttribute:Herkunft|Italien",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Italien",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Herkunft"
+  },
+  {
+    "$key": "SpecificationAttribute:Herkunft|Kolumbien",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 4,
+    "MediaFileId": 0,
+    "Name": "Kolumbien",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Herkunft"
+  },
+  {
+    "$key": "SpecificationAttribute:Herkunft|Spanien",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Spanien",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Herkunft"
+  },
+  {
+    "$key": "SpecificationAttribute:Herkunft|Äthiopien",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 5,
+    "MediaFileId": 0,
+    "Name": "Äthiopien",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Herkunft"
   },
   {
     "$key": "SpecificationAttribute:Hersteller|Adidas",
@@ -1110,6 +1380,116 @@
     "SpecificationAttributeId": "SpecificationAttribute:Hersteller"
   },
   {
+    "$key": "SpecificationAttribute:Härte|Hart",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Hart",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Härte"
+  },
+  {
+    "$key": "SpecificationAttribute:Härte|Mittel",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Mittel",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Härte"
+  },
+  {
+    "$key": "SpecificationAttribute:Härte|Weich",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Weich",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Härte"
+  },
+  {
+    "$key": "SpecificationAttribute:Intensität|Extra kräftig",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 4,
+    "MediaFileId": 0,
+    "Name": "Extra kräftig",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Intensität"
+  },
+  {
+    "$key": "SpecificationAttribute:Intensität|Kräftig",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Kräftig",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Intensität"
+  },
+  {
+    "$key": "SpecificationAttribute:Intensität|Mild",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Mild",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Intensität"
+  },
+  {
+    "$key": "SpecificationAttribute:Intensität|Mittel",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Mittel",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Intensität"
+  },
+  {
+    "$key": "SpecificationAttribute:Kaffeeart|Bio-Kaffee",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Bio-Kaffee",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Kaffeeart"
+  },
+  {
+    "$key": "SpecificationAttribute:Kaffeeart|Espresso",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Espresso",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Kaffeeart"
+  },
+  {
+    "$key": "SpecificationAttribute:Kaffeeart|Filterkaffee",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Filterkaffee",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Kaffeeart"
+  },
+  {
+    "$key": "SpecificationAttribute:Kaffeeart|Rarität",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 4,
+    "MediaFileId": 0,
+    "Name": "Rarität",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Kaffeeart"
+  },
+  {
     "$key": "SpecificationAttribute:MP3-Qualität|128 kbit/s",
     "Alias": null,
     "Color": null,
@@ -1280,6 +1660,16 @@
     "SpecificationAttributeId": "SpecificationAttribute:Material"
   },
   {
+    "$key": "SpecificationAttribute:Material|Merinowolle",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 18,
+    "MediaFileId": 0,
+    "Name": "Merinowolle",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Material"
+  },
+  {
     "$key": "SpecificationAttribute:Material|Nylon",
     "Alias": null,
     "Color": null,
@@ -1330,6 +1720,266 @@
     "SpecificationAttributeId": "SpecificationAttribute:Material"
   },
   {
+    "$key": "SpecificationAttribute:Material|Wolle",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 17,
+    "MediaFileId": 0,
+    "Name": "Wolle",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Material"
+  },
+  {
+    "$key": "SpecificationAttribute:Messbereich|bis 1000 m",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "bis 1000 m",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Messbereich"
+  },
+  {
+    "$key": "SpecificationAttribute:Messbereich|bis 400 m",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "bis 400 m",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Messbereich"
+  },
+  {
+    "$key": "SpecificationAttribute:Messbereich|bis 600 m",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "bis 600 m",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Messbereich"
+  },
+  {
+    "$key": "SpecificationAttribute:Montage|Einfacher Selbstaufbau",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Einfacher Selbstaufbau",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Montage"
+  },
+  {
+    "$key": "SpecificationAttribute:Montage|Fertig montiert",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Fertig montiert",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Montage"
+  },
+  {
+    "$key": "SpecificationAttribute:Neigungsfunktion|Ja",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Ja",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Neigungsfunktion"
+  },
+  {
+    "$key": "SpecificationAttribute:Neigungsfunktion|Nein",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Nein",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Neigungsfunktion"
+  },
+  {
+    "$key": "SpecificationAttribute:Olivensorte|Coratina",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Coratina",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Olivensorte"
+  },
+  {
+    "$key": "SpecificationAttribute:Olivensorte|Koroneiki",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Koroneiki",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Olivensorte"
+  },
+  {
+    "$key": "SpecificationAttribute:Olivensorte|Picual",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Picual",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Olivensorte"
+  },
+  {
+    "$key": "SpecificationAttribute:Passform|Normal",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Normal",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Passform"
+  },
+  {
+    "$key": "SpecificationAttribute:Passform|Schmal",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Schmal",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Passform"
+  },
+  {
+    "$key": "SpecificationAttribute:Passform|Weit",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Weit",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Passform"
+  },
+  {
+    "$key": "SpecificationAttribute:Pflege|Handwäsche",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Handwäsche",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Pflege"
+  },
+  {
+    "$key": "SpecificationAttribute:Pflege|Maschinenwäsche 30 °C",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Maschinenwäsche 30 °C",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Pflege"
+  },
+  {
+    "$key": "SpecificationAttribute:Pflege|Maschinenwäsche 40 °C",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Maschinenwäsche 40 °C",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Pflege"
+  },
+  {
+    "$key": "SpecificationAttribute:Plattform|Linux",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Linux",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Plattform"
+  },
+  {
+    "$key": "SpecificationAttribute:Plattform|Windows",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Windows",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Plattform"
+  },
+  {
+    "$key": "SpecificationAttribute:Plattform|macOS",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "macOS",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Plattform"
+  },
+  {
+    "$key": "SpecificationAttribute:Röstung|Dunkel",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Dunkel",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Röstung"
+  },
+  {
+    "$key": "SpecificationAttribute:Röstung|Hell",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Hell",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Röstung"
+  },
+  {
+    "$key": "SpecificationAttribute:Röstung|Mittel",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Mittel",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Röstung"
+  },
+  {
+    "$key": "SpecificationAttribute:Saison|Frühjahr/Sommer",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Frühjahr/Sommer",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Saison"
+  },
+  {
+    "$key": "SpecificationAttribute:Saison|Ganzjährig",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Ganzjährig",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Saison"
+  },
+  {
+    "$key": "SpecificationAttribute:Saison|Herbst/Winter",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Herbst/Winter",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Saison"
+  },
+  {
     "$key": "SpecificationAttribute:Scheibenmaterial|Mineral",
     "Alias": null,
     "Color": null,
@@ -1348,6 +1998,36 @@
     "Name": "Saphir",
     "NumberValue": 0.0,
     "SpecificationAttributeId": "SpecificationAttribute:Scheibenmaterial"
+  },
+  {
+    "$key": "SpecificationAttribute:Schichten|2-teilig",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "2-teilig",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Schichten"
+  },
+  {
+    "$key": "SpecificationAttribute:Schichten|3-teilig",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "3-teilig",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Schichten"
+  },
+  {
+    "$key": "SpecificationAttribute:Schichten|4-teilig",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "4-teilig",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Schichten"
   },
   {
     "$key": "SpecificationAttribute:Speicherkapazität|128 GB",
@@ -1378,6 +2058,36 @@
     "Name": "64 GB",
     "NumberValue": 0.0,
     "SpecificationAttributeId": "SpecificationAttribute:Speicherkapazität"
+  },
+  {
+    "$key": "SpecificationAttribute:Spielstärke|Einsteiger",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Einsteiger",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Spielstärke"
+  },
+  {
+    "$key": "SpecificationAttribute:Spielstärke|Fortgeschritten",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Fortgeschritten",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Spielstärke"
+  },
+  {
+    "$key": "SpecificationAttribute:Spielstärke|Profi",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Profi",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Spielstärke"
   },
   {
     "$key": "SpecificationAttribute:Sprache|Deutsch",
@@ -1420,6 +2130,56 @@
     "SpecificationAttributeId": "SpecificationAttribute:Sprache"
   },
   {
+    "$key": "SpecificationAttribute:Stil|Klassisch",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Klassisch",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Stil"
+  },
+  {
+    "$key": "SpecificationAttribute:Stil|Modern",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Modern",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Stil"
+  },
+  {
+    "$key": "SpecificationAttribute:Stil|Skandinavisch",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Skandinavisch",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Stil"
+  },
+  {
+    "$key": "SpecificationAttribute:Taschenart|Cartbag",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Cartbag",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Taschenart"
+  },
+  {
+    "$key": "SpecificationAttribute:Taschenart|Standbag",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Standbag",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Taschenart"
+  },
+  {
     "$key": "SpecificationAttribute:Technische Ausführung|Automatik",
     "Alias": null,
     "Color": null,
@@ -1448,6 +2208,36 @@
     "Name": "Quarz, batteriebetrieben",
     "NumberValue": 0.0,
     "SpecificationAttributeId": "SpecificationAttribute:Technische Ausführung"
+  },
+  {
+    "$key": "SpecificationAttribute:Tee-Länge|54 mm",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "54 mm",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Tee-Länge"
+  },
+  {
+    "$key": "SpecificationAttribute:Tee-Länge|70 mm",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "70 mm",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Tee-Länge"
+  },
+  {
+    "$key": "SpecificationAttribute:Tee-Länge|83 mm",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "83 mm",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Tee-Länge"
   },
   {
     "$key": "SpecificationAttribute:Verschluss#1|Faltverschluss",
@@ -1508,5 +2298,65 @@
     "Name": "Sicherheitsfaltschließe",
     "NumberValue": 0.0,
     "SpecificationAttributeId": "SpecificationAttribute:Verschluss#2"
+  },
+  {
+    "$key": "SpecificationAttribute:Wetterschutz|Wasserabweisend",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Wasserabweisend",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Wetterschutz"
+  },
+  {
+    "$key": "SpecificationAttribute:Wetterschutz|Wasserdicht",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Wasserdicht",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Wetterschutz"
+  },
+  {
+    "$key": "SpecificationAttribute:Zielgruppe|Damen",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 2,
+    "MediaFileId": 0,
+    "Name": "Damen",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Zielgruppe"
+  },
+  {
+    "$key": "SpecificationAttribute:Zielgruppe|Herren",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 1,
+    "MediaFileId": 0,
+    "Name": "Herren",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Zielgruppe"
+  },
+  {
+    "$key": "SpecificationAttribute:Zielgruppe|Kinder",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 3,
+    "MediaFileId": 0,
+    "Name": "Kinder",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Zielgruppe"
+  },
+  {
+    "$key": "SpecificationAttribute:Zielgruppe|Unisex",
+    "Alias": null,
+    "Color": null,
+    "DisplayOrder": 4,
+    "MediaFileId": 0,
+    "Name": "Unisex",
+    "NumberValue": 0.0,
+    "SpecificationAttributeId": "SpecificationAttribute:Zielgruppe"
   }
 ]

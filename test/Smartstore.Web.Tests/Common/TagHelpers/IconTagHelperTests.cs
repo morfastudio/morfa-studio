@@ -231,8 +231,10 @@ public class IconTagHelperTests
         var output = new TagHelperOutput("icon-stack", attributes, (_, _) => Task.FromResult(children));
         await helper.ProcessAsync(context, output);
         Assert.That(output.TagName, Is.EqualTo("span"));
-        Assert.That(output.Attributes["class"].Value.ToString(), Does.Contain("icon-stack").And.Contain("icon-2x").And.Contain("icon-spin"));
-        Assert.That(output.Attributes["style"].Value.ToString(), Does.Contain("--icon-rotate:90deg").And.Contain("--icon-flip-x:-1"));
+        // Quarter turns and mirroring are utility classes; only arbitrary angles need an inline style.
+        Assert.That(output.Attributes["class"].Value.ToString(), Does.Contain("icon-stack").And.Contain("icon-2x").And.Contain("icon-spin")
+            .And.Contain("icon-rotate-90").And.Contain("icon-flip-h"));
+        Assert.That(output.Attributes.ContainsName("style"), Is.False);
         Assert.That(output.Attributes["role"].Value, Is.EqualTo("img"));
         Assert.That(output.Content.GetContent(), Is.EqualTo(children.GetContent()));
     }
@@ -251,7 +253,7 @@ public class IconTagHelperTests
             .ReturnsAsync(found ? icon : null);
         service.Setup(x => x.GetSvgAsync(icon, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new IconSvg { Address = "hi:cart-01/rounded", ViewBox = "0 0 24 24", Content = "<path/>" });
-        service.Setup(x => x.GetIconAsync("system:not-found!/default", null, It.IsAny<CancellationToken>()))
+        service.Setup(x => x.GetIconAsync("system:not-found!/outline", null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(icon);
         var helper = new TestIconTagHelper(service.Object, new IconRenderer(service.Object, Mock.Of<IIconKitService>()))
         {

@@ -13,32 +13,37 @@
         .OrderBy(x => x.SystemName.Equals(defaultLibraryName, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
         .ThenBy(x => x.DisplayName).ToArray();
 
-    var fieldName = ViewData.TemplateInfo.GetFullHtmlFieldName(nameof(Model.Expression));
-    var expression = Model?.Expression;
+    var fieldName = ViewData.TemplateInfo.GetFullHtmlFieldName(nameof(Model.Icon));
+    var expression = Model.Icon;
     if (ViewData.ModelState.TryGetValue(fieldName, out var state))
     {
         expression = IconExpression.TryParse(state.AttemptedValue, out var posted) ? posted : null;
     }
+    if (expression.HasValue && expression.Value.Address.IsEmpty)
+    {
+        expression = null;
+    }
+
     var presentation = expression?.Presentation ?? default;
     var selectedAddress = expression?.Address.ToString();
     var selectedLabel = expression?.Address.Name;
-    var area = Model?.Area.NullEmpty() ?? IconAreaResolver.ResolveArea(Context);
+    var area = Model.Area.NullEmpty() ?? IconAreaResolver.ResolveArea(Context);
     var selectedIcon = expression.HasValue ? await Icons.GetIconAsync(expression.Value.Address, area) : null;
-    var showHiddenKits = Model?.ShowHiddenKits == true;
+    var showHiddenKits = Model.ShowHiddenKits;
     var initialSource = Browser.GetSource(selectedAddress, area, showHiddenKits);
     // Retain the selected hidden source for label initialization, without listing it.
     var kits = Kits.Kits.Where(x => x.ShowInPicker || showHiddenKits || x.Name == initialSource?.Kit)
         .ToArray();
-    var visibleOptions = Model?.VisibleOptions ?? IconOptionFields.None;
+    var visibleOptions = Model.VisibleOptions;
 }
 
 <script src="~/js/smartstore.icontools.js" sm-target-zone="scripts" sm-key="icontools"></script>
 <script src="~/admin/js/smartstore.iconbrowser.js" sm-target-zone="scripts" sm-key="iconbrowser"></script>
 
 <div class="icon-browser" data-search-url="@Url.RouteUrl("IconKit.Browse")"
-     data-icon-area="@area" data-icon-presentation="@presentation.ToString()" data-show-provider-indicators="@(Model?.ShowProviderIndicators == true ? "true" : "false")"
-     data-external-label="@(Model?.ShowProviderIndicators == true ? T("Admin.IconBrowser.External").ToString() : null)" data-size-label="@T("Admin.IconBrowser.Size")" data-visible-options="@((int)visibleOptions)">
-    @Html.HiddenFor(x => x.Expression, new { @class = "icon-browser-expression" })
+     data-icon-area="@area" data-icon-presentation="@presentation.ToString()" data-show-provider-indicators="@(Model.ShowProviderIndicators ? "true" : "false")"
+     data-external-label="@(Model.ShowProviderIndicators ? T("Admin.IconBrowser.External").ToString() : null)" data-size-label="@T("Admin.IconBrowser.Size")" data-visible-options="@((int)visibleOptions)">
+    @Html.HiddenFor(x => x.Icon, new { @class = "icon-browser-expression" })
     <div class="row gx-2">
         <div class="col-3 dropdown icon-browser-source-dropdown">
             <button type="button" class="btn btn-secondary dropdown-toggle btn-block"
@@ -102,68 +107,10 @@
                 </select>
                 @if (visibleOptions != IconOptionFields.None)
                 {
-                    @* Tools are enabled individually as their shared editors become available. *@
-                    <div class="icon-browser-toolbar d-inline-flex align-items-center align-self-center flex-shrink-0 order-1 ml-auto d-none" role="group" aria-label="@T("Admin.IconBrowser.Options")">
-                        @if (visibleOptions.HasFlag(IconOptionFields.Color))
-                        {
-                            <button type="button" class="btn btn-plain btn-flat btn-icon no-chevron"
-                                    data-option="color" title="@T("Admin.Design.Color")" aria-label="@T("Admin.Design.Color")" disabled aria-disabled="true">
-                                <span class="icon-tool-color-swatch" aria-hidden="true"></span>
-                            </button>
-                        }
-                        @if (visibleOptions.HasFlag(IconOptionFields.Flip))
-                        {
-                            <button type="button" class="btn btn-plain btn-flat btn-icon no-chevron"
-                                    data-option="flip-h" title="@T("Admin.Design.FlipHorizontal")" aria-label="@T("Admin.Design.FlipHorizontal")" aria-disabled="true" aria-pressed="false">
-                                <icon name="flip-h" aria-hidden="true" />
-                            </button>
-                        }
-                        @if (visibleOptions.HasFlag(IconOptionFields.Flip))
-                        {
-                            <button type="button" class="btn btn-plain btn-flat btn-icon no-chevron"
-                                    data-option="flip-v" title="@T("Admin.Design.FlipVertical")" aria-label="@T("Admin.Design.FlipVertical")" aria-disabled="true" aria-pressed="false">
-                                <icon name="flip-v" aria-hidden="true" />
-                            </button>
-                        }
-                        @if (visibleOptions.HasFlag(IconOptionFields.Rotate))
-                        {
-                            <button type="button" class="btn btn-plain btn-flat btn-icon no-chevron dropdown-toggle"
-                                    data-option="rotate" title="@T("Admin.Design.Rotation")" aria-label="@T("Admin.Design.Rotation")" aria-disabled="true">
-                                <icon name="rotate" aria-hidden="true" />
-                            </button>
-                        }
-                        @if (visibleOptions.HasFlag(IconOptionFields.Size))
-                        {
-                            <button type="button" class="btn btn-plain btn-flat btn-icon no-chevron dropdown-toggle"
-                                    data-option="size" title="@T("Admin.IconBrowser.Size")" aria-label="@T("Admin.IconBrowser.Size")" aria-disabled="true">
-                                <icon name="scaling" aria-hidden="true" />
-                            </button>
-                        }
-                        @if (visibleOptions.HasFlag(IconOptionFields.Animation))
-                        {
-                            <button type="button" class="btn btn-plain btn-flat btn-icon no-chevron dropdown-toggle"
-                                    data-option="animation" data-none-label="@T("Admin.Design.NoAnimation")" title="@T("Admin.Design.Animation")" aria-label="@T("Admin.Design.Animation")" aria-disabled="true">
-                                <icon name="animation" aria-hidden="true" />
-                            </button>
-                        }
-                        @if (visibleOptions.HasFlag(IconOptionFields.StrokeScale))
-                        {
-                            <button type="button" class="btn btn-plain btn-flat btn-icon no-chevron dropdown-toggle"
-                                    data-option="stroke-scale" title="@T("Admin.Design.StrokeWidth")" aria-label="@T("Admin.Design.StrokeWidth")" aria-disabled="true">
-                                <icon name="hi:pencil" aria-hidden="true" />
-                            </button>
-                        }
-                        @if ((visibleOptions & (IconOptionFields.Size | IconOptionFields.Animation | IconOptionFields.StrokeScale)) != IconOptionFields.None)
-                        {
-                            <button type="button" class="btn btn-plain btn-flat btn-icon no-chevron" data-more="true"
-                                    title="@T("Common.MoreOptions")" aria-label="@T("Common.MoreOptions")" aria-disabled="true">
-                                <icon name="hi:more-horizontal!/sr" aria-hidden="true" />
-                            </button>
-                        }
-                    </div>
+                    <partial name="_IconPresentationToolbar" model="visibleOptions" />
                 }
             </div>
-            @Html.ValidationMessageFor(x => x.Expression)
+            @Html.ValidationMessageFor(x => x.Icon)
         </div>
     </div>
 </div>

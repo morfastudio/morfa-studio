@@ -19,7 +19,7 @@ public sealed partial class IconRenderer(IIconService icons, IIconKitService kit
         var missing = icon == null;
         if (missing)
         {
-            icon = await icons.GetIconAsync("system:not-found!/default", area: area, cancelToken: cancelToken);
+            icon = await icons.GetIconAsync("system:not-found!/outline", area: area, cancelToken: cancelToken);
             if (icon == null)
             {
                 return null;
@@ -276,6 +276,7 @@ public sealed partial class IconRenderer(IIconService icons, IIconKitService kit
         AddNumber(svg, "--icon-shift-x", presentation.ShiftX / 16, "em");
         AddNumber(svg, "--icon-shift-y", presentation.ShiftY / 16, "em");
         AddStyle(svg, "--icon-color", presentation.Color);
+        AddNumber(svg, "--icon-opacity", presentation.Opacity);
         AddStyle(svg, "--icon-animation-duration", presentation.AnimationDuration);
         if (presentation.AnimationReverse.HasValue)
         {
