@@ -1,0 +1,6 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- LightningCss.Native does not ship an osx-arm64 CLI; fall back to osx-x64 (runs via Rosetta 2). -->
+    <SmartstoreLightningCssRid Condition="'$(SmartstoreLightningCssRid)' == 'osx-arm64'">osx-x64</SmartstoreLightningCssRid>
+  </PropertyGroup>
+</Project>
