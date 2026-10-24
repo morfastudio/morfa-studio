@@ -16,20 +16,20 @@
     <sorting allow-unsort="true" allow-multisort="false"></sorting>
     <toolbar>
         <toolbar-group>
-            <button datagrid-action="DataGridToolAction.ToggleSearchPanel" type="button" class="btn btn-light btn-icon">
-                <i class="fa fa-fw fa-filter"></i>
+            <button datagrid-action="DataGridToolAction.ToggleSearchPanel" type="button" class="btn btn-plain btn-icon">
+                <icon name="filter" />
             </button>
         </toolbar-group>
         <toolbar-group>
             <a asp-action="Create" class="btn btn-primary btn-flat no-anims mr-auto">
-                <i class="fa fa-plus"></i>
+                <icon name="plus"  />
                 <span>@T("Admin.Common.AddNew")...</span>
             </a>
-            <button datagrid-action="DataGridToolAction.SaveChanges" type="button" class="btn btn-warning no-anims btn-flat">
-                <i class="fa fa-check"></i>
+            <button datagrid-action="DataGridToolAction.SaveChanges" type="button" class="btn btn-primary no-anims btn-flat">
+                <icon name="check" />
                 <span>@T("Admin.Common.SaveChanges")</span>
             </button>
-            <button datagrid-action="DataGridToolAction.CancelEdit" type="button" class="btn btn-light btn-flat mr-auto">
+            <button datagrid-action="DataGridToolAction.CancelEdit" type="button" class="btn btn-plain mr-auto">
                 <span>@T("Common.Cancel")</span>
             </button>
         </toolbar-group>
@@ -38,7 +38,7 @@
         <zone name="datagrid_toolbar_omega"></zone>
         <toolbar-group>
             <button datagrid-action="DataGridToolAction.DeleteSelectedRows" type="button" class="btn btn-danger no-anims btn-flat">
-                <i class="far fa-trash-can"></i>
+                <icon name="trash" />
                 <span>@T("Admin.Common.Delete.Selected")</span>
             </button>
         </toolbar-group>
@@ -47,23 +47,21 @@
         <partial name="Grids/_Grid.Products.Search" model="parentModel" />
     </search-panel>
     <columns>
-        @if (parentModel.DisplayProductPictures)
-        {
-            <column for="PictureThumbnailUrl"
-                    title=""
-                    width="48px"
-                    sortable="false"
-                    visible="true"
-                    readonly="true"
-                    resizable="false"
-                    reorderable="false">
-                <display-template>
-                    <div v-if="item.row.Id > 0" class="hstack justify-content-center position-absolute w-100 h-100 top-0 start-0" style="padding: 8px;">
-                        <img :alt="item.row.Id" :src="item.value" style="max-width: 42px; max-height: 32px" />
-                    </div>
-                </display-template>
-            </column>
-        }
+        <column for="PictureThumbnailUrl"
+                sm-if="parentModel.DisplayProductPictures"
+                title=""
+                width="48px"
+                sortable="false"
+                visible="true"
+                readonly="true"
+                resizable="false"
+                reorderable="false">
+            <display-template>
+                <div v-if="item.row.Id > 0" class="hstack justify-content-center position-absolute w-100 h-100 top-0 start-0" style="padding: 8px;">
+                    <img :alt="item.row.Id" :src="item.value" style="max-width: 42px; max-height: 32px" />
+                </div>
+            </display-template>
+        </column>
         <column for="Name" width="3fr" hideable="false">
             <display-template>
                 @Html.LabeledProductName()
@@ -99,7 +97,7 @@
            :data-copy-product-name="item.row.CopyProductModel.Name">
             @T("Common.Copy")
         </a>
-        <div class="dropdown-divider"></div>
+        <fragment><div class="dropdown-divider"></div></fragment>
         <a datarow-action="DataRowAction.Delete">@T("Common.Delete")</a>
     </row-commands>
 </datagrid>

@@ -1,0 +1,32 @@
+[
+  {
+    "$key": "Bestseller",
+    "Name": "Bestseller",
+    "Published": true
+  },
+  {
+    "$key": "Gemütlich",
+    "Name": "Gemütlich",
+    "Published": true
+  },
+  {
+    "$key": "Geschenk",
+    "Name": "Geschenk",
+    "Published": true
+  },
+  {
+    "$key": "Limitiert",
+    "Name": "Limitiert",
+    "Published": true
+  },
+  {
+    "$key": "Nachhaltig",
+    "Name": "Nachhaltig",
+    "Published": true
+  },
+  {
+    "$key": "Outdoor",
+    "Name": "Outdoor",
+    "Published": true
+  }
+]

@@ -190,6 +190,12 @@ public partial class CatalogHelper
             SeName = await manufacturer.GetActiveSlugAsync()
         };
 
+        model.Path = _urlHelper.RouteUrl("Manufacturer", new { model.SeName });
+        if (_seoSettings.CanonicalUrlsEnabled)
+        {
+            model.CanonicalUrl = _urlHelper.RouteUrl("Manufacturer", new { model.SeName }, _httpRequest.Scheme);
+        }
+
         model.MetaProperties = await model.MapMetaPropertiesAsync();
 
         return model;
@@ -547,7 +553,7 @@ public partial class CatalogHelper
         if (id == 0) return null;
 
         var key = $"CatalogHelper.DeliveryTime.{id}";
-        return await _httpRequest.HttpContext.GetItemAsync(key, async () => 
+        return await _httpRequest.HttpContext.GetItemAsync(key, async () =>
         {
             return await _db.DeliveryTimes.FindByIdAsync(id, true);
         });

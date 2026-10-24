@@ -135,7 +135,6 @@ public static class EnumerableExtensions
         /// Performs an action on each item while iterating through a list.
         /// </summary>
         [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Each(Action<T> action)
         {
             if (source is List<T> list)
@@ -192,7 +191,8 @@ public static class EnumerableExtensions
             Guard.NotNull(keySelector);
             Guard.NotNull(elementSelector);
 
-            var dictionary = new Dictionary<TKey, TElement>(comparer);
+            source.TryGetNonEnumeratedCount(out var capacity);
+            var dictionary = new Dictionary<TKey, TElement>(capacity, comparer);
 
             foreach (var local in source)
             {
@@ -223,7 +223,6 @@ public static class EnumerableExtensions
         }
 
         [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task EachAsync(Func<T, Task> action)
         {
             foreach (T t in source)

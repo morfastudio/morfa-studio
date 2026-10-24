@@ -1,4 +1,4 @@
-/// <reference path="references.scss" />
+﻿/// <reference path="references.scss" />
 
 
 // General
@@ -31,20 +31,14 @@
         &.dropdown-toggle:after {
             // Quick fix for chevron position
             position: relative;
-            top: 2px;
+            //top: 1px;
             margin-inline-start: 0;
         }
     }
 
-	.nav-link > :is(img, i, svg) {
+	.nav-link > :is(.icon, .icon-stack) {
         position: relative;
-		font-size: inherit;
 		color: var(--nav-link-icon-color);
-	}
-
-    .nav-link:hover > :is(i, svg),
-    .nav-link.active > :is(i, svg) {
-		color: inherit;
 	}
 
 	.nav-link > .chevron {
@@ -117,6 +111,7 @@
 // ==============================================================
 
 .nav-tabs-line {
+    --nav-link-icon-color: currentColor;
     --nav-link-padding-x: 1rem;
     --nav-link-padding-y: 0.825rem;
     --nav-link-color: #{$mtab-color};
@@ -150,7 +145,7 @@
 			opacity: 0.4;
 		}
 
-		> :is(i, svg, img) {
+		> :is(.icon, .icon-stack) {
 			display: none;
 		}
 
@@ -159,7 +154,7 @@
         }
 
 		@include media-breakpoint-up(lg) {
-			> :is(i, svg, img) {
+			> :is(.icon, .icon-stack) {
 				display: inline-block;
 			}
 		}
@@ -257,12 +252,13 @@
         --nav-link-padding-x: 1.25rem;
         --nav-link-padding-y: 0.625rem;
         --nav-link-color: #{$gray-700};
+        --nav-link-icon-color: var(--body-color);
         @include rfs($font-size-sm, --nav-link-font-size);
 
         max-width: 250px;
         min-height: 100%;
 
-	    .nav-link > :is(i, svg, img) {
+        .nav-link > :is(.icon, .icon-stack) {
             // Move icon slightly away from label if tabs are placed on left or right
             //inset-inline-start: -0.25em;
             margin-inline: 0.25em;
@@ -317,8 +313,7 @@
                     transition: all ease 0.15s;
                 }
 
-                &:not(.active) > :is(i, svg) {
-                    color: $dropdown-icon-color;
+                > :is(.icon, .icon-stack) {
                     transition: transform ease 0.15s;
                 }
 
@@ -334,8 +329,7 @@
                         transform: translateX(2px);
                     }
 
-                    > :is(i, svg) {
-                        color: $gray-700;
+                    > :is(.icon, .icon-stack) {
                         transform: scale(1.2);
                     }
                 }

@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using Autofac.Builder;
 using Humanizer;
+using Microsoft.Extensions.FileProviders;
+using Smartstore.Core.AI;
 using Smartstore.Core.Checkout.Payment;
 using Smartstore.Core.Checkout.Shipping;
 using Smartstore.Core.Checkout.Tax;
@@ -10,13 +12,11 @@ using Smartstore.Core.DataExchange;
 using Smartstore.Core.DataExchange.Export;
 using Smartstore.Core.Identity;
 using Smartstore.Core.OutputCache;
-using Smartstore.Core.AI;
+using Smartstore.Core.Security;
+using Smartstore.Core.Theming;
 using Smartstore.Core.Widgets;
 using Smartstore.Data;
 using Smartstore.Engine.Modularity;
-using Microsoft.Extensions.FileProviders;
-using Smartstore.Core.Theming;
-using Smartstore.Core.Security;
 
 namespace Smartstore.Core.Bootstrapping;
 
@@ -52,7 +52,7 @@ public sealed class ModularityModule : Module
                     {
                         x.Context.InjectProperties(x.Instance);
                     }
-                    
+
                     if (x.Instance is ModuleBase moduleBase)
                     {
                         moduleBase.Services = x.Context.Resolve<ICommonServices>();
@@ -101,6 +101,7 @@ public sealed class ModularityModule : Module
             var systemName = GetSystemName(type, moduleDescriptor);
             var friendlyName = GetFriendlyName(type, moduleDescriptor);
             var displayOrder = GetDisplayOrder(type, moduleDescriptor);
+            type.TryGetAttribute<IconAttribute>(false, out var iconAttribute);
             var dependentWidgets = GetDependentWidgets(type);
             var resPattern = (moduleDescriptor != null ? "Plugins" : "Providers") + ".{1}.{0}"; // e.g. Plugins.FriendlyName.MySystemName
             var settingPattern = (moduleDescriptor != null ? "Plugins" : "Providers") + ".{0}.{1}"; // e.g. Plugins.MySystemName.DisplayOrder
@@ -126,6 +127,7 @@ public sealed class ModularityModule : Module
                 m.For(em => em.ResourceKeyPattern, resPattern);
                 m.For(em => em.SettingKeyPattern, settingPattern);
                 m.For(em => em.FriendlyName, friendlyName.Name);
+                m.For(em => em.Icon, iconAttribute?.Address);
                 m.For(em => em.Description, friendlyName.Description);
                 m.For(em => em.DisplayOrder, displayOrder);
                 m.For(em => em.DependentWidgets, dependentWidgets);

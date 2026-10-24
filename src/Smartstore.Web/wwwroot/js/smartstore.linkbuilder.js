@@ -111,7 +111,8 @@
 
                 // append query string
                 if (type !== 'url' && !_.isEmpty(val) && !_.isEmpty(qs)) {
-                    val = (val || '') + '?' + qs;
+                    var qsPrefix = val.indexOf('?') !== -1 ? '&' : '?';
+                    val = (val || '') + qsPrefix + qs;
                 }
 
                 self._updateQueryStringIcon(!_.isEmpty(qs));
@@ -195,13 +196,14 @@
                 type = elem.data('type');
 
             var btn = cnt.find('.btn-linktype'),
-                icon = elem.find('> i').attr('class')?.replace('fa-fw ', ''), 
+                icon = elem.children('.icon, sm-icon').clone().removeClass('icon-fw'),
                 name = elem.find('span').text();
 
-            btn.find('i').attr('class', icon);
+            btn.children('.icon, sm-icon').remove();
+            btn.prepend(icon);
             btn.attr('title', name);
 
-            cnt.find('.btn-query-string').toggle(type !== 'url');
+            cnt.find('.link-query-string-container').toggleClass('hide', type === 'url');
         },
 
         _tryHideTypeContainer: function (hasQueryString) {
@@ -223,17 +225,13 @@
         },
 
         _updateQueryStringIcon: function (hasQueryString) {
-            $(this.element).find('.btn-query-string > i')
-                .removeClass('text-muted text-success')
-                .addClass(hasQueryString ? 'text-success' : 'text-muted');
+            $(this.element).find('.btn-query-string').toggleClass('btn-flagged', hasQueryString);
         },
 
         _updateLinkTargetCtrl: function (target) {
             var hasLinkTarget = !_.isEmpty(target);
 
-            $(this.element).find('.btn-link-target > i')
-                .removeClass('text-muted text-success')
-                .addClass(hasLinkTarget ? 'text-success' : 'text-muted');
+            $(this.element).find('.btn-link-target').toggleClass('btn-flagged', hasLinkTarget);
 
             $(this.element).find('.dropdown-item').removeClass('checked');
             $(this.element).find('.dropdown-item[data-value="' + target + '"]').addClass("checked");
@@ -242,11 +240,17 @@
         _getQueryString: function () {
             var val = this.queryStringCtrl.val() || '';
 
+            // Normalize by removing any leading question mark(s) and use URLSearchParams
+            // to strip empty or invalid entries without losing the original string format.
             while (val.startsWith('?')) {
                 val = val.substring(1);
             }
 
-            return val;
+            var params = new URLSearchParams(val);
+            var result = params.toString();
+
+            // Preserve the user's raw input if it is only whitespace/empty, otherwise return encoded version.
+            return result;
         }
     };
 

@@ -1,66 +1,76 @@
 ﻿using Smartstore.Collections;
+using Smartstore.IconKit;
 using Smartstore.Core.Localization;
 
-namespace Smartstore.Core.Content.Menus
-{
-    // INFO: The provider's SystemName is also the edit template name > Views/Shared/EditorTemplates/MenuItem.{SystemName}.cshtml.
-    // Model is: string
-    [MenuItemProvider("entity")]
-    public class EntityMenuItemProvider : MenuItemProviderBase
-    {
-        private readonly ILinkResolver _linkResolver;
+namespace Smartstore.Core.Content.Menus;
 
-        public EntityMenuItemProvider(ILinkResolver linkResolver)
+// INFO: The provider's SystemName is also the edit template name > Views/Shared/EditorTemplates/MenuItem.{SystemName}.cshtml.
+// Model is: string
+[MenuItemProvider("entity")]
+public class EntityMenuItemProvider : MenuItemProviderBase
+{
+    private readonly ILinkResolver _linkResolver;
+
+    public EntityMenuItemProvider(ILinkResolver linkResolver)
+    {
+        _linkResolver = linkResolver;
+    }
+
+    protected override async Task ApplyLinkAsync(MenuItemProviderRequest request, TreeNode<MenuItem> node)
+    {
+        // Always resolve against current store, current customer and working language.
+        var result = await _linkResolver.ResolveAsync(request.Entity.Model);
+        var item = node.Value;
+
+        item.Url = result.Link;
+        item.ImageId = result.PictureId;
+
+        if (item.Text.IsEmpty())
         {
-            _linkResolver = linkResolver;
+            item.Text = result.Label;
         }
 
-        protected override async Task ApplyLinkAsync(MenuItemProviderRequest request, TreeNode<MenuItem> node)
+        if (result.EntityId.HasValue && !request.IsEditMode)
         {
-            // Always resolve against current store, current customer and working language.
-            var result = await _linkResolver.ResolveAsync(request.Entity.Model);
-            var item = node.Value;
+            item.EntityId = result.EntityId.Value;
+            item.EntityName = result.EntityName;
+        }
 
-            item.Url = result.Link;
-            item.ImageId = result.PictureId;
-            
-            if (item.Text.IsEmpty())
+        if (result.Expression.LinkTarget.HasValue())
+        {
+            item.LinkHtmlAttributes.Add("target", result.Expression.LinkTarget);
+        }
+
+        if (request.IsEditMode)
+        {
+            var info = _linkResolver.GetBuilderMetadata().FirstOrDefault(x => x.Schema == result.Expression.Schema);
+
+            if (info != null)
             {
-                item.Text = result.Label;
-            }
-
-            if (result.EntityId.HasValue && !request.IsEditMode)
-            {
-                item.EntityId = result.EntityId.Value;
-                item.EntityName = result.EntityName;
-            }
-
-            if (result.Expression.LinkTarget.HasValue())
-            {
-                item.LinkHtmlAttributes.Add("target", result.Expression.LinkTarget);
-            }
-
-            if (request.IsEditMode)
-            {
-                var info = _linkResolver.GetBuilderMetadata().FirstOrDefault(x => x.Schema == result.Expression.Schema);
-
-                if (info != null)
+                item.Summary = T(info.ResKey);
+                item.Icon = info.Icon;
+                if (info.Icon.HasValue())
                 {
-                    item.Summary = T(info.ResKey);
-                    item.Icon = info.Icon;
-                }
-
-                if (info == null || item.Url.IsEmpty())
-                {
-                    item.Text = null;
-                    item.ResKey = "Admin.ContentManagement.Menus.SpecifyLinkTarget";
+                    var parts = info.Icon.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    var name = parts.FirstOrDefault(x => x.StartsWith("fa-", StringComparison.Ordinal));
+                    if (name != null)
+                    {
+                        var variant = parts.Contains("fab") ? "b" : parts.Contains("far") ? "r" : "s";
+                        item.Icon = new IconAddress(name[3..], "fa", variant, skipMapping: true).ToString();
+                    }
                 }
             }
-            else
+
+            if (info == null || item.Url.IsEmpty())
             {
-                // For edit mode, only apply MenuItemRecord.Published.
-                item.Visible = result.Status == LinkStatus.Ok;
+                item.Text = null;
+                item.ResKey = "Admin.ContentManagement.Menus.SpecifyLinkTarget";
             }
+        }
+        else
+        {
+            // For edit mode, only apply MenuItemRecord.Published.
+            item.Visible = result.Status == LinkStatus.Ok;
         }
     }
 }

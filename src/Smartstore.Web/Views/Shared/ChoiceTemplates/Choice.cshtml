@@ -3,9 +3,30 @@
 @model ChoiceModel
 
 @{
+	Assets.AppendScriptFiles("~/js/smartstore.choice.js");
+
 	var controlId = Model.BuildControlId();
 	var label = Model.GetLabel();
 	var description = Model.GetDescription();
+	var isSwatch = Model.AttributeControlType == AttributeControlType.Boxes;
+	var selectedSwatch = isSwatch ? Model.Values?.FirstOrDefault(x => x.IsPreSelected) : null;
+	var selectedSwatchValue = selectedSwatch == null
+		? null
+		: Model.UseCardLayout ? selectedSwatch.GetSwatchDisplayName() : selectedSwatch.GetAccessibleLabel();
+	var emptySwatchValueText = Model.IsRequired ? T("Common.PleaseSelect").Value : T("Common.Unspecified").Value;
+	var swatchValueText = selectedSwatchValue.NullEmpty() ?? emptySwatchValueText;
+	var swatchValueStateClass = selectedSwatchValue.HasValue()
+		? null
+		: Model.IsRequired ? "text-danger" : "text-muted";
+	var choiceLabelClass = "choice-label";
+	if (isSwatch)
+	{
+		choiceLabelClass += " choice-label-swatch";
+	}
+	else if (Model.IsRequired)
+	{
+		choiceLabelClass += " required";
+	}
 
 	var isTextInput = Model.AttributeControlType == AttributeControlType.TextBox || Model.AttributeControlType == AttributeControlType.MultilineTextbox;
 	string templateSuffix = null;
@@ -44,14 +65,26 @@
 		}
 		case AttributeControlType.Boxes:
 		{
-			templateSuffix = "Box";
+			templateSuffix = "Swatch";
 			break;
 		}
 	}
 }
 
 <div class="form-group choice">
-    <label class="choice-label@(Model.IsRequired ? " required" : "")" for="@controlId">@label</label>
+    <label class="@choiceLabelClass" for="@controlId">
+        @if (isSwatch)
+        {
+            <span class="choice-label-name">@(label?.Trim()):</span>
+            <span class="choice-label-value @swatchValueStateClass"
+                  data-swatch-empty-value="@emptySwatchValueText"
+                  data-swatch-empty-class="@swatchValueStateClass">@swatchValueText</span>
+        }
+        else
+        {
+            @label
+        }
+    </label>
     <div sm-if="!isTextInput && description.HasValue()" class="choice-description">
         @Html.Raw(description)
     </div>

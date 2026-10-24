@@ -22,9 +22,9 @@ internal static class PolymorphyCodec
     #region Read
 
     public static object? ReadValue(
-        JsonElement el, 
-        Type declaredType, 
-        JsonSerializerOptions options, 
+        JsonElement el,
+        Type declaredType,
+        JsonSerializerOptions options,
         PolymorphyOptions poly)
     {
         return IsPolymorphicType(declaredType)
@@ -71,6 +71,10 @@ internal static class PolymorphyCodec
                 return JsonSerializer.Deserialize(valuesEl, runtimeType, readOptions);
             }
 
+            // Wrapped scalar/custom-converter payload: {"$type":"...","$value":...}
+            if (el.TryGetProperty(o.ScalarValuePropertyName, out var valueEl))
+                return JsonSerializer.Deserialize(valueEl, runtimeType, readOptions);
+
             // Object payload: strip discriminator at this level; nested $type remain.
             var jsonBytes = SerializeObjectWithoutType(el, o.TypePropertyName);
             return JsonSerializer.Deserialize(jsonBytes, runtimeType, readOptions);
@@ -105,7 +109,7 @@ internal static class PolymorphyCodec
         {
             return value;
         }
-        
+
         switch (el.ValueKind)
         {
             case JsonValueKind.Array:
@@ -498,8 +502,11 @@ internal static class PolymorphyCodec
 
         if (payload.ValueKind != JsonValueKind.Object)
         {
-            // Defensive fallback: should not happen for POCOs, but keep behavior predictable.
-            JsonSerializer.Serialize(writer, value, runtimeType, options);
+            // Custom converters may emit scalar or array payloads for otherwise complex runtime types.
+            WriteWrappedObjectStart(writer, runtimeType, o);
+            writer.WritePropertyName(o.ScalarValuePropertyName);
+            payload.WriteTo(writer);
+            writer.WriteEndObject();
             return;
         }
 
@@ -564,7 +571,7 @@ internal static class PolymorphyCodec
             });
 
             return isPolymorphAbstract;
-        }    
+        }
 
         return false;
     }
@@ -588,7 +595,7 @@ internal static class PolymorphyCodec
     public static bool TryGetPolymorphyKind(
         Type t,
         JsonSerializerOptions? options,
-        [NotNullWhen(true)] out PolymorphyKind? kind, 
+        [NotNullWhen(true)] out PolymorphyKind? kind,
         [NotNullWhen(true)] out Type? elementType)
     {
         kind = default;
@@ -611,7 +618,7 @@ internal static class PolymorphyCodec
                 elementType = itemType;
                 return true;
             }
-                
+
         }
         else if (IsPolymorphicType(t, options))
         {

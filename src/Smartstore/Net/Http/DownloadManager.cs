@@ -1,61 +1,122 @@
 ﻿using System.Net;
 using System.Net.Http;
+using Smartstore.Engine;
 using Smartstore.IO;
 
-namespace Smartstore.Net.Http
+namespace Smartstore.Net.Http;
+
+public sealed class DownloadManager : Disposable
 {
-    public sealed class DownloadManager : Disposable
+    private const int MaxRedirects = 5;
+
+    private readonly IApplicationContext _appContext;
+
+    public DownloadManager(HttpClient httpClient, IApplicationContext applicationContext)
     {
-        public DownloadManager(HttpClient httpClient)
+        HttpClient = Guard.NotNull(httpClient);
+        _appContext = applicationContext;
+    }
+
+    public HttpClient HttpClient { get; }
+
+    /// <summary>
+    /// Downloads a file asynchronously and saves it to disk.
+    /// </summary>
+    /// <param name="item">Information about the file to download.</param>
+    /// <param name="cancelToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    public Task DownloadFileAsync(DownloadManagerItem item, CancellationToken cancelToken = default)
+    {
+        return ProcessUrl(item, cancelToken);
+    }
+
+    /// <summary>
+    /// Starts asynchronous download of multiple files and saves them to disk.
+    /// </summary>
+    /// <param name="items">Information about the files to download.</param>
+    /// <param name="cancelToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    public async Task DownloadFilesAsync(IEnumerable<DownloadManagerItem> items, CancellationToken cancelToken = default)
+    {
+        var downloadTasks = items
+            .Select(x => ProcessUrl(x, cancelToken))
+            .ToList();
+
+        while (downloadTasks.Count > 0)
         {
-            HttpClient = Guard.NotNull(httpClient, nameof(httpClient));
+            // Identify the first task that completes.
+            Task firstFinishedTask = await Task.WhenAny(downloadTasks);
+
+            // Process only once.
+            downloadTasks.Remove(firstFinishedTask);
+
+            await firstFinishedTask;
         }
+    }
 
-        public HttpClient HttpClient { get; }
-
-        /// <summary>
-        /// Downloads a file asynchronously and saves it to disk.
-        /// </summary>
-        /// <param name="item">Information about the file to download.</param>
-        /// <param name="cancelToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-        public Task DownloadFileAsync(DownloadManagerItem item, CancellationToken cancelToken = default)
+    private async Task ProcessUrl(DownloadManagerItem item, CancellationToken cancelToken)
+    {
+        try
         {
-            return ProcessUrl(item, cancelToken);
-        }
-
-        /// <summary>
-        /// Starts asynchronous download of multiple files and saves them to disk.
-        /// </summary>
-        /// <param name="items">Information about the files to download.</param>
-        /// <param name="cancelToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-        public async Task DownloadFilesAsync(IEnumerable<DownloadManagerItem> items, CancellationToken cancelToken = default)
-        {
-            var downloadTasks = items
-                .Select(x => ProcessUrl(x, cancelToken))
-                .ToList();
-
-            while (downloadTasks.Count > 0)
+            if (!Uri.TryCreate(item.Url, UriKind.Absolute, out var uri))
             {
-                // Identify the first task that completes.
-                Task firstFinishedTask = await Task.WhenAny(downloadTasks);
-
-                // Process only once.
-                downloadTasks.Remove(firstFinishedTask);
-
-                await firstFinishedTask;
+                item.Success = false;
+                item.ErrorMessage = "Invalid URL.";
+                return;
             }
-        }
 
-        private async Task ProcessUrl(DownloadManagerItem item, CancellationToken cancelToken)
-        {
-            try
+            // SSRF guard: resolve the host and reject private/loopback/link-local addresses
+            // before issuing the request. Redirects are followed manually so each hop is re-validated.
+            if (!uri.Scheme.EqualsNoCase("http") && !uri.Scheme.EqualsNoCase("https") ||
+                !await IPAddressUtils.IsPublicHostAsync(uri.DnsSafeHost, cancelToken))
             {
-                using var response = await HttpClient.GetAsync(item.Url, HttpCompletionOption.ResponseHeadersRead, cancelToken);
+                item.Success = false;
+                item.ErrorMessage = "The URL was blocked by the security policy.";
+                return;
+            }
 
+            var redirectCount = 0;
+            HttpResponseMessage response = null;
+
+            while (true)
+            {
+                response?.Dispose();
+                response = await HttpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancelToken);
+
+                if (!response.StatusCode.IsRedirect() ||
+                    response.Headers.Location is not { } location ||
+                    redirectCount++ >= MaxRedirects)
+                {
+                    break;
+                }
+
+                // Re-validate the redirect target before following it.
+                var redirectUri = location.IsAbsoluteUri ? location : new Uri(uri, location);
+                if (!redirectUri.Scheme.EqualsNoCase("http") && !redirectUri.Scheme.EqualsNoCase("https") ||
+                    !await IPAddressUtils.IsPublicHostAsync(redirectUri.DnsSafeHost, cancelToken))
+                {
+                    response.Dispose();
+                    item.Success = false;
+                    item.ErrorMessage = "The URL was blocked by the security policy.";
+                    return;
+                }
+
+                uri = redirectUri;
+            }
+
+            using (response)
+            {
                 item.StatusCode = response.StatusCode;
 
                 if (response.IsSuccessStatusCode)
                 {
+                    var maxFileSize = _appContext.AppConfiguration.MaxDownloadFileSize * 1024L * 1024L;
+                    var contentLength = response.Content.Headers.ContentLength;
+                    if (contentLength > maxFileSize)
+                    {
+                        item.Success = false;
+                        item.ErrorMessage = "The downloaded file exceeds the maximum allowed size.";
+                        return;
+                    }
+
                     if (item.MimeType.IsEmpty())
                     {
                         item.MimeType = MimeTypes.MapNameToMimeType(item.FileName);
@@ -76,36 +137,36 @@ namespace Smartstore.Net.Http
                     using var source = await response.Content.ReadAsStreamAsync(cancelToken);
                     using var target = File.Open(item.Path, FileMode.Create);
 
-                    await source.CopyToAsync(target, cancelToken);
+                    // Stream with size enforcement in case Content-Length is missing or forged.
+                    await source.CopyToWithLimitAsync(target, maxFileSize, cancelToken);
 
                     item.Success = true;
                 }
                 else
                 {
                     item.Success = false;
-                    item.ErrorMessage = response.ReasonPhrase.HasValue()
-                        ? $"{response.StatusCode} ({response.ReasonPhrase})"
-                        : response.StatusCode.ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                item.Success = false;
-                item.ErrorMessage = ex.ToAllMessages();
-
-                if (ex.InnerException is WebException webExc)
-                {
-                    item.ExceptionStatus = webExc.Status;
+                    // Avoid surfacing status + reason verbatim — it acts as a port-scan oracle for internal services.
+                    item.ErrorMessage = $"Remote server returned HTTP {(int)response.StatusCode}.";
                 }
             }
         }
-
-        protected override void OnDispose(bool disposing)
+        catch (Exception ex)
         {
-            if (disposing)
+            item.Success = false;
+            item.ErrorMessage = ex.Message;
+
+            if (ex.InnerException is WebException webExc)
             {
-                // Don't dispose HttpClient, let HttpClientFactory do the heavy stuff.
+                item.ExceptionStatus = webExc.Status;
             }
+        }
+    }
+
+    protected override void OnDispose(bool disposing)
+    {
+        if (disposing)
+        {
+            // Don't dispose HttpClient, let HttpClientFactory do the heavy stuff.
         }
     }
 }

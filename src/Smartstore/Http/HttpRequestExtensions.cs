@@ -3,8 +3,10 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using Smartstore.Http;
 using Smartstore.IO;
 using Smartstore.Utilities;
 
@@ -13,6 +15,45 @@ namespace Smartstore;
 public static class HttpRequestExtensions
 {
     const string ODataPrefix = "/odata";
+
+    /// <summary>Creates an independent snapshot of the current HTTP request.</summary>
+    /// <param name="request">The request to capture.</param>
+    /// <returns>A new JSON-serializable snapshot containing copied headers and request values.</returns>
+    /// <remarks>
+    /// No request, service, or user identity instance is retained. Results are deliberately not
+    /// cached in HttpContext.Items: a later call must reflect changes to request data or the current
+    /// user. Reuse a returned snapshot locally when several operations should share the same
+    /// point-in-time request data.
+    /// </remarks>
+    public static HttpRequestSnapshot CreateSnapshot(this HttpRequest request)
+    {
+        Guard.NotNull(request);
+
+        var context = request.HttpContext;
+        string? action = context.GetRouteValueAs<string>("action");
+
+        return new()
+        {
+            Method = request.Method,
+            Scheme = request.Scheme,
+            Host = request.Host.Value.EmptyNull(),
+            PathBase = request.PathBase.Value.EmptyNull(),
+            Path = request.Path.Value.EmptyNull(),
+            QueryString = request.QueryString.Value.EmptyNull(),
+            Protocol = request.Protocol,
+            RawUrl = request.RawUrl(),
+            RouteInfo = action.HasValue()
+                ? new RouteInfo(action, context.GetRouteValueAs<string>("controller"), new RouteValueDictionary(request.RouteValues))
+                : null,
+            Headers = request.Headers.ToDictionary(
+                header => header.Key,
+                header => header.Value.Select(value => value.EmptyNull()).ToArray(),
+                StringComparer.OrdinalIgnoreCase),
+            TraceIdentifier = context.TraceIdentifier,
+            CapturedOnUtc = DateTime.UtcNow,
+            UserName = context.User.Identity?.Name
+        };
+    }
 
     /// <summary>
     /// Tries to read a request value first from <see cref="HttpRequest.Form"/> (if method is POST), then from
@@ -207,7 +248,7 @@ public static class HttpRequestExtensions
         if (request is null)
             return false;
 
-        return request.HttpContext.GetItem("IsSubRequest", () => 
+        return request.HttpContext.GetItem("IsSubRequest", () =>
         {
             if (IsExternalReferrer(request))
             {
@@ -219,6 +260,28 @@ public static class HttpRequestExtensions
                 IsGet(request) == false ||
                 IsAjax(request) == true;
         });
+    }
+
+    /// <summary>
+    /// Builds an absolute URL (scheme + host + port + path) from the given app-relative <paramref name="path"/>.
+    /// If <paramref name="path"/> is <see langword="null"/> or empty, the current request path (including query string) is used.
+    /// </summary>
+    /// <param name="path">
+    /// An optional app-relative path (e.g. <c>/checkout/confirm</c> or <c>~/checkout/confirm</c>).
+    /// When omitted, the current <see cref="HttpRequest.Path"/> and <see cref="HttpRequest.QueryString"/> are used.
+    /// </param>
+    /// <returns>An absolute URL string such as <c>https://example.com:5001/checkout/confirm</c>.</returns>
+    public static string ToAbsoluteUrl(this HttpRequest request, string? path = null)
+    {
+        Guard.NotNull(request);
+
+        if (path.IsEmpty())
+        {
+            // Use the raw current request URL (PathBase + Path + QueryString).
+            path = request.RawUrl();
+        }
+
+        return WebHelper.GetAbsoluteUrl(path, request, true);
     }
 
     /// <summary>

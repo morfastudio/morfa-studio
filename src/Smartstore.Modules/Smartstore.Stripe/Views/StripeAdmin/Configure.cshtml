@@ -7,23 +7,21 @@
 @await Component.InvokeAsync("StoreScope")
 
 <widget target-zone="admin_button_toolbar_before">
-    <button id="SaveConfigButton" type="submit" name="save" class="btn btn-warning" value="save">
-        <i class="fa fa-check"></i>
+    <button id="SaveConfigButton" type="submit" name="save" class="btn btn-primary" value="save">
+        <icon name="check"  />
         <span>@T("Admin.Common.Save")</span>
     </button>
 </widget>
 
-<div class="plugin-configuration">
-    <div>
-        <div class="alert alert-info alert-dismissible">
+<div class="alert alert-info alert-dismissible">
+    <button type="button" class="btn-close" data-dismiss="alert"></button>
+    <a class="d-inline-block mb-3 mw-100" style="max-width: 268px" href="#" target="_blank">
+        <img class="img-fluid alert-branding" src="@Url.Content("~/Modules/Smartstore.Stripe/branding.png")" alt="Stripe" />
+    </a>
+    <div class="text-expander" data-max-height="160">
+        <div class="text-expander-content">
             @Html.Raw(T("Plugins.Smartstore.Stripe.AdminInstruction"))
-            <button type="button" class="btn-close" data-dismiss="alert"></button>
         </div>
-    </div>
-    <div>
-        <a href="#" target="_blank">
-            <img src="@Url.Content("~/Modules/Smartstore.Stripe/branding.png")" alt="Stripe" />
-        </a>
     </div>
 </div>
 
@@ -66,13 +64,13 @@
                     <input asp-for="WebhookUrl" readonly />
                     <div class="input-group-append">
                         <button class="btn btn-light btn-icon btn-clipboard" data-copy-from="#@(Html.IdFor(x => x.WebhookUrl))">
-                            <bootstrap-icon name="clipboard" />
+                            <icon name="clipboard" />
                         </button>
                     </div>
                     <span class="input-group-append">
                         <button type="submit" id="createwebhook" name="createwebhook" value="createwebhook" class="btn btn-light"
                                 attr-disabled='(!Model.PublicApiKey.HasValue() || !Model.SecrectApiKey.HasValue(), "disabled")'>
-                            <i class="fa fa-cog"></i>
+                            <icon name="gear"  />
                             <span>@T("Plugins.Smartstore.Stripe.CreateWebhook")</span>
                         </button>
                     </span>
@@ -115,6 +113,17 @@
             <div class="adminData">
                 <setting-editor asp-for="ShowButtonInMiniShoppingCart"></setting-editor>
                 <span asp-validation-for="ShowButtonInMiniShoppingCart"></span>
+            </div>
+        </div>
+        <div class="adminRow">
+            <div class="adminTitle">
+                <smart-label asp-for="PaymentPageButtonMethods" />
+            </div>
+            <div class="adminData">
+                <setting-editor asp-for="PaymentPageButtonMethods">
+                    <select asp-for="PaymentPageButtonMethods" asp-items="ViewBag.AvailablePaymentPageButtonMethods" multiple="multiple"></select>
+                </setting-editor>
+                <span asp-validation-for="PaymentPageButtonMethods"></span>
             </div>
         </div>
     </div>

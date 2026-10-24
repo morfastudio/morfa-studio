@@ -130,7 +130,7 @@ public partial class ShoppingCartValidator : IShoppingCartValidator
     }
 
     public virtual async Task<bool> ValidateCartAsync(
-        ShoppingCart cart, 
+        ShoppingCart cart,
         IList<string> warnings,
         bool validateCheckoutAttributes = false,
         bool validateRequiredProducts = false)
@@ -165,26 +165,25 @@ public partial class ShoppingCartValidator : IShoppingCartValidator
             }
         }
 
-        // Validate checkout attributes if defined.
+        // Validate checkout attributes.
         if (validateCheckoutAttributes)
         {
-            var checkoutAttributes = cart?.Customer?.GenericAttributes?.CheckoutAttributes;
+            var checkoutAttributes = cart.Customer?.GenericAttributes?.CheckoutAttributes;
             if (checkoutAttributes != null)
             {
-                var existingAttributesQuery = _db.CheckoutAttributes.ApplyStoreFilter(_storeContext.CurrentStore.Id);
-                if (!cart.IsShippingRequired)
+                var activeAttributes = await _checkoutAttributeMaterializer.GetCheckoutAttributesAsync(cart, cart.StoreId);
+                var activeAttributeIds = activeAttributes.Select(x => x.Id).ToHashSet();
+                var selectedAttributeIds = checkoutAttributes.AttributesMap.Select(x => x.Key).ToHashSet();
+                var invalidAttributeIds = selectedAttributeIds.Where(x => !activeAttributeIds.Contains(x)).ToArray();
+
+                if (invalidAttributeIds.Length > 0)
                 {
-                    // No shipping required. Filter attributes which require shippable products.
-                    existingAttributesQuery = existingAttributesQuery.Where(x => !x.ShippableProductRequired);
+                    checkoutAttributes.RemoveAttributes(invalidAttributeIds);
+                    cart.Customer.GenericAttributes.CheckoutAttributes = checkoutAttributes;
                 }
 
-                var selectedAttributes = await _checkoutAttributeMaterializer.MaterializeCheckoutAttributesAsync(checkoutAttributes);
-                var notSelectedAttributes = await existingAttributesQuery
-                    .Where(x => x.IsRequired && x.IsActive && !selectedAttributes.Contains(x))
-                    .ToListAsync();
-
                 // Check for required attributes.
-                foreach (var attribute in notSelectedAttributes)
+                foreach (var attribute in activeAttributes.Where(x => x.IsRequired && !selectedAttributeIds.Contains(x.Id)))
                 {
                     currentWarnings.Add(GetAttributeRequiredWarning(
                         attribute.AttributeControlType,
@@ -312,10 +311,10 @@ public partial class ShoppingCartValidator : IShoppingCartValidator
     }
 
     public virtual async Task<bool> ValidateProductAsync(
-        ShoppingCartItem cartItem, 
+        ShoppingCartItem cartItem,
         IEnumerable<OrganizedShoppingCartItem> cartItems,
         IList<string> warnings,
-        int? storeId = null, 
+        int? storeId = null,
         int? quantity = null)
     {
         Guard.NotNull(cartItem);
@@ -670,7 +669,7 @@ public partial class ShoppingCartValidator : IShoppingCartValidator
             return true;
         }
 
-        var requiredProductIds = product.ParseRequiredProductIds();
+        var requiredProductIds = product.RequiredProductIdList;
         if (requiredProductIds.Length == 0)
         {
             return true;
@@ -712,15 +711,15 @@ public partial class ShoppingCartValidator : IShoppingCartValidator
         }
 
         var parentItems = cart.Items
-            .Where(x => x.Active 
+            .Where(x => x.Active
                 && x.Item.ParentItemId == null
-                && x.Item.Product.Id != requiredProduct.Id 
+                && x.Item.Product.Id != requiredProduct.Id
                 && x.Item.Product.RequireOtherProducts)
             .ToList();
 
         foreach (var parentItem in parentItems)
         {
-            var requiredProductsIds = parentItem.Item.Product.ParseRequiredProductIds();
+            var requiredProductsIds = parentItem.Item.Product.RequiredProductIdList;
             if (requiredProductsIds.Contains(requiredProduct.Id))
             {
                 var expectedQuantity = parentItem.Item.Quantity * requiredProduct.QuantityPerParentUnit;

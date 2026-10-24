@@ -1,0 +1,102 @@
+﻿#nullable enable
+
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Primitives;
+using Smartstore.Caching;
+using Smartstore.IO;
+
+namespace Smartstore.Core.AI.Metadata;
+
+public class DefaultAIMetadataLoader : IAIMetadataLoader
+{
+    private readonly IMemoryCache _cache;
+    private readonly IApplicationContext _appContext;
+    private readonly IRemoteAIMetadataLoader _remoteLoader;
+
+    public DefaultAIMetadataLoader(IMemoryCache cache, IApplicationContext appContext, IRemoteAIMetadataLoader remoteLoader)
+    {
+        _cache = cache;
+        _appContext = appContext;
+        _remoteLoader = remoteLoader;
+    }
+
+    protected internal string BuildCacheKey(string moduleSystemName)
+        => _cache.BuildScopedKey("aimetadata:" + moduleSystemName);
+
+    protected IMemoryCache Cache
+    {
+        get => _cache;
+    }
+
+    public AIMetadata LoadMetadata(string moduleSystemName)
+    {
+        Guard.NotEmpty(moduleSystemName);
+
+        var cacheKey = BuildCacheKey(moduleSystemName);
+
+        var result = _cache.GetOrCreate(cacheKey, entry =>
+        {
+            var (metadata, changeToken) = LoadMetadataCore(moduleSystemName);
+            if (changeToken != null)
+            {
+                // Register the change token to invalidate the cache entry when the file changes.
+                entry.AddExpirationToken(changeToken);
+            }
+
+            return new CacheEntry { Key = cacheKey, Value = metadata, ValueType = typeof(AIMetadata) };
+        });
+
+        return (AIMetadata)result!.Value;
+    }
+
+    public virtual async Task<AIMetadata?> PostProcessAsync(AIMetadata localMetadata, CancellationToken cancelToken = default)
+    {
+        Guard.NotNull(localMetadata);
+
+        var metadata = await _remoteLoader.FetchAsync(localMetadata, cancelToken);
+        return metadata;
+    }
+
+    public void ReplaceMetadata(string moduleSystemName, AIMetadata metadata)
+    {
+        Guard.NotEmpty(moduleSystemName);
+        Guard.NotNull(metadata);
+
+        if (_cache.TryGetValue(BuildCacheKey(moduleSystemName), out CacheEntry? entry))
+        {
+            entry!.Value = metadata;
+        }
+    }
+
+    protected virtual (AIMetadata, IChangeToken?) LoadMetadataCore(string moduleSystemName)
+    {
+        var module = _appContext.ModuleCatalog.GetModuleByName(moduleSystemName) ?? throw new InvalidOperationException($"Module {moduleSystemName} does not exist.");
+        var file = module.ContentRoot.GetFile("metadata.json");
+        if (!file.Exists)
+        {
+            throw new InvalidOperationException($"Metadata file for {moduleSystemName} not found.");
+        }
+
+        if (Deserialize(file) is not AIMetadata metadata)
+        {
+            throw new InvalidOperationException("Failed to deserialize AIMetadata.");
+        }
+
+        // Obtain a change token from the file provider whose
+        // callback is triggered when the file is modified.
+        var changeToken = file.FileSystem.Watch(file.SubPath);
+
+        return (metadata, changeToken);
+    }
+
+    protected virtual AIMetadata? Deserialize(IFile file)
+    {
+        using var stream = file.OpenRead();
+        return AIMetadata.FromJson(stream);
+    }
+
+    public void Invalidate(string moduleSystemName)
+    {
+        _cache.Remove(BuildCacheKey(moduleSystemName));
+    }
+}

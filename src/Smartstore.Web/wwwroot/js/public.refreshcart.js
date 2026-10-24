@@ -91,6 +91,11 @@ $(function () {
                     if (!_.isEmpty(response.cartHtml)) {
                         cartBody.html(response.cartHtml);
                     }
+                    if (!_.isEmpty(response.checkoutAttributesHtml)) {
+                        const checkoutAttributes = $('#checkout-attributes');
+                        checkoutAttributes.html(response.checkoutAttributesHtml);
+                        applyCommonPlugins(checkoutAttributes);
+                    }
                     if (!_.isEmpty(response.totalsHtml)) {
                         $('#order-totals').html(response.totalsHtml);
                     }
@@ -125,9 +130,11 @@ $(function () {
                 applyCommonPlugins(cartBody);
 
                 // Update shopbar.
-                ShopBar.loadSummary('cart', true);
-                ShopBar.loadSummary('wishlist', true);
-
+                if (typeof ShopBar !== 'undefined') {
+                    ShopBar.loadSummary('cart', true);
+                    ShopBar.loadSummary('wishlist', true);
+                }
+                
                 hideThrobber();
 
                 var cartRefreshEvent = jQuery.Event('shoppingCartRefresh');

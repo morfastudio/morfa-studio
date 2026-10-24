@@ -15,6 +15,8 @@ namespace Smartstore.Json;
 /// </summary>
 public class JsonLdFragment
 {
+    private static readonly string[] _propertiesToNormalize = ["type", "id", "graph"];
+
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -23,6 +25,7 @@ public class JsonLdFragment
 
     private readonly JsonObject _data;
 
+    // TODO: (jsonld) (prio low) Context url should be without ending / to be conform to spec.
     private JsonLdFragment(string type, bool withContext = false)
     {
         Type = type;
@@ -40,7 +43,7 @@ public class JsonLdFragment
     /// Explicitly converts this <see cref="JsonLdFragment"/> to its underlying <see cref="JsonObject"/>.
     /// Useful when a raw <see cref="JsonObject"/> is required, e.g. for <c>Obj(string key, JsonObject raw)</c>.
     /// </summary>
-    public static explicit operator JsonObject(JsonLdFragment obj) 
+    public static explicit operator JsonObject(JsonLdFragment obj)
         => obj._data;
 
     /// <summary>
@@ -48,7 +51,7 @@ public class JsonLdFragment
     /// as the first property, followed by <c>"@type"</c>. Use this for root fragments rendered directly
     /// as JSON-LD script blocks.
     /// </summary>
-    internal static JsonLdFragment CreateTopLevel(string type) 
+    internal static JsonLdFragment CreateTopLevel(string type)
         => new(type, withContext: true);
 
     /// <summary>
@@ -73,7 +76,7 @@ public class JsonLdFragment
             var jsonObj = JsonSerializer.SerializeToNode(properties, _jsonOptions)?.AsObject();
             if (jsonObj != null)
             {
-                NormalizeTypeProperty(jsonObj);
+                NormalizePropertyNames(jsonObj);
                 foreach (var (key, value) in jsonObj)
                 {
                     // @type is already set in the constructor; skip any accidental override
@@ -88,7 +91,7 @@ public class JsonLdFragment
         return fragment;
     }
 
-    public JsonObject AsJsonObject() 
+    public JsonObject AsJsonObject()
         => _data;
 
     #region Prop overloads
@@ -151,12 +154,27 @@ public class JsonLdFragment
 
     /// <summary>
     /// Adds a property to this JSON-LD fragment (fallback overload for unsupported types).
-    /// First-write wins if the key already exists. Nulls are ignored.
+    /// If <paramref name="value"/> serializes to a <see cref="JsonObject"/> (e.g. an anonymous object or POCO),
+    /// it is treated like <c>Obj(key, raw)</c>: property names are normalized and the object is deep-merged
+    /// when the key already exists. For all other types the serialized node is set directly.
+    /// Nulls are ignored.
     /// </summary>
     public JsonLdFragment Prop(string key, object? value)
     {
         Guard.NotEmpty(key);
-        if (value != null) SetOrMerge(_data, key, JsonValue.Create(value));
+        if (value != null)
+        {
+            var node = JsonSerializer.SerializeToNode(value, _jsonOptions);
+            if (node is JsonObject jsonObj)
+            {
+                NormalizePropertyNames(jsonObj);
+                SetOrMerge(_data, key, jsonObj);
+            }
+            else if (node != null)
+            {
+                SetOrMerge(_data, key, node);
+            }
+        }
         return this;
     }
 
@@ -183,7 +201,7 @@ public class JsonLdFragment
         var jsonObj = JsonSerializer.SerializeToNode(properties, _jsonOptions)?.AsObject();
         if (jsonObj != null)
         {
-            NormalizeTypeProperty(jsonObj);
+            NormalizePropertyNames(jsonObj);
             MergeInto(_data, jsonObj, overwrite);
         }
         return this;
@@ -251,7 +269,7 @@ public class JsonLdFragment
         Guard.NotNull(raw);
 
         var clone = raw.DeepClone().AsObject();
-        NormalizeTypeProperty(clone);
+        NormalizePropertyNames(clone);
         SetOrMerge(_data, key, clone);
         return this;
     }
@@ -284,7 +302,7 @@ public class JsonLdFragment
                 else if (item != null)
                 {
                     var node = JsonSerializer.SerializeToNode(item, _jsonOptions);
-                    if (node is JsonObject nodeObj) NormalizeTypeProperty(nodeObj);
+                    if (node is JsonObject nodeObj) NormalizePropertyNames(nodeObj);
                     jsonArray.Add(node);
                 }
             }
@@ -294,18 +312,23 @@ public class JsonLdFragment
     }
 
     /// <summary>
-    /// Recursively normalizes <c>"type"</c> to <c>"@type"</c> and moves it to index 0 so it appears
-    /// before all other properties. C# anonymous objects cannot define "@"-prefixed keys,
+    /// Recursively normalizes <c>"type"</c>, <c>"id"</c> and <c>"graph"</c> to <c>"@***"</c>,
+    /// and moves them to index 0 so they appear before all other properties. C# anonymous objects cannot define "@"-prefixed keys,
     /// so callers use <c>type = "..."</c> as a convention.
     /// </summary>
-    private static void NormalizeTypeProperty(JsonObject obj)
+    private static void NormalizePropertyNames(JsonObject obj)
     {
-        if (obj.TryGetPropertyValue("type", out var typeValue))
+        foreach (var name in _propertiesToNormalize)
         {
-            obj.Remove("type");
-            if (!obj.ContainsKey("@type"))
+            if (obj.TryGetPropertyValue(name, out var value))
             {
-                obj.Insert(0, "@type", typeValue);
+                obj.Remove(name);
+
+                var newName = "@" + name;
+                if (!obj.ContainsKey(newName))
+                {
+                    obj.Insert(0, newName, value);
+                }
             }
         }
 
@@ -313,13 +336,13 @@ public class JsonLdFragment
         {
             if (value is JsonObject nested)
             {
-                NormalizeTypeProperty(nested);
+                NormalizePropertyNames(nested);
             }
             else if (value is JsonArray array)
             {
                 foreach (var item in array)
                 {
-                    if (item is JsonObject nestedItem) NormalizeTypeProperty(nestedItem);
+                    if (item is JsonObject nestedItem) NormalizePropertyNames(nestedItem);
                 }
             }
         }

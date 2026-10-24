@@ -1,0 +1,36 @@
+﻿@model AddOrderProductModel
+
+<div class="adminContent">
+    <div class="adminRow">
+        <div class="adminTitle">
+            <smart-label asp-for="Quantity" />
+        </div>
+        <div class="adminData">
+            <editor asp-for="Quantity" data-tax-field="quantity" />
+        </div>
+    </div>
+    <div class="adminRow">
+        <div class="adminTitle">
+            <smart-label asp-for="TaxRate" />
+        </div>
+        <div class="adminData">
+            <editor asp-for="TaxRate" sm-postfix="%" data-tax-field="taxrate" />
+        </div>
+    </div>
+    <div class="adminRow">
+        <div class="adminTitle">
+            <smart-label asp-for="UnitPriceInclTax" />
+        </div>
+        <div class="adminData">
+            <tax-pair kind="TaxPairKind.UnitPrice" asp-for-gross="UnitPriceInclTax" asp-for-net="UnitPriceExclTax" />
+        </div>
+    </div>
+    <div class="adminRow">
+        <div class="adminTitle">
+            <smart-label asp-for="PriceInclTax" />
+        </div>
+        <div class="adminData">
+            <tax-pair kind="TaxPairKind.LineTotal" asp-for-gross="PriceInclTax" asp-for-net="PriceExclTax" />
+        </div>
+    </div>
+</div>

@@ -145,6 +145,7 @@ public partial class OrderModel : EditOrderModel
 
     public class ReturnCaseModel : EntityModelBase
     {
+        public ReturnCaseKind Kind { get; set; }
         public int Quantity { get; set; }
         public ReturnCaseStatus Status { get; set; }
         public string StatusString { get; set; }
@@ -238,7 +239,10 @@ public partial class OrderModel : EditOrderModel
         public decimal PriceExclTax { get; set; }
         public string PriceExclTaxString { get; set; }
 
+        [AdditionalMetadata("min", 0)]
         public decimal TaxRate { get; set; }
+        
+        [AdditionalMetadata("min", 1)]
         public int Quantity { get; set; }
 
         public decimal DiscountAmountInclTax { get; set; }
@@ -256,6 +260,9 @@ public partial class OrderModel : EditOrderModel
         public DownloadActivationType DownloadActivationType { get; set; }
         public bool IsDownloadActivated { get; set; }
         public int? LicenseDownloadId { get; set; }
+
+        public bool IsEsd { get; set; }
+        public DateTime? WithdrawalWaiverAcceptedOn { get; set; }
 
         public bool BundlePerItemPricing { get; set; }
         public bool BundlePerItemShoppingCart { get; set; }

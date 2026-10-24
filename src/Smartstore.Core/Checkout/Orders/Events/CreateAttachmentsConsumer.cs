@@ -1,45 +1,66 @@
-﻿using Smartstore.Core.Common.Configuration;
+﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Mvc;
+using Smartstore.Core.Common.Configuration;
 using Smartstore.Core.Content.Media;
 using Smartstore.Core.Localization;
 using Smartstore.Core.Messaging;
 using Smartstore.Core.Messaging.Events;
 using Smartstore.Events;
+using Smartstore.Http;
+using Smartstore.Pdf;
 
-namespace Smartstore.Core.Checkout.Orders.Events
+namespace Smartstore.Core.Checkout.Orders.Events;
+
+internal class CreateAttachmentsConsumer : IConsumer
 {
-    internal class CreateAttachmentsConsumer : IConsumer
+    public ILogger Logger { get; set; } = NullLogger.Instance;
+    public Localizer T { get; set; } = NullLocalizer.Instance;
+
+    public void HandleEvent(MessageQueuingEvent message,
+        Lazy<IUrlHelper> urlHelper,
+        PdfSettings pdfSettings)
     {
-        public ILogger Logger { get; set; } = NullLogger.Instance;
-        public Localizer T { get; set; } = NullLocalizer.Instance;
+        var messageName = message.MessageContext.MessageTemplate.Name;
 
-        public async Task HandleEventAsync(MessageQueuingEvent message,
-            Lazy<PdfInvoiceHttpClient> client,
-            PdfSettings pdfSettings)
+        bool attachPdf =
+            (pdfSettings.AttachOrderPdfToOrderPlacedEmail
+                && messageName.EqualsNoCase(MessageTemplateNames.OrderPlacedCustomer))
+            || (pdfSettings.AttachOrderPdfToOrderCompletedEmail
+                && messageName.EqualsNoCase(MessageTemplateNames.OrderCompletedCustomer));
+
+        if (attachPdf
+            && message.MessageModel.Get("Order") is IDictionary<string, object> order
+            && order.Get("ID") is int orderId)
         {
-            var messageName = message.MessageContext.MessageTemplate.Name;
-            var processMessage = (pdfSettings.AttachOrderPdfToOrderPlacedEmail && messageName.EqualsNoCase(MessageTemplateNames.OrderPlacedCustomer))
-                || (pdfSettings.AttachOrderPdfToOrderCompletedEmail && messageName.EqualsNoCase(MessageTemplateNames.OrderCompletedCustomer));
-
-            if (processMessage 
-                && message.MessageModel.Get("Order") is IDictionary<string, object> order 
-                && order.Get("ID") is int orderId)
+            try
             {
-                try
-                {
-                    var result = await client.Value.GetPdfInvoiceAsync(orderId);
+                // Resolve the MVC helper only when a PDF is needed; unrelated messages may be
+                // queued outside an MVC request.
+                var helper = urlHelper.Value;
+                var request = helper.ActionContext.HttpContext.Request;
+                var path = helper.Action("Print", "Order", new { id = orderId, pdf = true, area = string.Empty });
+                var url = WebHelper.GetAbsoluteUrl(path, request);
+                var requestSnapshot = request.CreateSnapshot();
 
-                    message.QueuedEmail.Attachments.Add(new()
+                var work = AttachmentWork.Create<PdfHttpClient, (string Url, HttpRequestSnapshot Snapshot)>(
+                    (url, requestSnapshot),
+                    static async (client, state, attachment, cancelToken) =>
                     {
-                        StorageLocation = EmailAttachmentStorageLocation.Blob,
-                        MimeType = result.MimeType,
-                        Name = result.FileName,
-                        MediaStorage = new MediaStorage { Data = result.Buffer }
+                        var result = await client.GetPdfAsync(state.Url, state.Snapshot, cancelToken);
+                        attachment.Name = result.FileName;
+                        attachment.MediaStorage = new MediaStorage { Data = result.Buffer };
                     });
-                }
-                catch (Exception ex)
+
+                message.AddDeferredAttachment(new QueuedEmailAttachment
                 {
-                    Logger.Error(ex, T("Admin.System.QueuedEmails.ErrorCreatingAttachment"));
-                }
+                    StorageLocation = EmailAttachmentStorageLocation.Blob,
+                    MimeType = MediaTypeNames.Application.Pdf,
+                    Name = $"order-{orderId}.pdf"
+                }, work);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, T("Admin.System.QueuedEmails.ErrorCreatingAttachment"));
             }
         }
     }

@@ -1,18 +1,23 @@
 ﻿@model FooterModel
 
-@using Smartstore.Core.Content.Menus;
 @using Smartstore.Web.Models.Common;
 @using Smartstore.Core.Security;
 
 @{
     var inverseFooter = Display.GetThemeVariable<bool>("inverse-footer");
+    var showLinks = Model.ShowSocialLinks && Model.SocialLinks.Count > 0;
+    
+    if (showLinks && Assets.JsonLd.TryGetFragment("Organization", out var org))
+    {
+        org.Arr("sameAs", Model.SocialLinks.Select(x => x.Href).Where(x => x != "#"));
+    }
 }
 
 <footer id="footer" class="@(inverseFooter ? "footer-inverse" : "footer-light")">
 
     <zone name="footer_top"></zone>
 
-    <nav sm-if="Model.ShowSocialLinks && Model.SocialLinks.Any()" class="footer-social-wrapper" aria-label="@T("Aria.Label.SocialMediaLinks")">
+    <nav sm-if="showLinks" class="footer-social-wrapper" aria-label="@T("Aria.Label.SocialMediaLinks")">
         <div class="container footer-social">
             <div class="row">
                 <div class="col text-center">
@@ -24,7 +29,7 @@
                                class="btn btn-icon rounded-circle btn-flat btn-social btn-brand-@link.CssClass" 
                                title="@link.DisplayName"
                                aria-label="@link.DisplayName">
-                                <i class="fab fa-@link.CssClass" aria-hidden="true"></i>
+                                <icon name="@(link.CssClass == "x-twitter" ? "twitter-x" : link.CssClass)" aria-hidden="true" />
                             </a>
                         }
                     </div>
@@ -117,7 +122,7 @@
                                                        aria-label="@T("Newsletter.Email")"
                                                        autocomplete="email" />
                                                 <span class="input-group-icon text-muted" style="--inline-icon-offset: 4px">
-                                                    <i class="far fa-envelope" aria-hidden="true"></i>
+                                                    <icon name="mail"  aria-hidden="true" />
                                                 </span>
                                                 <span class="input-group-append">
                                                     <span class="input-group-inline-addon rounded-end-pill">

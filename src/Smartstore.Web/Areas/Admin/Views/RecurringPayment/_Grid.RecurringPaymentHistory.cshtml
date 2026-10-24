@@ -12,23 +12,20 @@
     <datasource read="@Url.Action("RecurringPaymentHistoryList", new { recurringPaymentId = parentModel.Id })" />
     <paging position="Bottom" show-size-chooser="true" enabled="false" />
     <sorting enabled="false"></sorting>
-    @if (parentModel.CanProcessNextPayment || parentModel.CanCancel)
-    {
-        <toolbar>
-            <toolbar-group>
-                <button sm-if="parentModel.CanProcessNextPayment" type="button" 
-                        class="btn btn-primary btn-flat no-anims mr-1 grid-process-next-payment"
-                        data-url="@Url.Action("ProcessNextPayment", new { id = parentModel.Id })">
-                    <span>@T("Admin.RecurringPayments.History.ProcessNextPayment")</span>
-                </button>
-                <button sm-if="parentModel.CanCancel" type="button" 
-                        class="btn btn-danger no-anims grid-cancel-payment"
-                        data-url="@Url.Action("CancelRecurringPayment", new { id = parentModel.Id })">
-                    <span>@T("Admin.RecurringPayments.History.CancelPayment")</span>
-                </button>
-            </toolbar-group>
-        </toolbar>
-    }
+    <toolbar sm-if="parentModel.CanProcessNextPayment || parentModel.CanCancel">
+        <toolbar-group>
+            <button sm-if="parentModel.CanProcessNextPayment" type="button" 
+                    class="btn btn-primary btn-flat no-anims mr-1 grid-process-next-payment"
+                    data-url="@Url.Action("ProcessNextPayment", new { id = parentModel.Id })">
+                <span>@T("Admin.RecurringPayments.History.ProcessNextPayment")</span>
+            </button>
+            <button sm-if="parentModel.CanCancel" type="button" 
+                    class="btn btn-danger no-anims grid-cancel-payment"
+                    data-url="@Url.Action("CancelRecurringPayment", new { id = parentModel.Id })">
+                <span>@T("Admin.RecurringPayments.History.CancelPayment")</span>
+            </button>
+        </toolbar-group>
+    </toolbar>
     <columns>
         <column for="Id" halign="center" visible="false" type="string" />
         <column for="CreatedOn" entity-member="CreatedOnUtc" />
@@ -40,7 +37,7 @@
         <column for="ShippingStatus">
             <display-template>
                 <div class="dg-cell-value">
-                    <i :class="item.row.ShippingStatusLabelClass" :title="item.row.ShippingStatusString"></i>
+                    <sm-icon v-if="item.row.ShippingStatusIcon" :name="item.row.ShippingStatusIcon" class="icon-fw" :class="item.row.ShippingStatusLabelClass" :title="item.row.ShippingStatusString"></sm-icon>
                     <span class="text-truncate">{{ item.row.ShippingStatusString }}</span>
                 </div>
             </display-template>
@@ -53,7 +50,7 @@
         <column for="PaymentStatus">
             <display-template>
                 <div class="dg-cell-value">
-                    <i :class="item.row.PaymentStatusLabelClass" :title="item.row.PaymentStatusString"></i>
+                    <sm-icon v-if="item.row.PaymentStatusIcon" :name="item.row.PaymentStatusIcon" class="icon-fw" :class="item.row.PaymentStatusLabelClass" :title="item.row.PaymentStatusString"></sm-icon>
                     <span class="text-truncate">{{ item.row.PaymentStatusString }}</span>
                 </div>
             </display-template>

@@ -34,7 +34,7 @@ public partial class CatalogHelper
         model.AllowSorting = _catalogSettings.AllowProductSorting;
         if (model.AllowSorting)
         {
-            model.AvailableSortOptions = _cache.Get($"pres:productlistsortoptions-{languageId}", () => 
+            model.AvailableSortOptions = _cache.Get($"pres:productlistsortoptions-{languageId}", () =>
                 Enum.GetValues(typeof(ProductSortingEnum))
                     .Cast<ProductSortingEnum>()
                     .Where(x => x != ProductSortingEnum.CreatedOnAsc && x != ProductSortingEnum.Initial)
@@ -108,7 +108,7 @@ public partial class CatalogHelper
         else if (viewMode == ProductSummaryViewMode.List)
         {
             settings.MapShortDescription = true;
-            settings.MapLegalInfo = _taxSettings.ShowLegalHintsInProductList;
+            settings.MapLegalInfo = _catalogSettings.LegalInfoInLists != ProductLegalInfo.None;
             settings.MapManufacturers = true;
             settings.MapColorAttributes = _catalogSettings.ShowColorSquaresInLists;
             settings.MapAttributes = _catalogSettings.ShowProductOptionsInLists;
@@ -121,7 +121,7 @@ public partial class CatalogHelper
         {
             settings.MapShortDescription = _catalogSettings.IncludeShortDescriptionInCompareProducts;
             settings.MapFullDescription = _catalogSettings.IncludeFullDescriptionInCompareProducts;
-            settings.MapLegalInfo = _taxSettings.ShowLegalHintsInProductList;
+            settings.MapLegalInfo = _catalogSettings.LegalInfoInLists != ProductLegalInfo.None;
             settings.MapManufacturers = true;
             settings.MapAttributes = true;
             settings.MapSpecificationAttributes = true;
@@ -206,11 +206,11 @@ public partial class CatalogHelper
             var prefetchTranslations = settings.PrefetchTranslations == true || (settings.PrefetchTranslations == null && _performanceSettings.AlwaysPrefetchTranslations);
             prefetchTranslations = prefetchTranslations && _isMultiLanguageEnvironment;
             var prefetchSlugs = settings.PrefetchUrlSlugs == true || (settings.PrefetchUrlSlugs == null && _performanceSettings.AlwaysPrefetchUrlSlugs);
-            var allProductIds = prefetchSlugs || prefetchTranslations ? products.Select(x => x.Id).ToArray() : Array.Empty<int>();
-            
-            string taxInfo = T(calculationOptions.TaxInclusive ? "Tax.InclVAT" : "Tax.ExclVAT");
+            var allProductIds = prefetchSlugs || prefetchTranslations ? products.Select(x => x.Id).ToArray() : [];
             var legalInfo = string.Empty;
-            var taxExemptLegalInfo = string.Empty;
+            var shippingLegalInfo = string.Empty;
+            var freeShippingLegalInfo = string.Empty;
+            var taxExemptFreeShippingLegalInfo = string.Empty;
 
             var res = new Dictionary<string, LocalizedString>(StringComparer.OrdinalIgnoreCase)
             {
@@ -219,24 +219,39 @@ public partial class CatalogHelper
                 { "Products.DimensionsValue", T("Products.DimensionsValue") },
                 { "Common.AdditionalShippingSurcharge", T("Common.AdditionalShippingSurcharge") }
             };
-            
+
             if (settings.MapLegalInfo)
             {
-                var shippingInfoUrl = await _urlHelper.TopicAsync("ShippingInfo");
-                if (shippingInfoUrl.HasValue())
+                // Prepare legal info once per list. The product mapping only selects the suitable variant.
+                var taxLegalInfo = string.Empty;
+                if (_catalogSettings.LegalInfoInLists.HasFlag(ProductLegalInfo.Tax))
                 {
-                    legalInfo = T("Tax.LegalInfoShort", taxInfo, shippingInfoUrl);
-                    taxExemptLegalInfo = T("Tax.LegalInfoProductDetail", string.Empty, string.Empty, string.Empty, shippingInfoUrl);
+                    taxLegalInfo = T("Products.TaxLegalInfo", T(calculationOptions.TaxInclusive ? "Tax.InclVAT" : "Tax.ExclVAT"));
+                }
+
+                if (_catalogSettings.LegalInfoInLists.HasFlag(ProductLegalInfo.Shipping))
+                {
+                    var shippingInfoUrl = await _urlHelper.TopicAsync("ShippingInfo");
+                    shippingLegalInfo = shippingInfoUrl.HasValue()
+                        ? T("Products.ShippingInfoUrl", shippingInfoUrl)
+                        : T("Products.ShippingInfo");
+
+                    taxExemptFreeShippingLegalInfo = T("Common.FreeShipping");
+                    freeShippingLegalInfo = taxLegalInfo.HasValue()
+                        ? taxLegalInfo.Grow(T("Products.FreeShippingInfo"), ", ")
+                        : taxExemptFreeShippingLegalInfo;
                 }
                 else
                 {
-                    legalInfo = T("Tax.LegalInfoShort2", taxInfo);
+                    freeShippingLegalInfo = taxLegalInfo;
                 }
+
+                legalInfo = taxLegalInfo.Grow(shippingLegalInfo, ", ");
             }
 
             if (prefetchSlugs)
             {
-                await _urlService.PrefetchUrlRecordsAsync(nameof(Product), new[] { language.Id, 0 }, allProductIds);
+                await _urlService.PrefetchUrlRecordsAsync(nameof(Product), [language.Id, 0], allProductIds);
             }
 
             if (prefetchTranslations)
@@ -254,7 +269,7 @@ public partial class CatalogHelper
                 {
                     await batchContext.AppliedDiscounts.LoadAllAsync();
                 }
-                
+
                 await batchContext.TierPrices.LoadAllAsync();
             }
 
@@ -327,7 +342,9 @@ public partial class CatalogHelper
                 CachedBrandModels = cachedBrandModels,
                 PrimaryCurrency = _currencyService.PrimaryCurrency,
                 LegalInfo = legalInfo,
-                TaxExemptLegalInfo = taxExemptLegalInfo,
+                ShippingLegalInfo = shippingLegalInfo,
+                FreeShippingLegalInfo = freeShippingLegalInfo,
+                TaxExemptFreeShippingLegalInfo = taxExemptFreeShippingLegalInfo,
                 Model = model,
                 Resources = res,
                 MappingSettings = settings,
@@ -523,24 +540,25 @@ public partial class CatalogHelper
         item.TotalReviews = product.ApprovedTotalReviews;
         item.IsShippingEnabled = contextProduct.IsShippingEnabled;
 
-        if (!product.IsShippingEnabled || product.IsFreeShipping)
+        if (settings.MapLegalInfo)
         {
-            item.LegalInfo += product.IsTaxExempt
-                ? T("Common.FreeShipping")
-                : T("Tax.LegalInfoShort3", T(options.TaxInclusive ? "Tax.InclVAT" : "Tax.ExclVAT"), T("Common.FreeShipping"));
-        }
-        else
-        {
-            item.LegalInfo = product.IsTaxExempt ? ctx.TaxExemptLegalInfo : ctx.LegalInfo;
+            if (!product.IsShippingEnabled || product.IsFreeShipping)
+            {
+                item.LegalInfo = product.IsTaxExempt ? ctx.TaxExemptFreeShippingLegalInfo : ctx.FreeShippingLegalInfo;
+            }
+            else
+            {
+                item.LegalInfo = product.IsTaxExempt ? ctx.ShippingLegalInfo : ctx.LegalInfo;
+            }
         }
 
-        // INFO: we cannot include ManageInventoryMethod.ManageStockByAttributes here because it's only functional with MergeWithCombination.
+        // INFO: We cannot include ManageInventoryMethod.ManageStockByAttributes here because it's only functional with MergeWithCombination.
         item.DeliveryTime = await PrepareDeliveryTimeModel(product, settings, product.ManageInventoryMethod == ManageInventoryMethod.ManageStock);
 
         if (model.ShowWeight && contextProduct.Weight > 0)
         {
             var measureWeightName = (await GetMeasureWeightAsync(_measureSettings.BaseWeightId))?.GetLocalized(x => x.Name) ?? string.Empty;
-            item.Weight = $"{contextProduct.Weight:G29} {measureWeightName}";
+            item.Weight = new Measure(contextProduct.Weight, measureWeightName);
         }
 
         // "New" badge.

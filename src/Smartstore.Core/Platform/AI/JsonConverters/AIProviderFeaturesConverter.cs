@@ -1,8 +1,8 @@
 ﻿using Smartstore.Json.Converters;
 
-namespace Smartstore.Core.AI;
+namespace Smartstore.Core.AI.JsonConverters;
 
-internal sealed class AIProviderFeaturesConverter : ArrayEnumFlagConverter<AIProviderFeatures>
+public sealed class AIProviderFeaturesConverter : ArrayEnumFlagConverter<AIProviderFeatures>
 {
     protected override IReadOnlyDictionary<string, AIProviderFeatures> GetMapping()
     {

@@ -1,0 +1,101 @@
+﻿@using Smartstore.Core.Catalog.Attributes
+
+@model ChoiceModel
+
+@{
+    var controlId = Model.BuildControlId();
+    var items = Model.Values ?? new List<ChoiceItemModel>();
+    var srLabelTemplate = T("Aria.Label.Choice");
+    var canUseCardLayout = Model.CanUseCardLayout;
+
+    var useCardLayout = Model.UseCardLayout;
+    var sizeClass = Model.SwatchSize.ToCssToken();
+    var shapeClass = Model.EffectiveSwatchShape.ToCssToken();
+    var showFinalPrice = Model.SwatchPriceDisplay == SwatchPriceDisplayMode.FinalPrice;
+
+    var groupClass = $"swatch-group swatch-group-{sizeClass} swatch-shape-{shapeClass}";
+    if (canUseCardLayout)
+    {
+        groupClass += " swatch-group-fixed";
+    }
+    if (useCardLayout)
+    {
+        groupClass += " swatch-group-cards scroll-fade scroll-fade-x scroll-fade-md-none scroll-fade-touch scroll-fade-bleed";
+    }
+}
+
+<div class="swatches" 
+     id="swatches-@Model.Id" 
+     role="radiogroup"      
+     data-manualselect="true"
+     data-swatch-size="@sizeClass"
+     data-swatch-shape="@shapeClass"
+     data-media-card="@useCardLayout.ToString().ToLowerInvariant()"
+     aria-orientation="horizontal"  
+     attr-aria-required='(Model.IsRequired, "true")'>
+    <ul class="@groupClass"
+        style="--swatch-aspect-ratio: @Model.EffectiveSwatchAspectRatio.ToStringInvariant(); --swatch-multicolor-angle: @(Model.MulticolorGradientAngle.ToStringInvariant())deg">
+        @foreach (var item in items)
+        {
+            var css = item.GetSwatchStyle();
+            var hasColor = item.HasColor;
+            var hasImage = item.HasImage;
+            var isDark = hasColor && ImagingHelper.GetPerceivedBrightness(item.Color) < 200;
+            var swatchPrice = item.GetSwatchPriceText(Model.SwatchPriceDisplay);
+            var label = useCardLayout
+                ? item.GetSwatchCardLabel(Model.SwatchPriceDisplay)
+                : item.GetAccessibleLabel();
+            var dynamicLabel = useCardLayout
+                ? item.GetSwatchDisplayName()
+                : item.GetAccessibleLabel();
+
+            var swatchClass = "swatch"
+                + (item.IsPreSelected ? " selected" : null)
+                + (isDark ? " dark" : null)
+                + (item.IsDisabled ? " disabled" : item.IsUnavailable ? " unavailable" : null);
+            var elementClass = "swatch-element"
+                + (useCardLayout ? " swatch-card" : hasImage ? " swatch-image" : hasColor ? " swatch-color" : " swatch-text");
+
+            <li class="@swatchClass" data-swatch-value="@dynamicLabel">
+                <input type="radio"
+                       class="swatch-input"
+                       id="@(controlId)_@(item.Id)"
+                       name="@(controlId)"
+                       value="@item.Id"
+                       aria-label="@srLabelTemplate.Value.FormatInvariant(Model.Name, label)"
+                       attr-checked='(item.IsPreSelected, "checked")'
+                       attr-disabled='(item.IsDisabled, "disabled")' />
+
+                <label class="swatch-label" for="@(controlId)_@(item.Id)">
+                    <span class="swatch-content">
+                        @if (useCardLayout)
+                        {
+                            var basePriceInfo = showFinalPrice && item.SwatchBasePriceInfo.HasValue()
+                                ? LocalizedValue.FixBrackets(item.SwatchBasePriceInfo, WorkContext.WorkingLanguage)
+                                : null;
+                            <span class="@elementClass">
+                                <span class="swatch-media swatch-visual@(hasImage ? " swatch-image" : " swatch-color")" attr-style="(css.HasValue(), css)"></span>
+                                <span class="swatch-details">
+                                    <span class="swatch-value">@item.SwatchValueText</span>
+                                    <span sm-if="swatchPrice.HasValue()" class="swatch-price">@swatchPrice</span>
+                                    <del sm-if="showFinalPrice && item.SwatchComparePrice.HasValue"
+                                         class="swatch-compare-price">@item.SwatchComparePrice</del>
+                                    <span sm-if="basePriceInfo != null"
+                                          title="@basePriceInfo"
+                                          class="swatch-base-price text-muted">@Html.Raw(basePriceInfo)</span>
+                                    <span sm-if="item.UnavailableReason.HasValue()" class="swatch-status">@item.UnavailableReason</span>
+                                </span>
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="@elementClass swatch-visual" attr-style="(css.HasValue(), css)">
+                                <span sm-if="!css.HasValue()" class="swatch-value">@item.Name</span>
+                            </span>
+                        }
+                    </span>
+                </label>
+            </li>
+        }
+    </ul>
+</div>

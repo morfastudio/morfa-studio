@@ -10,7 +10,9 @@
         // RangeSlider
         "range": function (el) { $(el).rangeSlider() },
         // ColorBox
-        "color": function (el) { $(el).colorpickerWrapper() },
+        "color": function (el) { $(el).colorpicker() },
+        // ColorPalette
+        "color-palette": function (el) { $(el).colorPalette() },
         // Select2: AccessPermissions, CustomerRoles, DeliveryTimes, Discounts, Stores
         "select": function (el) {
             if ($.fn.select2 === undefined || $.fn.selectWrapper === undefined)
@@ -22,13 +24,18 @@
         },
         // Datetime & Time
         "date-time": function (el) {
-            var $el = $(el);
-            $el.parent().datetimepicker({
+            const group = el.parentElement;
+            if (Smartstore.DateTimePicker.getInstance(group)) return;
+            const $el = $(el);
+            const picker = new Smartstore.DateTimePicker(group, {
                 format: $el.data("format"),
-                useCurrent: $el.data("use-current"),
+                useCurrent: $el.data("use-current") ?? true,
                 locale: moment.locale(),
                 keepOpen: false
             });
+            group.addEventListener('smartdatetimepicker:change', event => {
+                $(group).trigger({ type: 'change.datetimepicker', ...event.detail });
+            }, { signal: picker.events.signal });
         },
         // Html
         "html": function (el) {
@@ -43,58 +50,67 @@
     };
     editorMap["time"] = editorMap["date-time"];
 
-    // Replace datetimepicker internal _place() method with our own, because the original is really badly fucked up!
-    // TODO: (core) Move $.fn.datetimepicker.Constructor.prototype._place() to applicable place when bundling is available.
-    $.fn.datetimepicker.Constructor.prototype._place = function (e) {
-        const self = e?.data?.picker || this,
-            parent = document.body,
-            component = (self.component?.length ? self.component : self._element).get(0),
-            position = component.getBoundingClientRect(),
-            widget = self.widget[0],
-            scrollTop = document.documentElement.scrollTop;
-        let vpos = "bottom",
-            hpos = "right";
+    $.fn.colorPalette = function () {
+        return this.each(function () {
+            const $editor = $(this);
 
-        parent.append(widget);
+            if ($editor.data("colorPalette")) {
+                return;
+            }
 
-        const widgetWidth = widget.offsetWidth;
-        const widgetHeight = widget.offsetHeight;
+            const maxColors = Math.max(1, parseInt($editor.data("max-colors")) || 1);
+            const additionalName = $editor.data("additional-name");
+            const $addContainer = $editor.children(".color-palette-add-container");
+            const $addButton = $addContainer.children(".color-palette-add");
+            const template = $editor.children(".color-palette-template").html();
 
-        if (position.bottom + widgetHeight > window.innerHeight && position.top - widgetHeight > -2) {
-            vpos = "top";
-        }
+            function updateInputTitle(input) {
+                input.title = input.value;
+            }
 
-        if (position.right - widgetWidth < 0) {
-            hpos = "left";
-        }
+            function update() {
+                const $items = $editor.children(".color-palette-item");
+                const $inputs = $editor.find('.colorpicker-component > input');
 
-        if (vpos === "top") {
-            widget.classList.add("top");
-            widget.classList.remove("bottom");
-        }
-        else {
-            widget.classList.add("bottom");
-            widget.classList.remove("top");
-        }
+                $items.each((index, item) => {
+                    const $input = $(item).find("input").first();
+                    $input.attr("name", `${additionalName}[${index}]`);
+                    $input.attr("id", `${$editor.attr("id")}_AdditionalColors_${index}_`);
+                });
 
-        if (hpos === "left") {
-            widget.classList.add("float-left");
-            widget.classList.remove("float-right");
-        }
-        else {
-            widget.classList.add("float-right");
-            widget.classList.remove("float-left");
-        }
+                // Avoid having the color value appear cut off.
+                $inputs.addClass("p-2");
+                $inputs.each((_, input) => updateInputTitle(input));
+                $addContainer.toggleClass("d-none", $items.length >= maxColors - 1);
+            }
 
-        // Default pos --> right/bottom
-        var pos = {
-            top: (vpos === "top" ? Math.max(0, scrollTop + position.top - widgetHeight - 8) : (scrollTop + position.bottom)) + "px",
-            left: (hpos == "left" ? position.left : position.left + (position.width - widgetWidth)) + "px",
-            bottom: "auto",
-            right: "auto"
-        };
+            $addButton.on("click", () => {
+                const index = $editor.children(".color-palette-item").length;
+                if (index >= maxColors - 1) {
+                    return;
+                }
 
-        $.extend(widget.style, pos);
+                const $item = $(template.replace(/__index__/g, index));
+                $addContainer.before($item);
+                initializeEditControls($item);
+                update();
+                $item.find("input").trigger("focus");
+            });
+
+            $editor.on("click", ".color-palette-remove", (e) => {
+                const $item = $(e.currentTarget).closest(".color-palette-item");
+                const colorpicker = $item.find('[data-editor="color"]').data("colorpicker");
+
+                colorpicker?.destroy();
+                $item.remove();
+                update();
+            });
+
+            $editor.on("input change", '.colorpicker-component > input', (e) => updateInputTitle(e.currentTarget));
+
+            $editor.data("colorPalette", true);
+            update();
+        });
     };
 
     function initConfirmationDialogs(context) {
@@ -197,7 +213,13 @@
     }
 
     window.initializeEditControls = function (context) {
-        context = context?.length ? context.get(0) : context;
+        if (context instanceof jQuery) {
+            context = context[0];
+        }
+        else if (!(context instanceof HTMLElement)) {
+            context = null;
+        }
+
         var editControls = (context || document).getElementsByClassName("edit-control");
 
         Array.from(editControls).forEach(el => {

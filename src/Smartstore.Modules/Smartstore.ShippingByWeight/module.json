@@ -3,10 +3,11 @@
   "Author": "SmartStore AG",
   "Group": "Shipping",
   "SystemName": "Smartstore.ShippingByWeight",
+  "Icon": "hi:delivery-truck-01?color=#D84315",
   "FriendlyName": "Shipping by weight",
   "Description": "Provides shipping methods with computation based on weight.",
-  "Version": "6.3.0",
-  "MinAppVersion": "6.3.0",
+  "Version": "6.4.0",
+  "MinAppVersion": "6.4.0",
   "Order": 1,
   "ResourceRootKey": "Plugins.Shipping.ByWeight",
   "ProjectUrl": ""

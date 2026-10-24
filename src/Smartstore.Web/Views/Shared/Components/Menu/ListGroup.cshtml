@@ -35,22 +35,27 @@
         <a href="@itemUrl" attrs="attrs" role="menuitem">
             @if (hasIcons)
             {
-                <i class="fal fa-fw@(item.Icon.HasValue() ? item.Icon.EnsureStartsWith(" ") : " fas") list-group-item-icon" aria-hidden="true"></i>
+                <span class="list-group-item-icon" aria-hidden="true">
+                    @if (item.Icon.HasValue())
+                    {
+                        <icon name="@item.Icon" attr-class='@(item.IconClass.HasValue(), item.IconClass)' aria-hidden="true" />
+                    }
+                </span>
             }
             else if (hasImages && item.ImageUrl.HasValue())
             {
-                <img class="sm-icon" src="@Url.Content(item.ImageUrl)" alt="@itemText" aria-hidden="true" />
+                <img class="icon" src="@Url.Content(item.ImageUrl)" alt="@itemText" aria-hidden="true" />
             }
             else if (hasImages)
             {
-                <i class="fa-fw fas" aria-hidden="true"></i>
+                <span class="icon icon-fw" aria-hidden="true"></span>
             }
 
             <span sm-language-attributes-for="item">@itemText</span>
 
             @if (item.BadgeText.HasValue())
             {
-                <span class="badge badge-pill badge-counter badge-@(((BadgeStyle)item.BadgeStyle).ToString().ToLower()) ml-auto" attrs="item.BadgeHtmlAttributes">
+                <span class="badge-pill badge-counter @BadgeExpression.ToCssClasses(item.BadgeStyle) ml-auto" attrs="item.BadgeHtmlAttributes">
                     @Html.Raw(item.BadgeText)
                 </span>
             }

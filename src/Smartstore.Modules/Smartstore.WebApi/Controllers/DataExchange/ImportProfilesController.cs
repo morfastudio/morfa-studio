@@ -175,6 +175,8 @@ public class ImportProfilesController : WebApiController<ImportProfile>
 
     private static async Task CopyFiles(IFormFileCollection files, IDirectory targetDir)
     {
+        var targetBaseDir = targetDir.PhysicalPath;
+
         foreach (var file in files)
         {
             var fileName = PathUtility.SanitizeFileName(file.FileName);
@@ -198,6 +200,14 @@ public class ImportProfilesController : WebApiController<ImportProfile>
                     else
                     {
                         // Entry is a file.
+                        if (!PathUtility.PathIsWithinDirectory(Path.Combine(targetBaseDir, entry.FullName), targetBaseDir, out _))
+                        {
+                            // INFO: Malicious entry detected. Ignore entry and skip extraction.
+                            // entry.FullName may look like "../../somefile.txt"
+                            // that would cause the file to be extracted outside of the target directory.
+                            continue;
+                        }
+
                         var targetFile = await targetDir.GetFileAsync(entry.FullName);
                         using var targetStream = await targetFile.OpenWriteAsync();
 

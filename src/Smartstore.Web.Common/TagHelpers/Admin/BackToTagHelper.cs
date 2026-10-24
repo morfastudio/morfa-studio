@@ -1,37 +1,38 @@
 ﻿using Microsoft.AspNetCore.Razor.TagHelpers;
-using Smartstore.Core.Localization;
+using Smartstore.IconKit;
 
-namespace Smartstore.Web.TagHelpers.Admin
+using Smartstore.Web.Rendering;
+
+namespace Smartstore.Web.TagHelpers.Admin;
+
+[HtmlTargetElement("a", Attributes = BackToAttributeName)]
+public class BackToTagHelper : SmartTagHelper
 {
-    [HtmlTargetElement("a", Attributes = BackToAttributeName)]
-    public class BackToTagHelper(Localizer localizer) : TagHelper
+    protected override string GenerateTagId(TagHelperContext context) => null;
+
+    const string BackToAttributeName = "sm-backto";
+
+    /// <summary>
+    /// Renders the link as a regular button with a left arrow icon.
+    /// </summary>
+    [HtmlAttributeName(BackToAttributeName)]
+    public bool IsBackButton { get; set; }
+
+    protected override async Task ProcessCoreAsync(TagHelperContext context, TagHelperOutput output)
     {
-        const string BackToAttributeName = "sm-backto";
-
-        private Localizer T { get; } = localizer;
-
-        /// <summary>
-        /// Renders the link as a regular button with a left arrow icon.
-        /// </summary>
-        [HtmlAttributeName(BackToAttributeName)]
-        public bool IsBackButton { get; set; }
-
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        if (!IsBackButton)
         {
-            if (!IsBackButton)
-            {
-                return;
-            }
-            
-            output.AppendCssClass("btn btn-outline-secondary btn-sm btn-icon");
-
-            if (!output.Attributes.ContainsName("title"))
-            {
-                output.Attributes.SetAttribute("title", T("Admin.Common.BackToList"));
-            }
-
-            output.Content.Clear();
-            output.Content.SetHtmlContent("<i class=\"fa fa-arrow-left\"></i>");
+            return;
         }
+
+        output.AppendCssClass("btn btn-outline-secondary btn-sm btn-icon");
+
+        if (!output.Attributes.ContainsName("title"))
+        {
+            output.Attributes.SetAttribute("title", T("Admin.Common.BackToList"));
+        }
+
+        var icon = await HtmlHelper.IconAsync("arrow-left?size=lg");
+        output.Content.SetHtmlContent(icon);
     }
 }

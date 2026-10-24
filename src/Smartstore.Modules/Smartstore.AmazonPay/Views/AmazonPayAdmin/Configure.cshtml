@@ -20,23 +20,21 @@
 }
 
 <widget target-zone="admin_button_toolbar_before">
-    <button id="SaveConfigButton" type="submit" name="save" class="btn btn-warning" value="save">
-        <i class="fa fa-check"></i>
+    <button id="SaveConfigButton" type="submit" name="save" class="btn btn-primary" value="save">
+        <icon name="check"  />
         <span>@T("Admin.Common.Save")</span>
     </button>
 </widget>
 
-<div class="plugin-configuration">
-    <div>
-        <div class="alert alert-info alert-dismissible">
+<div class="alert alert-info alert-dismissible">
+    <button type="button" class="btn-close" data-dismiss="alert"></button>
+    <a class="d-inline-block mb-3 mw-100" style="max-width: 268px" href="https://sellercentral-europe.amazon.com" target="_blank">
+        <img class="img-fluid alert-branding" src="@Url.Content("~/Modules/Smartstore.AmazonPay/branding.png")" alt="Amazon Pay" />
+    </a>
+    <div class="text-expander" data-max-height="160">
+        <div class="text-expander-content">
             @Html.Raw(T("Plugins.Payments.AmazonPay.AdminInstruction"))
-            <button type="button" class="btn-close" data-dismiss="alert"></button>
         </div>
-    </div>
-    <div>
-        <a href="https://sellercentral-europe.amazon.com" target="_blank">
-            <img src="@Url.Content("~/Modules/Smartstore.AmazonPay/branding.png")" alt="Amazon Pay" />
-        </a>
     </div>
 </div>
 
@@ -55,11 +53,11 @@
             <div class="adminTitle">&nbsp;</div>
             <div class="adminData">
                 <a href="javascript:;" class="btn btn-primary register-now">
-                    <i class="fa fa-right-to-bracket"></i>
+                    <icon name="login"  />
                     <span>@T("Plugins.Payments.AmazonPay.RegisterNow")</span>
                 </a>
                 <button type="button" class="btn btn-secondary paste-access-data">
-                    <i class="far fa-clipboard"></i>
+                    <icon name="clipboard"  />
                     <span>@T("Plugins.Payments.AmazonPay.PasteAccessData")</span>
                 </button>
             </div>
@@ -103,7 +101,7 @@
                     {
                         <span>*****************</span>
                         <button id="remove-private-key" type="button" class="btn btn-secondary btn-to-danger btn-sm ml-3" data-url="@Url.Action("RemovePrivateKey")">
-                            <i class="far fa-trash-can"></i>
+                            <icon name="trash" />
                             <span>@T("Admin.Common.Delete")</span>
                         </button>
                     }

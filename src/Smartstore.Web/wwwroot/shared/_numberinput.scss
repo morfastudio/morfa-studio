@@ -86,9 +86,10 @@
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
-    z-index: 10;
-    background-color: $input-bg;
-    color: $gray-600;
+    z-index: 6;
+    background-color: transparent;
+    color: inherit;
+    opacity: 0.5;
     font-size: var(--ni-font-size);
     line-height: var(--ni-line-height);
     cursor: default;
@@ -107,7 +108,7 @@
 
 .numberinput-stepper {
     position: absolute;
-    z-index: 15;
+    z-index: 7;
     text-decoration: none !important;
     display: inline-flex;
     align-items: center;
@@ -129,7 +130,7 @@
     &:after {
         // Mimic input group addon
         position: absolute;
-        z-index: 10;
+        z-index: 5;
         content: ' ';
         display: block;
         background: $input-group-addon-bg;
@@ -141,7 +142,9 @@
         width: var(--ni-addon-width);
         border-start-end-radius: var(--ni-border-radius);
         border-end-end-radius: var(--ni-border-radius);
-        box-shadow: if($enable-shadows, $btn-box-shadow, null);
+        @if $enable-shadows {
+            box-shadow: $btn-box-shadow;
+        }
     }
 
     > .numberinput-formatted {
@@ -165,8 +168,8 @@
         height: calc(50% - 1px);
         color: inherit;
 
-        > i {
-            font-size: 10px;
+        > .icon {
+            font-size: 1rem;
         }
 
         &.numberinput-up {
@@ -240,7 +243,7 @@
         padding-bottom: 0.15rem;
         justify-content: center;
         align-items: center;
-        background-color: transparent;
+        background-color: transparent !important;
     }
 
     &.input-group-lg > .numberinput-postfix {
@@ -276,6 +279,11 @@
             opacity: 1;
         }
     }
+}
+
+.numberinput-group.input-group-sm > .numberinput-stepper > .icon,
+.numberinput.form-control-sm ~ .numberinput-stepper > .icon {
+    font-size: 14px;
 }
 
 // Text prepend
