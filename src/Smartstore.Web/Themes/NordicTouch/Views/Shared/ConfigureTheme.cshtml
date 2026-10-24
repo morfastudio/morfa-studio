@@ -12,85 +12,85 @@
     <tab sm-title="@T("Common.General")" sm-selected="true">
         <div class="adminContent">
             @{
-                ThemeVarEditor("gray-100", "Grayscale");
-                ThemeVarEditor("gray-200");
-                ThemeVarEditor("gray-300");
-                ThemeVarEditor("gray-400");
-                ThemeVarEditor("gray-500");
-                ThemeVarEditor("gray-600");
-                ThemeVarEditor("gray-700");
-                ThemeVarEditor("gray-800");
-                ThemeVarEditor("gray-900");
-                ThemeVarEditor("white-200");
+                await ThemeVarEditorAsync("gray-100", "Grayscale");
+                await ThemeVarEditorAsync("gray-200");
+                await ThemeVarEditorAsync("gray-300");
+                await ThemeVarEditorAsync("gray-400");
+                await ThemeVarEditorAsync("gray-500");
+                await ThemeVarEditorAsync("gray-600");
+                await ThemeVarEditorAsync("gray-700");
+                await ThemeVarEditorAsync("gray-800");
+                await ThemeVarEditorAsync("gray-900");
+                await ThemeVarEditorAsync("white-200");
 
-                ThemeVarEditor("red", "Colors");
-                ThemeVarEditor("orange");
-                ThemeVarEditor("yellow");
-                ThemeVarEditor("green");
-                ThemeVarEditor("blue");
-                ThemeVarEditor("bluegrey");
-                ThemeVarEditor("indigo");
-                ThemeVarEditor("teal");
-                ThemeVarEditor("cyan");
-                ThemeVarEditor("pink");
-                ThemeVarEditor("purple");
+                await ThemeVarEditorAsync("red", "Colors");
+                await ThemeVarEditorAsync("orange");
+                await ThemeVarEditorAsync("yellow");
+                await ThemeVarEditorAsync("green");
+                await ThemeVarEditorAsync("blue");
+                await ThemeVarEditorAsync("bluegrey");
+                await ThemeVarEditorAsync("indigo");
+                await ThemeVarEditorAsync("teal");
+                await ThemeVarEditorAsync("cyan");
+                await ThemeVarEditorAsync("pink");
+                await ThemeVarEditorAsync("purple");
 
-                ThemeVarEditor("primary", "Brand Colors");
-                ThemeVarEditor("secondary");
-                ThemeVarEditor("warning");
-                ThemeVarEditor("danger");
-                ThemeVarEditor("info");
-                ThemeVarEditor("success");
-                ThemeVarEditor("light");
-                ThemeVarEditor("dark");
+                await ThemeVarEditorAsync("primary", "Brand Colors");
+                await ThemeVarEditorAsync("secondary");
+                await ThemeVarEditorAsync("warning");
+                await ThemeVarEditorAsync("danger");
+                await ThemeVarEditorAsync("info");
+                await ThemeVarEditorAsync("success");
+                await ThemeVarEditorAsync("light");
+                await ThemeVarEditorAsync("dark");
 
-                ThemeVarEditor("boxed", "Layout", T("Admin.ThemeVar.Boxed"));
+                await ThemeVarEditorAsync("boxed", "Layout", T("Admin.ThemeVar.Boxed"));
 
-                ThemeVarEditor("temp-topic", "Site Colors");
-                ThemeVarEditor("body-color");
-                ThemeVarEditor("yiq-text-dark");
-                ThemeVarEditor("yiq-text-light");
-                ThemeVarEditor("body-secondary-color");
-                ThemeVarEditor("body-tertiary-color");
-                ThemeVarEditor("link-color");
-                ThemeVarEditor("btn-secondary-bg", "");
+                await ThemeVarEditorAsync("temp-topic", "Site Colors");
+                await ThemeVarEditorAsync("body-color");
+                await ThemeVarEditorAsync("yiq-text-dark");
+                await ThemeVarEditorAsync("yiq-text-light");
+                await ThemeVarEditorAsync("body-secondary-color");
+                await ThemeVarEditorAsync("body-tertiary-color");
+                await ThemeVarEditorAsync("link-color");
+                await ThemeVarEditorAsync("btn-secondary-bg", "");
 
-                ThemeVarEditor("border-radius", "Borders");
-                ThemeVarEditor("border-radius-sm");
-                ThemeVarEditor("border-radius-lg");
-                ThemeVarEditor("border-radius-xl");
-                ThemeVarEditor("border-radius-xxl");
+                await ThemeVarEditorAsync("border-radius", "Borders");
+                await ThemeVarEditorAsync("border-radius-sm");
+                await ThemeVarEditorAsync("border-radius-lg");
+                await ThemeVarEditorAsync("border-radius-xl");
+                await ThemeVarEditorAsync("border-radius-xxl");
             }
         </div>
     </tab>
     <tab sm-title="@T("Admin.Themes.Fonts")">
         <div class="adminContent">
             @{
-                ThemeVarEditor("font-family-sans-serif", "Typo");
-                ThemeVarEditor("font-family-monospace");
-                ThemeVarEditor("font-size-base");
-                ThemeVarEditor("font-size-lg");
-                ThemeVarEditor("font-size-sm");
-                ThemeVarEditor("font-size-xs");
-                ThemeVarEditor("font-weight-light");
-                ThemeVarEditor("font-weight-normal");
-                ThemeVarEditor("font-weight-medium");
-                ThemeVarEditor("font-weight-bold");
+                await ThemeVarEditorAsync("font-family-sans-serif", "Typo");
+                await ThemeVarEditorAsync("font-family-monospace");
+                await ThemeVarEditorAsync("font-size-base");
+                await ThemeVarEditorAsync("font-size-lg");
+                await ThemeVarEditorAsync("font-size-sm");
+                await ThemeVarEditorAsync("font-size-xs");
+                await ThemeVarEditorAsync("font-weight-light");
+                await ThemeVarEditorAsync("font-weight-normal");
+                await ThemeVarEditorAsync("font-weight-medium");
+                await ThemeVarEditorAsync("font-weight-bold");
 
-                ThemeVarEditor("headings-font-family", "Headings");
-                ThemeVarEditor("headings-font-weight");
-                ThemeVarEditor("headings-line-height");
-                ThemeVarEditor("headings-color");
-                ThemeVarEditor("lead-font-weight");
-                ThemeVarEditor("prose-headings-lg-font-weight");
-                ThemeVarEditor("prose-headings-sm-font-weight");
+                await ThemeVarEditorAsync("headings-font-family", "Headings");
+                await ThemeVarEditorAsync("headings-font-weight");
+                await ThemeVarEditorAsync("headings-line-height");
+                await ThemeVarEditorAsync("headings-color");
+                await ThemeVarEditorAsync("lead-font-weight");
+                await ThemeVarEditorAsync("prose-headings-lg-font-weight");
+                await ThemeVarEditorAsync("prose-headings-sm-font-weight");
 
-                ThemeVarEditor("h1-font-size", "Heading Sizes");
-                ThemeVarEditor("h2-font-size");
-                ThemeVarEditor("h3-font-size");
-                ThemeVarEditor("h4-font-size");
-                ThemeVarEditor("h5-font-size");
-                ThemeVarEditor("h6-font-size");
+                await ThemeVarEditorAsync("h1-font-size", "Heading Sizes");
+                await ThemeVarEditorAsync("h2-font-size");
+                await ThemeVarEditorAsync("h3-font-size");
+                await ThemeVarEditorAsync("h4-font-size");
+                await ThemeVarEditorAsync("h5-font-size");
+                await ThemeVarEditorAsync("h6-font-size");
             }
 
             <div class="adminRow">
@@ -113,9 +113,9 @@
             </div>
 
             @{
-                ThemeVarEditor("google-font-1");
-                ThemeVarEditor("google-font-2");
-                ThemeVarEditor("google-font-3");
+                await ThemeVarEditorAsync("google-font-1");
+                await ThemeVarEditorAsync("google-font-2");
+                await ThemeVarEditorAsync("google-font-3");
             }
         </div>
     </tab>
@@ -123,210 +123,210 @@
         <div class="adminContent">
             @{
 
-                ThemeVarEditor("inverse-menubar", "");
-                ThemeVarEditor("menubar-bg");
-                ThemeVarEditor("menubar-color");
-                ThemeVarEditor("menubar-inverse-color");
+                await ThemeVarEditorAsync("inverse-menubar", "");
+                await ThemeVarEditorAsync("menubar-bg");
+                await ThemeVarEditorAsync("menubar-color");
+                await ThemeVarEditorAsync("menubar-inverse-color");
 
-                ThemeVarEditor("inverse-shopbar", "");
-                ThemeVarEditor("shopbar-bg");
-                ThemeVarEditor("shopbar-color");
-                ThemeVarEditor("shopbar-inverse-color");
+                await ThemeVarEditorAsync("inverse-shopbar", "");
+                await ThemeVarEditorAsync("shopbar-bg");
+                await ThemeVarEditorAsync("shopbar-color");
+                await ThemeVarEditorAsync("shopbar-inverse-color");
 
-                ThemeVarEditor("inverse-navbar", "");
-                ThemeVarEditor("megamenu-bg");
-                ThemeVarEditor("megamenu-color");
-                ThemeVarEditor("megamenu-inverse-color");
-                ThemeVarEditor("megamenu-line-height");
+                await ThemeVarEditorAsync("inverse-navbar", "");
+                await ThemeVarEditorAsync("megamenu-bg");
+                await ThemeVarEditorAsync("megamenu-color");
+                await ThemeVarEditorAsync("megamenu-inverse-color");
+                await ThemeVarEditorAsync("megamenu-line-height");
 
-                ThemeVarEditor("megamenu-dropdown-bg");
-                ThemeVarEditor("megamenu-heading-color");
-                ThemeVarEditor("megamenu-subitem-color");
-                ThemeVarEditor("megamenu-text-color");
-                ThemeVarEditor("megamenu-rotator-bg");
+                await ThemeVarEditorAsync("megamenu-dropdown-bg");
+                await ThemeVarEditorAsync("megamenu-heading-color");
+                await ThemeVarEditorAsync("megamenu-subitem-color");
+                await ThemeVarEditorAsync("megamenu-text-color");
+                await ThemeVarEditorAsync("megamenu-rotator-bg");
 
-                ThemeVarEditor("searchbox-pill", "Searchbox");
-                ThemeVarEditor("searchbox-shadow");
-                ThemeVarEditor("searchbox-bg-1");
-                ThemeVarEditor("searchbox-bg-2");
-                ThemeVarEditor("searchbox-bg-mobile");
-                ThemeVarEditor("searchbox-color-1");
-                ThemeVarEditor("searchbox-color-2");
-                ThemeVarEditor("searchbox-border-1");
-                ThemeVarEditor("searchbox-border-2");
-                ThemeVarEditor("searchbox-outline-width");
-                ThemeVarEditor("searchbox-outline-color");
-                ThemeVarEditor("searchbox-border-mobile");
-                ThemeVarEditor("searchbox-hit-tag-color");
+                await ThemeVarEditorAsync("searchbox-pill", "Searchbox");
+                await ThemeVarEditorAsync("searchbox-shadow");
+                await ThemeVarEditorAsync("searchbox-bg-1");
+                await ThemeVarEditorAsync("searchbox-bg-2");
+                await ThemeVarEditorAsync("searchbox-bg-mobile");
+                await ThemeVarEditorAsync("searchbox-color-1");
+                await ThemeVarEditorAsync("searchbox-color-2");
+                await ThemeVarEditorAsync("searchbox-border-1");
+                await ThemeVarEditorAsync("searchbox-border-2");
+                await ThemeVarEditorAsync("searchbox-outline-width");
+                await ThemeVarEditorAsync("searchbox-outline-color");
+                await ThemeVarEditorAsync("searchbox-border-mobile");
+                await ThemeVarEditorAsync("searchbox-hit-tag-color");
             }
         </div>
     </tab>
     <tab sm-title="@T("Admin.Themes.Components")">
         <div class="adminContent">
             @{
-                ThemeVarEditor("card-border-radius", "Cards");
-                ThemeVarEditor("card-border-color");
-                ThemeVarEditor("card-cap-bg");
-                ThemeVarEditor("card-bg");
+                await ThemeVarEditorAsync("card-border-radius", "Cards");
+                await ThemeVarEditorAsync("card-border-color");
+                await ThemeVarEditorAsync("card-cap-bg");
+                await ThemeVarEditorAsync("card-bg");
 
-                ThemeVarEditor("dropdown-bg", "Dropdowns");
-                ThemeVarEditor("dropdown-color");
-                ThemeVarEditor("dropdown-border-color");
-                ThemeVarEditor("dropdown-border-radius");
-                ThemeVarEditor("dropdown-divider-bg");
-                ThemeVarEditor("dropdown-box-shadow");
-                ThemeVarEditor("dropdown-link-color");
-                ThemeVarEditor("dropdown-link-hover-color");
-                ThemeVarEditor("dropdown-link-hover-bg");
+                await ThemeVarEditorAsync("dropdown-bg", "Dropdowns");
+                await ThemeVarEditorAsync("dropdown-color");
+                await ThemeVarEditorAsync("dropdown-border-color");
+                await ThemeVarEditorAsync("dropdown-border-radius");
+                await ThemeVarEditorAsync("dropdown-divider-bg");
+                await ThemeVarEditorAsync("dropdown-box-shadow");
+                await ThemeVarEditorAsync("dropdown-link-color");
+                await ThemeVarEditorAsync("dropdown-link-hover-color");
+                await ThemeVarEditorAsync("dropdown-link-hover-bg");
 
-                ThemeVarEditor("table-bg", "Tables");
-                ThemeVarEditor("table-accent-bg");
-                ThemeVarEditor("table-hover-bg");
-                ThemeVarEditor("table-active-bg");
-                ThemeVarEditor("table-border-color");
+                await ThemeVarEditorAsync("table-bg", "Tables");
+                await ThemeVarEditorAsync("table-accent-bg");
+                await ThemeVarEditorAsync("table-hover-bg");
+                await ThemeVarEditorAsync("table-active-bg");
+                await ThemeVarEditorAsync("table-border-color");
             }
         </div>
     </tab>
     <tab sm-title="@T("Admin.Themes.Manage")">
         <div class="adminContent">
             @{
-                ThemeVarEditor("body-bg", "Site Geneli", "Sitenin genel arka plan rengi");
-                ThemeVarEditor("site-bg", null, "Ekran aşağıdan ve yukarıdan çekildiğinde arka planda görünen renk");
+                await ThemeVarEditorAsync("body-bg", "Site Geneli", "Sitenin genel arka plan rengi");
+                await ThemeVarEditorAsync("site-bg", null, "Ekran aşağıdan ve yukarıdan çekildiğinde arka planda görünen renk");
 
-                ThemeVarEditor("nt-promo-bar-bg", "Üst Duyuru Çubuğu", "Duyuru çubuğu arka plan rengi");
-                ThemeVarEditor("nt-promo-bar-color", null, "Duyuru çubuğu yazı rengi");
-                ThemeVarEditor("nt-promo-bar-border-color", null, "Duyuru çubuğu alt çizgi rengi");
+                await ThemeVarEditorAsync("nt-promo-bar-bg", "Üst Duyuru Çubuğu", "Duyuru çubuğu arka plan rengi");
+                await ThemeVarEditorAsync("nt-promo-bar-color", null, "Duyuru çubuğu yazı rengi");
+                await ThemeVarEditorAsync("nt-promo-bar-border-color", null, "Duyuru çubuğu alt çizgi rengi");
 
-                ThemeVarEditor("nt-category-card-bg", "Anasayfa - Kategori Kartları", "?? Kategori kartının arka plan rengi (Polaroid çerçeve)");
-                ThemeVarEditor("nt-category-frame-bg", null, "Kategori görsel çerçevesinin arka plan rengi");
-                ThemeVarEditor("nt-category-label-color", null, "Kategori etiket yazı rengi");
-                ThemeVarEditor("nt-category-label-bg", null, "Kategori etiket arka plan rengi");
+                await ThemeVarEditorAsync("nt-category-card-bg", "Anasayfa - Kategori Kartları", "?? Kategori kartının arka plan rengi (Polaroid çerçeve)");
+                await ThemeVarEditorAsync("nt-category-frame-bg", null, "Kategori görsel çerçevesinin arka plan rengi");
+                await ThemeVarEditorAsync("nt-category-label-color", null, "Kategori etiket yazı rengi");
+                await ThemeVarEditorAsync("nt-category-label-bg", null, "Kategori etiket arka plan rengi");
 
-                ThemeVarEditor("block-title-border-color", "Anasayfa - Blok & Ürün Listesi", "?? Bölüm başlığı alt çizgi rengi (ör. Son Eklenenler, Çok Satanlar)");
-                ThemeVarEditor("art-btn-secondary-color", null, "?? Ürün kartı ikincil buton yazı rengi");
-                ThemeVarEditor("art-show-all-bg", null, "\"Tümünü göster\" buton arka plan rengi");
-                ThemeVarEditor("art-active-bg-color", null, T("Admin.ThemeVar.ArtActiveBgColor"));
-                ThemeVarEditor("art-active-border-color", null, T("Admin.ThemeVar.ArtActiveBorderColor"));
+                await ThemeVarEditorAsync("block-title-border-color", "Anasayfa - Blok & Ürün Listesi", "?? Bölüm başlığı alt çizgi rengi (ör. Son Eklenenler, Çok Satanlar)");
+                await ThemeVarEditorAsync("art-btn-secondary-color", null, "?? Ürün kartı ikincil buton yazı rengi");
+                await ThemeVarEditorAsync("art-show-all-bg", null, "\"Tümünü göster\" buton arka plan rengi");
+                await ThemeVarEditorAsync("art-active-bg-color", null, T("Admin.ThemeVar.ArtActiveBgColor"));
+                await ThemeVarEditorAsync("art-active-border-color", null, T("Admin.ThemeVar.ArtActiveBorderColor"));
 
-                ThemeVarEditor("header-bg", "Header", "Header arka plan rengi");
+                await ThemeVarEditorAsync("header-bg", "Header", "Header arka plan rengi");
                 //ThemeVarEditor("header-color");
                 //ThemeVarEditor("shopbar-label");
                 //ThemeVarEditor("header-color-muted");
 
-                ThemeVarEditor("inverse-footer", "Footer", "Footerdaki renkler tersine çevrilsin mi? Açılırsa inverse olanlar kullanılıyor.");
-                ThemeVarEditor("footer-bg", null, "Footer arka planı");
-                ThemeVarEditor("footer-color", null, "Footerdaki başlıkların rengi");
-                ThemeVarEditor("footer-color-muted", null, "Footerdaki alt başlıkların rengi");
-                ThemeVarEditor("footer-inverse-color", null, "Footerdaki başlıkların rengi - inverse");
-                ThemeVarEditor("footer-inverse-color-muted", null, "Footerdaki alt başlıkların rengi - inverse");
-                ThemeVarEditor("footer-social-bg", null, "Footerdaki sosyal medya ikonlarının arka plan rengi, varsayılan olarak transparan");
+                await ThemeVarEditorAsync("inverse-footer", "Footer", "Footerdaki renkler tersine çevrilsin mi? Açılırsa inverse olanlar kullanılıyor.");
+                await ThemeVarEditorAsync("footer-bg", null, "Footer arka planı");
+                await ThemeVarEditorAsync("footer-color", null, "Footerdaki başlıkların rengi");
+                await ThemeVarEditorAsync("footer-color-muted", null, "Footerdaki alt başlıkların rengi");
+                await ThemeVarEditorAsync("footer-inverse-color", null, "Footerdaki başlıkların rengi - inverse");
+                await ThemeVarEditorAsync("footer-inverse-color-muted", null, "Footerdaki alt başlıkların rengi - inverse");
+                await ThemeVarEditorAsync("footer-social-bg", null, "Footerdaki sosyal medya ikonlarının arka plan rengi, varsayılan olarak transparan");
                 //ThemeVarEditor("footer-social-color");
 
-                ThemeVarEditor("product-detail-addtocart-box-bg", "Ürün Detay", "Fiyat kutusunun arka plan rengi");
-                ThemeVarEditor("product-price-color", null, "Fiyat rengi");
-                ThemeVarEditor("add-to-cart-btn-bg", null, "Sepete ekle butonunun arka plan rengi");
-                ThemeVarEditor("add-to-cart-btn-color", null, "Sepete ekle butonundaki yazı rengi");
-                ThemeVarEditor("product-stock-instock-color", null, "Stokta var rengi");
-                ThemeVarEditor("product-stock-outofstock-color", null, "Stokta yok rengi");
-                ThemeVarEditor("product-saving-percent-color", null, "İndirim yüzdesi rengi");
-                ThemeVarEditor("product-offer-countdown-color", null, "Sınırlı teklif geri sayım rengi");
-                ThemeVarEditor("product-action-icon-color", null, "İkincil aksiyon ikonları rengi (favoriler, karşılaştır vb.)");
-                ThemeVarEditor("product-action-border-color", null, "İkincil aksiyonlar arası ayraç rengi");
-                ThemeVarEditor("product-tierprices-bg", null, "Toplu fiyatlandırma tablosu arka planı");
-                ThemeVarEditor("product-assoc-header-bg", null, "Varyant / ilişkili ürün satır başlığı arka planı");
+                await ThemeVarEditorAsync("product-detail-addtocart-box-bg", "Ürün Detay", "Fiyat kutusunun arka plan rengi");
+                await ThemeVarEditorAsync("product-price-color", null, "Fiyat rengi");
+                await ThemeVarEditorAsync("add-to-cart-btn-bg", null, "Sepete ekle butonunun arka plan rengi");
+                await ThemeVarEditorAsync("add-to-cart-btn-color", null, "Sepete ekle butonundaki yazı rengi");
+                await ThemeVarEditorAsync("product-stock-instock-color", null, "Stokta var rengi");
+                await ThemeVarEditorAsync("product-stock-outofstock-color", null, "Stokta yok rengi");
+                await ThemeVarEditorAsync("product-saving-percent-color", null, "İndirim yüzdesi rengi");
+                await ThemeVarEditorAsync("product-offer-countdown-color", null, "Sınırlı teklif geri sayım rengi");
+                await ThemeVarEditorAsync("product-action-icon-color", null, "İkincil aksiyon ikonları rengi (favoriler, karşılaştır vb.)");
+                await ThemeVarEditorAsync("product-action-border-color", null, "İkincil aksiyonlar arası ayraç rengi");
+                await ThemeVarEditorAsync("product-tierprices-bg", null, "Toplu fiyatlandırma tablosu arka planı");
+                await ThemeVarEditorAsync("product-assoc-header-bg", null, "Varyant / ilişkili ürün satır başlığı arka planı");
 
-                ThemeVarEditor("offcanvas-cart-body", "Sepet", "Yandan açılan sepetin arka plan rengi");
-                ThemeVarEditor("offcanvas-cart-footer", null, "Yandan açılan sepetin footer arka plan rengi");
-                ThemeVarEditor("offcanvas-cart-footer-color", null, "Yandan açılan sepetin footer yazı rengi");
-                ThemeVarEditor("offcanvas-cart-item-border-color", null, "Yandan açılan sepetteki ürün ayraç rengi");
-                ThemeVarEditor("offcanvas-cart-empty-icon-color", null, "Boş sepet / favoriler ikon rengi");
-                ThemeVarEditor("offcanvas-cart-throbber-bg", null, "Yandan açılan sepet yükleniyor göstergesi arka planı");
-                ThemeVarEditor("cart-footer-bg", null, "Sepet sayfası özet kutusunun arka plan rengi");
-                ThemeVarEditor("cart-row-border-color", null, "Sepet sayfasındaki ürün satır ayraç rengi");
-                ThemeVarEditor("cart-footer-divider-color", null, "Sepet özet bölümündeki ayraç rengi");
+                await ThemeVarEditorAsync("offcanvas-cart-body", "Sepet", "Yandan açılan sepetin arka plan rengi");
+                await ThemeVarEditorAsync("offcanvas-cart-footer", null, "Yandan açılan sepetin footer arka plan rengi");
+                await ThemeVarEditorAsync("offcanvas-cart-footer-color", null, "Yandan açılan sepetin footer yazı rengi");
+                await ThemeVarEditorAsync("offcanvas-cart-item-border-color", null, "Yandan açılan sepetteki ürün ayraç rengi");
+                await ThemeVarEditorAsync("offcanvas-cart-empty-icon-color", null, "Boş sepet / favoriler ikon rengi");
+                await ThemeVarEditorAsync("offcanvas-cart-throbber-bg", null, "Yandan açılan sepet yükleniyor göstergesi arka planı");
+                await ThemeVarEditorAsync("cart-footer-bg", null, "Sepet sayfası özet kutusunun arka plan rengi");
+                await ThemeVarEditorAsync("cart-row-border-color", null, "Sepet sayfasındaki ürün satır ayraç rengi");
+                await ThemeVarEditorAsync("cart-footer-divider-color", null, "Sepet özet bölümündeki ayraç rengi");
 
-                ThemeVarEditor("costep-progress-color", "Checkout Adımları", "Tamamlanmış ve aktif adım ana rengi (daire kenarlık, bağlantı çizgisi)");
-                ThemeVarEditor("costep-border", null, "İnaktif adım çizgisi ve daire kenarlık rengi");
-                ThemeVarEditor("costep-bg", null, "İnaktif adım daire arka planı");
-                ThemeVarEditor("costep-color", null, "İnaktif adım ikon rengi");
-                ThemeVarEditor("costep-label-color", null, "Adım etiket yazı rengi");
-                ThemeVarEditor("costep-active-bg", null, "Aktif adım daire arka planı");
-                ThemeVarEditor("costep-active-color", null, "Aktif adım ikon rengi");
-                ThemeVarEditor("costep-visited-color", null, "Tamamlanmış adım ikon rengi");
+                await ThemeVarEditorAsync("costep-progress-color", "Checkout Adımları", "Tamamlanmış ve aktif adım ana rengi (daire kenarlık, bağlantı çizgisi)");
+                await ThemeVarEditorAsync("costep-border", null, "İnaktif adım çizgisi ve daire kenarlık rengi");
+                await ThemeVarEditorAsync("costep-bg", null, "İnaktif adım daire arka planı");
+                await ThemeVarEditorAsync("costep-color", null, "İnaktif adım ikon rengi");
+                await ThemeVarEditorAsync("costep-label-color", null, "Adım etiket yazı rengi");
+                await ThemeVarEditorAsync("costep-active-bg", null, "Aktif adım daire arka planı");
+                await ThemeVarEditorAsync("costep-active-color", null, "Aktif adım ikon rengi");
+                await ThemeVarEditorAsync("costep-visited-color", null, "Tamamlanmış adım ikon rengi");
 
-                ThemeVarEditor("facet-group-header-color", "Arama & Filtre - Sol Panel", "Filtre grubu başlık yazı rengi");
-                ThemeVarEditor("facet-toggle-chevron-color", null, "Filtre grubu aç/kapa ok rengi");
-                ThemeVarEditor("facet-group-border-color", null, "Filtre grubu ayraç rengi");
-                ThemeVarEditor("facet-selection-glyph-color", null, "Filtre checkbox / radio onay işareti rengi");
-                ThemeVarEditor("facet-control-border-color", null, "Filtre checkbox / radio kenarlık rengi");
-                ThemeVarEditor("facet-control-checked-border-color", null, "Filtre checkbox / radio seçili / hover kenarlık rengi");
-                ThemeVarEditor("facet-selection-badge-bg", null, "Seçili filtre sayısı badge arka planı");
-                ThemeVarEditor("facet-remove-link-color", null, "\"Filtreleri kaldır\" bağlantı rengi");
+                await ThemeVarEditorAsync("facet-group-header-color", "Arama & Filtre - Sol Panel", "Filtre grubu başlık yazı rengi");
+                await ThemeVarEditorAsync("facet-toggle-chevron-color", null, "Filtre grubu aç/kapa ok rengi");
+                await ThemeVarEditorAsync("facet-group-border-color", null, "Filtre grubu ayraç rengi");
+                await ThemeVarEditorAsync("facet-selection-glyph-color", null, "Filtre checkbox / radio onay işareti rengi");
+                await ThemeVarEditorAsync("facet-control-border-color", null, "Filtre checkbox / radio kenarlık rengi");
+                await ThemeVarEditorAsync("facet-control-checked-border-color", null, "Filtre checkbox / radio seçili / hover kenarlık rengi");
+                await ThemeVarEditorAsync("facet-selection-badge-bg", null, "Seçili filtre sayısı badge arka planı");
+                await ThemeVarEditorAsync("facet-remove-link-color", null, "\"Filtreleri kaldır\" bağlantı rengi");
 
-                ThemeVarEditor("active-filter-badge-bg", "Arama & Filtre - Aktif Filtreler", "Aktif filtre etiketi arka plan rengi");
-                ThemeVarEditor("active-filter-badge-color", null, "Aktif filtre etiketi yazı rengi");
-                ThemeVarEditor("active-filter-remove-bg", null, "\"Tümünü kaldır\" butonu arka plan rengi");
-                ThemeVarEditor("active-filter-remove-color", null, "\"Tümünü kaldır\" butonu yazı rengi");
+                await ThemeVarEditorAsync("active-filter-badge-bg", "Arama & Filtre - Aktif Filtreler", "Aktif filtre etiketi arka plan rengi");
+                await ThemeVarEditorAsync("active-filter-badge-color", null, "Aktif filtre etiketi yazı rengi");
+                await ThemeVarEditorAsync("active-filter-remove-bg", null, "\"Tümünü kaldır\" butonu arka plan rengi");
+                await ThemeVarEditorAsync("active-filter-remove-color", null, "\"Tümünü kaldır\" butonu yazı rengi");
 
-                ThemeVarEditor("search-term-color", "Arama Sonuçları & Anlık Arama", "Arama sonuçlarında vurgulanan arama terimi rengi");
-                ThemeVarEditor("search-hitcount-color", null, "Sonuç sayısı yazı rengi");
-                ThemeVarEditor("instasearch-group-header-color", null, "Anlık arama dropdown grup başlığı rengi");
-                ThemeVarEditor("instasearch-divider-color", null, "Anlık arama dropdown kolon ayraç rengi");
-                ThemeVarEditor("instasearch-clear-color", null, "Arama temizle (X) butonu rengi");
+                await ThemeVarEditorAsync("search-term-color", "Arama Sonuçları & Anlık Arama", "Arama sonuçlarında vurgulanan arama terimi rengi");
+                await ThemeVarEditorAsync("search-hitcount-color", null, "Sonuç sayısı yazı rengi");
+                await ThemeVarEditorAsync("instasearch-group-header-color", null, "Anlık arama dropdown grup başlığı rengi");
+                await ThemeVarEditorAsync("instasearch-divider-color", null, "Anlık arama dropdown kolon ayraç rengi");
+                await ThemeVarEditorAsync("instasearch-clear-color", null, "Arama temizle (X) butonu rengi");
 
-                ThemeVarEditor("review-item-border-color", "Değerlendirmeler", "Yorum ayraç rengi");
-                ThemeVarEditor("write-review-bg", null, "Yorum yazma formu arka plan rengi");
+                await ThemeVarEditorAsync("review-item-border-color", "Değerlendirmeler", "Yorum ayraç rengi");
+                await ThemeVarEditorAsync("write-review-bg", null, "Yorum yazma formu arka plan rengi");
 
-                ThemeVarEditor("gallery-thumb-border-color", "Ürün Galerisi", "Galeri küçük resim kenarlık rengi");
-                ThemeVarEditor("gallery-thumb-active-border-color", null, "Seçili galeri küçük resim kenarlık rengi");
+                await ThemeVarEditorAsync("gallery-thumb-border-color", "Ürün Galerisi", "Galeri küçük resim kenarlık rengi");
+                await ThemeVarEditorAsync("gallery-thumb-active-border-color", null, "Seçili galeri küçük resim kenarlık rengi");
 
-                ThemeVarEditor("offcanvas-menu-bg", "Yan Menü (Offcanvas)", "Yan menü arka plan rengi");
-                ThemeVarEditor("offcanvas-menu-header-bg", null, "Yan menü başlık ve footer arka plan rengi");
-                ThemeVarEditor("offcanvas-menu-border-color", null, "Yan menü ayraç rengi");
-                ThemeVarEditor("offcanvas-menu-selected-color", null, "Seçili menü öğesi vurgu rengi");
+                await ThemeVarEditorAsync("offcanvas-menu-bg", "Yan Menü (Offcanvas)", "Yan menü arka plan rengi");
+                await ThemeVarEditorAsync("offcanvas-menu-header-bg", null, "Yan menü başlık ve footer arka plan rengi");
+                await ThemeVarEditorAsync("offcanvas-menu-border-color", null, "Yan menü ayraç rengi");
+                await ThemeVarEditorAsync("offcanvas-menu-selected-color", null, "Seçili menü öğesi vurgu rengi");
 
-                ThemeVarEditor("scroll-top-bg", "Diğer", "Yukarı kaydır butonu arka plan rengi");
-                ThemeVarEditor("post-comment-border-color", null, "Blog yorum ayraç rengi");
-                ThemeVarEditor("nav-tabs-active-link-color", null, "Aktif sekme bağlantı rengi");
+                await ThemeVarEditorAsync("scroll-top-bg", "Diğer", "Yukarı kaydır butonu arka plan rengi");
+                await ThemeVarEditorAsync("post-comment-border-color", null, "Blog yorum ayraç rengi");
+                await ThemeVarEditorAsync("nav-tabs-active-link-color", null, "Aktif sekme bağlantı rengi");
 
-                ThemeVarEditor("avatar-ring-outline-color", "Hesap & Kimlik", "Profil avatarı halka dış çizgi rengi");
-                ThemeVarEditor("login-box-bg", null, "Giriş kutusu arka plan rengi");
-                ThemeVarEditor("register-box-bg", null, "Kayıt kutusu arka plan rengi");
-                ThemeVarEditor("pwd-policy-bg", null, "Şifre politikası popup arka plan rengi");
-                ThemeVarEditor("pwd-rules-color", null, "Şifre kuralları yazı rengi");
-                ThemeVarEditor("payment-method-active-bg", null, "Seçili ödeme yöntemi arka plan rengi");
-                ThemeVarEditor("terms-consent-bg", null, "Kullanım koşulları kutusu arka plan rengi");
-                ThemeVarEditor("terms-consent-color", null, "Kullanım koşulları yazı rengi");
+                await ThemeVarEditorAsync("avatar-ring-outline-color", "Hesap & Kimlik", "Profil avatarı halka dış çizgi rengi");
+                await ThemeVarEditorAsync("login-box-bg", null, "Giriş kutusu arka plan rengi");
+                await ThemeVarEditorAsync("register-box-bg", null, "Kayıt kutusu arka plan rengi");
+                await ThemeVarEditorAsync("pwd-policy-bg", null, "Şifre politikası popup arka plan rengi");
+                await ThemeVarEditorAsync("pwd-rules-color", null, "Şifre kuralları yazı rengi");
+                await ThemeVarEditorAsync("payment-method-active-bg", null, "Seçili ödeme yöntemi arka plan rengi");
+                await ThemeVarEditorAsync("terms-consent-bg", null, "Kullanım koşulları kutusu arka plan rengi");
+                await ThemeVarEditorAsync("terms-consent-color", null, "Kullanım koşulları yazı rengi");
 
-                ThemeVarEditor("login-btn-bg", "Butonlar - Giriş & Kayıt", "Giriş butonu arka plan rengi");
-                ThemeVarEditor("login-btn-color", null, "Giriş butonu yazı rengi");
-                ThemeVarEditor("register-btn-bg", null, "Kayıt ol butonu arka plan rengi");
-                ThemeVarEditor("register-btn-color", null, "Kayıt ol butonu yazı rengi");
-                ThemeVarEditor("save-btn-bg", null, "Kaydet / Form gönder butonları arka plan rengi (adres, müşteri bilgi, kayıt formu)");
-                ThemeVarEditor("save-btn-color", null, "Kaydet / Form gönder butonları yazı rengi");
-                ThemeVarEditor("pwd-recovery-btn-bg", null, "Şifre sıfırlama / değiştirme butonu arka plan rengi");
-                ThemeVarEditor("pwd-recovery-btn-color", null, "Şifre sıfırlama / değiştirme butonu yazı rengi");
+                await ThemeVarEditorAsync("login-btn-bg", "Butonlar - Giriş & Kayıt", "Giriş butonu arka plan rengi");
+                await ThemeVarEditorAsync("login-btn-color", null, "Giriş butonu yazı rengi");
+                await ThemeVarEditorAsync("register-btn-bg", null, "Kayıt ol butonu arka plan rengi");
+                await ThemeVarEditorAsync("register-btn-color", null, "Kayıt ol butonu yazı rengi");
+                await ThemeVarEditorAsync("save-btn-bg", null, "Kaydet / Form gönder butonları arka plan rengi (adres, müşteri bilgi, kayıt formu)");
+                await ThemeVarEditorAsync("save-btn-color", null, "Kaydet / Form gönder butonları yazı rengi");
+                await ThemeVarEditorAsync("pwd-recovery-btn-bg", null, "Şifre sıfırlama / değiştirme butonu arka plan rengi");
+                await ThemeVarEditorAsync("pwd-recovery-btn-color", null, "Şifre sıfırlama / değiştirme butonu yazı rengi");
 
-                ThemeVarEditor("checkout-next-btn-bg", "Butonlar - Checkout", "Sonraki adım / adres seç butonları arka plan rengi");
-                ThemeVarEditor("checkout-next-btn-color", null, "Sonraki adım / adres seç butonları yazı rengi");
-                ThemeVarEditor("checkout-confirm-btn-bg", null, "Siparişi onayla butonu arka plan rengi");
-                ThemeVarEditor("checkout-confirm-btn-color", null, "Siparişi onayla butonu yazı rengi");
+                await ThemeVarEditorAsync("checkout-next-btn-bg", "Butonlar - Checkout", "Sonraki adım / adres seç butonları arka plan rengi");
+                await ThemeVarEditorAsync("checkout-next-btn-color", null, "Sonraki adım / adres seç butonları yazı rengi");
+                await ThemeVarEditorAsync("checkout-confirm-btn-bg", null, "Siparişi onayla butonu arka plan rengi");
+                await ThemeVarEditorAsync("checkout-confirm-btn-color", null, "Siparişi onayla butonu yazı rengi");
 
-                ThemeVarEditor("offcanvas-viewcart-btn-bg", "Butonlar - Sepet & Favori", "Yandan açılan sepet \"Sepete Git\" butonu arka plan rengi");
-                ThemeVarEditor("offcanvas-viewcart-btn-color", null, "Yandan açılan sepet \"Sepete Git\" butonu yazı rengi");
-                ThemeVarEditor("offcanvas-checkout-btn-bg", null, "Yandan açılan sepet \"Ödeme\" butonu arka plan rengi");
-                ThemeVarEditor("offcanvas-checkout-btn-color", null, "Yandan açılan sepet \"Ödeme\" butonu yazı rengi");
-                ThemeVarEditor("wishlist-btn-bg", null, "Favori listesi \"Sepete ekle\" ve \"E-posta gönder\" butonları arka plan rengi");
-                ThemeVarEditor("wishlist-btn-color", null, "Favori listesi butonları yazı rengi");
-                ThemeVarEditor("coupon-btn-bg", null, "Kupon / hediye kartı / puan uygula butonları arka plan rengi");
-                ThemeVarEditor("coupon-btn-color", null, "Kupon / hediye kartı / puan uygula butonları yazı rengi");
-                ThemeVarEditor("estimate-shipping-btn-bg", null, "Kargo hesapla butonu arka plan rengi");
-                ThemeVarEditor("estimate-shipping-btn-color", null, "Kargo hesapla butonu yazı rengi");
+                await ThemeVarEditorAsync("offcanvas-viewcart-btn-bg", "Butonlar - Sepet & Favori", "Yandan açılan sepet \"Sepete Git\" butonu arka plan rengi");
+                await ThemeVarEditorAsync("offcanvas-viewcart-btn-color", null, "Yandan açılan sepet \"Sepete Git\" butonu yazı rengi");
+                await ThemeVarEditorAsync("offcanvas-checkout-btn-bg", null, "Yandan açılan sepet \"Ödeme\" butonu arka plan rengi");
+                await ThemeVarEditorAsync("offcanvas-checkout-btn-color", null, "Yandan açılan sepet \"Ödeme\" butonu yazı rengi");
+                await ThemeVarEditorAsync("wishlist-btn-bg", null, "Favori listesi \"Sepete ekle\" ve \"E-posta gönder\" butonları arka plan rengi");
+                await ThemeVarEditorAsync("wishlist-btn-color", null, "Favori listesi butonları yazı rengi");
+                await ThemeVarEditorAsync("coupon-btn-bg", null, "Kupon / hediye kartı / puan uygula butonları arka plan rengi");
+                await ThemeVarEditorAsync("coupon-btn-color", null, "Kupon / hediye kartı / puan uygula butonları yazı rengi");
+                await ThemeVarEditorAsync("estimate-shipping-btn-bg", null, "Kargo hesapla butonu arka plan rengi");
+                await ThemeVarEditorAsync("estimate-shipping-btn-color", null, "Kargo hesapla butonu yazı rengi");
 
-                ThemeVarEditor("newsletter-btn-bg", "Butonlar - Diğer", "Bülten abone ol butonu arka plan rengi");
-                ThemeVarEditor("newsletter-btn-color", null, "Bülten abone ol butonu yazı rengi");
-                ThemeVarEditor("contact-btn-bg", null, "İletişim formu gönder butonu arka plan rengi");
-                ThemeVarEditor("contact-btn-color", null, "İletişim formu gönder butonu yazı rengi");
+                await ThemeVarEditorAsync("newsletter-btn-bg", "Butonlar - Diğer", "Bülten abone ol butonu arka plan rengi");
+                await ThemeVarEditorAsync("newsletter-btn-color", null, "Bülten abone ol butonu yazı rengi");
+                await ThemeVarEditorAsync("contact-btn-bg", null, "İletişim formu gönder butonu arka plan rengi");
+                await ThemeVarEditorAsync("contact-btn-color", null, "İletişim formu gönder butonu yazı rengi");
 
             }
         </div>
@@ -334,7 +334,7 @@
 </tabstrip>
 
 @{
-    void ThemeVarEditor(string varName, string groupName = null, string helpText = null)
+    async Task ThemeVarEditorAsync(string varName, string groupName = null, string helpText = null)
     {
         var themeVar = Display.GetThemeDescriptor().Variables[varName];
 
@@ -359,7 +359,7 @@
                 }
             </div>
             <div class="d-none d-xl-flex align-items-center">
-                @Html.ThemeVarChainInfo(themeVar)
+                @await Html.ThemeVarChainInfoAsync(themeVar)
             </div>
         </div>
     }

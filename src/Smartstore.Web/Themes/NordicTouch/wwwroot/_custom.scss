@@ -344,6 +344,16 @@ label {
         padding-block: 0.4rem;
 
         &:hover { color: $body-color; }
+
+        // IconKit clamps icons to 16px; keep carets text-sized like the former FA glyphs
+        > .icon {
+            --icon-min-size: 0px;
+        }
+    }
+
+    // Currency & language icons were added by IconKit; keep the text-only selectors
+    :is(#currency-selector, #language-selector) > .menubar-icon {
+        display: none;
     }
 }
 
@@ -469,8 +479,15 @@ label {
 
     .navbar-nav {
         gap: 0;
-        justify-content: center;
+        // "safe": when items overflow, align to start so the slider can scroll to the first item
+        justify-content: safe center;
         flex-wrap: nowrap;
+    }
+
+    // IconKit caret is a 1rem mask; keep it text-sized like the former FA glyph
+    .dropdown-toggle::after {
+        width: 1em;
+        height: 1em;
     }
 
     .nav-link,
@@ -1050,7 +1067,7 @@ label {
 
         @include media-breakpoint-up(lg) {
             height: 2.5rem;
-            .shopbar-button-icon { font-size: 1.25rem; }
+            .shopbar-button-icon { --icon-size: 1.25rem; font-size: 1.25rem; }
         }
 
         &:hover {
@@ -1062,14 +1079,14 @@ label {
     }
 
     .shopbar-button-icon {
+        // Flex sets --icon-size: 24px / 28px (lg); keep the minimal 20px icons
+        --icon-size: 1.25rem;
         font-size: 1.25rem;
         position: relative;
         width: auto;
         height: auto;
         line-height: 1;
         text-align: center;
-
-        > i { font-size: inherit !important; }
     }
 
     // Hide text labels - icon only
@@ -2088,7 +2105,7 @@ body.lyt-cols-2 {
         justify-content: center;
         line-height: 1;
 
-        > i { font-size: 1rem; line-height: 1; }
+        > .icon { --icon-size: 1rem; }
 
         // Brand-color hover keeps the colored bg, but icon flips to white for contrast
         &:hover,

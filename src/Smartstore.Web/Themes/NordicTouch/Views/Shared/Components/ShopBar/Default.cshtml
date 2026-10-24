@@ -57,7 +57,7 @@
                data-target="#offcanvas-menu"
                aria-controls="offcanvas-menu">
                 <span class="shopbar-button-icon" aria-hidden="true">
-                    <i class="icm icm-menu"></i>
+                    <icon name="bars" stroke-scale="0.85" />
                 </span>
             </a>
         </div>
@@ -66,7 +66,7 @@
         <div class="shopbar-tool" id="shopbar-search">
             <a class="shopbar-button" href="#" id="nt-search-toggler" aria-label="Search">
                 <span class="shopbar-button-icon" aria-hidden="true">
-                    <i class="fa fa-magnifying-glass"></i>
+                    <icon name="search" stroke-scale="0.85" />
                 </span>
             </a>
         </div>
@@ -75,7 +75,7 @@
         <div sm-if="Model.WishlistEnabled" class="shopbar-tool" id="shopbar-wishlist" data-target="#wishlist-tab">
             <a asp-route="Wishlist" attrs="cartTogglerAttributes" data-summary-href="@Url.Action("CartSummary", "ShoppingCart", new { wishlist = true })">
                 <span class="shopbar-button-icon" aria-hidden="true">
-                    <i class="icm icm-heart"></i>
+                    <icon name="heart" stroke-scale="0.85" />
                     <span class='@badgeCssClasses' attr-style='(Model.WishlistItemsCount == 0, "display: none")' data-bind-to="WishlistItemsCount">
                         @Model.WishlistItemsCount
                     </span>
@@ -87,7 +87,7 @@
         <div sm-if="Model.ShoppingCartEnabled" class="shopbar-tool" id="shopbar-cart" data-target="#cart-tab">
             <a asp-route="ShoppingCart" attrs="cartTogglerAttributes" data-summary-href="@Url.Action("CartSummary", "ShoppingCart", new { cart = true })">
                 <span class="shopbar-button-icon" aria-hidden="true">
-                    <i class="fas fa-bag-shopping"></i>
+                    <icon name="hi:shopping-bag-01!/sr" stroke-scale="0.85" />
                     <span class='@badgeCssClasses' attr-style='(Model.CartItemsCount == 0, "display: none")' data-bind-to="CartItemsCount">
                         @Model.CartItemsCount
                     </span>
