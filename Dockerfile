@@ -5,6 +5,13 @@
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build
 
+# The checked-in ModuleBuilder still targets .NET 9; allow it to run on .NET 10.
+ENV DOTNET_ROLL_FORWARD=Major
+ENV MSBUILDTERMINALLOGGER=off
+
+# Set automatically by BuildKit (amd64 or arm64)
+ARG TARGETARCH
+
 # Copy solution and source
 ARG SOLUTION=Smartstore.sln
 WORKDIR /app
@@ -16,13 +23,17 @@ COPY nuget.config ./
 # Create Modules dir if missing
 RUN mkdir /app/src/Smartstore.Web/Modules -p -v
 
-# Build
-RUN dotnet build $SOLUTION -c Release
+# Build for the target runtime (same as the CI workflow)
+RUN RID=$([ "$TARGETARCH" = "arm64" ] && echo linux-arm64 || echo linux-x64) && \
+	dotnet build $SOLUTION -c Release -p:SmartstoreBuildRuntime=$RID --no-self-contained
 
 # Publish
 WORKDIR /app/src/Smartstore.Web
-RUN dotnet publish Smartstore.Web.csproj -c Release -o /app/release/publish \
+RUN RID=$([ "$TARGETARCH" = "arm64" ] && echo linux-arm64 || echo linux-x64) && \
+	dotnet publish Smartstore.Web.csproj -c Release -o /app/release/publish \
+	-p:SmartstoreBuildRuntime=$RID \
 	--no-self-contained \
+	--no-build \
 	--no-restore
 
 # Build Docker image

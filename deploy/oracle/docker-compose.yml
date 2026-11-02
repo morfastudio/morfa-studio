@@ -1,0 +1,64 @@
+# -----------------------------------------------------------
+# Smartstore on a single VM (Oracle Cloud Always Free, ARM)
+#   web   : Smartstore, built from the repository Dockerfile
+#   caddy : HTTPS reverse proxy with automatic Let's Encrypt
+# The database is external (Neon).
+#
+# Usage (from this directory):
+#   cp .env.example .env   # then set DOMAIN
+#   docker compose up -d --build
+# -----------------------------------------------------------
+
+name: smartstore
+
+services:
+  web:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: morfa-smartstore:latest
+    restart: unless-stopped
+    expose:
+      - "80"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      # Views are precompiled; runtime compilation only costs memory in production.
+      Smartstore__EnableRazorRuntimeCompilation: "false"
+      # Trust X-Forwarded-* headers sent by Caddy (must match the network subnet below).
+      Smartstore__ReverseProxy__KnownNetworks__0: "172.30.0.0/24"
+    volumes:
+      # Settings.txt, InstalledModules.txt, Media, DataProtection-Keys
+      - tenants:/app/App_Data/Tenants
+      - logs:/app/App_Data/Logs
+    networks:
+      - internal
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - internal
+
+networks:
+  internal:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+
+volumes:
+  tenants:
+  logs:
+  caddy-data:
+  caddy-config:
